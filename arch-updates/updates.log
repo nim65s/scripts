@@ -1,0 +1,20 @@
+:: Synchronizing package databases...
+error: failed retrieving file 'core.db.tar.gz' from mir1.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'core.db.tar.gz' from mir.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'core.db.tar.gz' from mir2.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'core.db.tar.gz' from ftp.surfnet.nl : Transient resolver failure
+error: failed retrieving file 'core.db.tar.gz' from ftp.belnet.be : Transient resolver failure
+error: failed retrieving file 'archlinuxfr.db.tar.gz' from repo.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'archlinuxfr.db.tar.gz' from repo.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'archlinuxfr.db.tar.gz' from repo.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'extra.db.tar.gz' from mir1.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'extra.db.tar.gz' from mir.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'extra.db.tar.gz' from mir2.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'extra.db.tar.gz' from ftp.surfnet.nl : Transient resolver failure
+error: failed retrieving file 'extra.db.tar.gz' from ftp.belnet.be : Transient resolver failure
+error: failed retrieving file 'community.db.tar.gz' from mir1.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'community.db.tar.gz' from mir.archlinux.fr : Transient resolver failure
+error: failed retrieving file 'community.db.tar.gz' from mir2.archlinuxfr.org : Transient resolver failure
+error: failed retrieving file 'community.db.tar.gz' from ftp.surfnet.nl : Transient resolver failure
+error: failed retrieving file 'community.db.tar.gz' from ftp.belnet.be : Transient resolver failure
+error: failed retrieving file 'larch5.db.tar.gz' from ftp.berlios.de : Transient resolver failure

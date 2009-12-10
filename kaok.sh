@@ -16,5 +16,6 @@ if [ $NB != 0 ]
      fi
     done
   fi
+cp rc.lua /home/nim/dotfiles/rc.lua
 
 exit

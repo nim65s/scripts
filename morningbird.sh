@@ -44,12 +44,13 @@ if [ $PLAYER = mpd ]
 	done
     until [ `dcop amarok player isPlaying` = false ]
       do
-	sleep 120
+	sleep 180
       done
-    dcop amarok player stop
     dcop amarok playlist clearPlaylist
     dcop amarok player enableRandomMode true
     dcop amarok playlistbrowser loadPlaylist Toute\ la\ collection
+    sleep 1
+    dcop amarok player stop
   fi
 
 #######	TODO

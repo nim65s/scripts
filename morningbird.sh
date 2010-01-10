@@ -7,6 +7,7 @@ VOLINC=1
 PLAYER=amarok
 
 ENMARCHE=`ps -ef | grep $PLAYER | grep -v grep | wc -l`
+DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
 
 if [ $ENMARCHE = 0 ]
   then
@@ -31,12 +32,17 @@ if [ $PLAYER = mpd ]
   elif [ $PLAYER = amarok ]
   then
     dcop amarok player stop
-    dcop amarok playlist clearPlaylist
-    dcop amarok player enableRandomMode false
-    dcop amarok player enableRepeatPlaylist false
-    dcop amarok playlistbrowser loadPlaylist Reveil
-    dcop amarok player setVolume $VOLINIT
-    dcop amarok player play
+#    sleep 1
+    until `dcop amarok player isPlaying`
+      do
+#	dcop amarok playlist togglePlaylist
+	dcop amarok playlist clearPlaylist
+	dcop amarok player enableRandomMode false
+	dcop amarok player enableRepeatPlaylist false
+	dcop amarok player setVolume $VOLINIT
+        dcop amarok playlistbrowser loadPlaylist "Reveil"
+#	sleep 1
+      done
     for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
 	do
 	    sleep $TIMEINC

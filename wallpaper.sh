@@ -1,9 +1,13 @@
 #!/bin/bash
 
-nombre=439
+nombre=440
 export DISPLAY=:0.1
-pif=$RANDOM
-let "pif %= $nombre"
+pif=0
+while [ $pif = 0 ]
+    do
+	pif=$RANDOM
+	let "pif %= $nombre"
+    done
 awsetbg /home/nim/images/wall/$pif.*
 
 exit

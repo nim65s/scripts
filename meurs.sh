@@ -17,7 +17,7 @@ case $NOMBRE in
 			k* | K*)
 				for ATUER in `ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2`
 					do
-						kill $ATUER && echo processus $ATUER mort 
+						kill $ATUER && echo processus $ATUER mort
 					done
 				;;
 			*)
@@ -26,6 +26,7 @@ case $NOMBRE in
 			esac
 		;;
 	esac
+sleep 1
 NOMBRE=`ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2 | wc -l`
 case $NOMBRE in
 	0)

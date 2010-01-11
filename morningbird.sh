@@ -1,13 +1,12 @@
 #! /bin/bash
 
-VOLINIT=20
-VOLMAX=40
+VOLINIT=30
+VOLMAX=60
 TIMEINC=1
 VOLINC=1
-PLAYER=amarok
+PLAYER=mpd
 
 ENMARCHE=`ps -ef | grep $PLAYER | grep -v grep | wc -l`
-DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
 
 if [ $ENMARCHE = 0 ]
   then
@@ -31,6 +30,7 @@ if [ $PLAYER = mpd ]
 	done
   elif [ $PLAYER = amarok ]
   then
+    DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
     dcop amarok player stop
 #    sleep 1
     until `dcop amarok player isPlaying`

@@ -4,7 +4,7 @@ import string
 #Enter your username and password below within double quotes
 # eg. username="username" and password="password"
 username="nimisageek"
-password="conkyatomnim65s"
+password="conkyatomnim65s" #ce mot de passe est factice :)
 
 com="wget -O - https://"+username+":"+password+"@mail.google.com/mail/feed/atom --no-check-certificate"
 

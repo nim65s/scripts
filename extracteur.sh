@@ -13,9 +13,9 @@ IFS=$'\n'
 declare -a EXTENSION
 declare -a PROGRAMME
 
-EXTENSION=( 0 zip rar txt )
-PROGRAMME=( 0 unzip unrar cat )
-ARGUMENTS=( "" "" "x" "" )
+EXTENSION=( 0 zip rar tar tar.gz tar.bz2 7z )
+PROGRAMME=( 0 unzip unrar tar tar tar 7z )
+ARGUMENTS=( "" "" x -xvf -zxvf -jxvf e )
 
 for((i=1;i<${#EXTENSION[*]};i++))
   do

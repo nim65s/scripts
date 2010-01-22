@@ -1,5 +1,6 @@
 #!/bin/bash
 
+OLDIFS=$IFS
 IFS=$'\n'
 adresseactuelle=$PWD
 cd $HOME/images/wall/
@@ -19,5 +20,6 @@ cd $HOME/scripts
 sed "s/nombre=[1-9]*/nombre=$nombreactuel/" wallpaper.sh > wallpaper2.sh
 cat wallpaper2.sh > wallpaper.sh
 rm wallpaper2.sh
+IFS=$OLDIFS
 
 exit 0

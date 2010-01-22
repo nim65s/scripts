@@ -1,10 +1,14 @@
 #!/bin/bash
 
+
+OLDIFS=$IFS
 IFS=$'\n'
 for KEN in `ls -d \[JS\]* | grep -v rar`
   do
     feh -FrSname $KEN
   done
+
+IFS=$OLDIFS
 
 # ancien script... Je sais meme plus a quoi il servait XD
 # cd /home/nim/Desktop/

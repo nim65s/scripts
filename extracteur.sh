@@ -12,7 +12,7 @@ IFS=$'\n'
 
 declare -a EXTENSION
 declare -a PROGRAMME
-
+declare -a ARGUMENTS
 EXTENSION=( 0 zip rar tar tar.gz tar.bz2 7z )
 PROGRAMME=( 0 unzip unrar tar tar tar 7z )
 ARGUMENTS=( "" "" x -xvf -zxvf -jxvf e )

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-OLDIFS=$IFS
-IFS=$'\n'
 if [ -e "$1" ]
   then
     nombre=$RANDOM
@@ -22,6 +20,5 @@ if [ -e "$1" ]
       done
     $programme $1
   fi
-IFS=$OLDIFS
 exit
 

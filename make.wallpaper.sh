@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#option -m : déplace l'image plutôt que de la copier
+
 OLDIFS=$IFS
 IFS=$'\n'
 adresseactuelle=$PWD
@@ -11,7 +13,12 @@ echo $nombreactuel
 while [ $1 ]
 	do
 		let "nombreactuel += 1"
-		cp $adresseactuelle/$1 $nombreactuel.$1
+		if [[ "$1" == *m* ]]
+			then
+				mv $adresseactuelle/$1 $nombreactuel.$1
+			else
+				cp $adresseactuelle/$1 $nombreactuel.$1
+			fi
 		echo $1 ajouté en tant que $PWD/$nombreactuel.$1
 		shift
 	done

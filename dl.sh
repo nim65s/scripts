@@ -13,14 +13,20 @@ if [ $# -ne 0 ]
 				shift
 			done
 	else
-		nano $HOME/scripts/dl.txt
+		kate $HOME/scripts/dl.txt
 	fi
 
-while [ `cat $HOME/scripts/dl.txt | wc -l` != 0 ]
-	do
-		FICHIER=`mktemp`
-		plowdown -a $MUUA `head $HOME/scripts/dl.txt -n 1` || exit 1
-		sed '1d' $HOME/scripts/dl.txt >> $FICHIER
-		mv $FICHIER $HOME/scripts/dl.txt
-	done
+if [ `ps -ef | grep plowdown | grep -v grep | wc -l` = 0 ]
+	then
+		while [ `cat $HOME/scripts/dl.txt | wc -l` != 0 ]
+			do
+				echo "TELECHARGEMENT DE `head $HOME/scripts/dl.txt -n 1`"
+				FICHIER=`mktemp`
+				plowdown -a $MUUA `head $HOME/scripts/dl.txt -n 1`
+				sed '1d' $HOME/scripts/dl.txt >> $FICHIER
+				mv $FICHIER $HOME/scripts/dl.txt
+			done
+	else
+		echo "plowdown est en cours de fonctionnement => ajout des fichers dans la liste et fin du script."
+	fi
 exit 0

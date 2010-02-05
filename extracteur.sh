@@ -19,7 +19,7 @@ ARGUMENTS=( "" "" x -xvf -zxvf -jxvf e )
 
 for((i=1;i<${#EXTENSION[*]};i++))
   do
-    for FILE in `ls *.${EXTENSION[$i]} 2>> $HOME/logs/extracteur.log | sed "s/.${EXTENSION[$i]}//"`
+    for FILE in `ls *.${EXTENSION[$i]} 2>> $HOME/logs/nimscripts.log | sed "s/.${EXTENSION[$i]}//"`
       do
 	echo $FILE
 	if [[ "$1" == *d* ]]
@@ -41,16 +41,16 @@ for((i=1;i<${#EXTENSION[*]};i++))
 done
 
 FICHIER=`mktemp`
-for LIGNE in `cat $HOME/logs/extracteur.log | grep -v 'Aucun fichier ou dossier de ce type'`
+for LIGNE in `cat $HOME/logs/nimscripts.log | grep -v 'Aucun fichier ou dossier de ce type'`
   do
     echo $LIGNE >> $FICHIER
   done
-mv $FICHIER $HOME/logs/extracteur.log
+mv $FICHIER $HOME/logs/nimscripts.log
 
-if [ `cat $HOME/logs/extracteur.log | wc -l` != 0 ]
+if [ `cat $HOME/logs/nimscripts.log | wc -l` != 0 ]
   then
-    echo -e "\\033[1;31m""ERREURS dans $HOME/logs/extracteur.log :""\\033[0;39m"
-    cat $HOME/logs/extracteur.log 
+    echo -e "\\033[1;31m""ERREURS dans $HOME/logs/nimscripts.log :""\\033[0;39m"
+    cat $HOME/logs/nimscripts.log 
   fi
 
 IFS=$OLDIFS

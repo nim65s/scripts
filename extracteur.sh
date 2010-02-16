@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # option : "-r" => détruit l'archive
-# option : "-d" => extrait l'archive dans un nouveau dossier
 
-#TODO : si plus de 5 charactères sont similaires sur des fichiers différents => dans le meme dossier
-#TODO : si il n'y a qu'un dossier dans l'archive => ne pas créer de dossier
 #TODO : bug avec des parentheses, notamment dans un rar ?
 
 ODLIFS=$IFS
@@ -17,28 +14,34 @@ EXTENSION=( 0 zip rar tar tar.gz tar.bz2 7z )
 PROGRAMME=( 0 unzip unrar tar tar tar 7z )
 ARGUMENTS=( "" "" x -xvf -zxvf -jxvf e )
 
+mkdir NIMEWF
 for((i=1;i<${#EXTENSION[*]};i++))
   do
     for FILE in `ls *.${EXTENSION[$i]} 2>> $HOME/logs/nimscripts.log | sed "s/.${EXTENSION[$i]}//"`
       do
-	echo $FILE
-	if [[ "$1" == *d* ]]
-	  then
-	    mkdir $FILE
-	    mv $FILE.${EXTENSION[$i]} $FILE/
-	    cd $FILE/
-	  fi
+	mkdir $FILE
+	mv $FILE.${EXTENSION[$i]} $FILE/
+	cd $FILE/
 	${PROGRAMME[$i]} ${ARGUMENTS[$i]} "$FILE.${EXTENSION[$i]}"
+	NB=2
 	if [[ "$1" == *r* ]]
 	  then
 	    rm $FILE.${EXTENSION[$i]}
+	    NB=1
 	  fi
-	if [[ "$1" == *d* ]]
+	if [[ `ls | wc -l` == $NB ]]
 	  then
+	    mv * ../NIMEWF
+	    cd ..
+	    rmdir $FILE/
+	  else
 	    cd ..
 	  fi
     done
 done
+
+mv NIMEWF/* . 2>> $HOME/logs/nimscripts.log
+rmdir NIMEWF
 
 FICHIER=`mktemp`
 for LIGNE in `cat $HOME/logs/nimscripts.log | grep -v 'Aucun fichier ou dossier de ce type'`

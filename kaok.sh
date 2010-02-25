@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/nim/.config/awesome
+cd $HOME/.config/awesome
 
 NB=`ls 12* 2>> $HOME/logs/nimscritps.log | wc -l`
 I=1
@@ -28,7 +28,7 @@ mv $FICHIER $HOME/logs/nimscripts.log
 if [ `cat $HOME/logs/nimscripts.log | wc -l` != 0 ]
   then
     echo -e "\\033[1;31m""ERREURS dans $HOME/logs/nimscripts.log :""\\033[0;39m"
-    cat $HOME/logs/nimscripts.log 
+    cat $HOME/logs/nimscripts.log
   fi
 
 exit

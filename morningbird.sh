@@ -4,7 +4,7 @@ VOLINIT=30
 VOLMAX=60
 TIMEINC=1
 VOLINC=1
-PLAYER=mpd
+PLAYER=amarok
 
 ENMARCHE=`ps -ef | grep $PLAYER | grep -v grep | wc -l`
 

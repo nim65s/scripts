@@ -9,6 +9,8 @@ if [ ! -e ga`date '+%y%m%d' --date '1 days ago'`.gif ]
     then
 	wget "http://picayune.uclick.com/comics/ga/`date '+%Y' --date '1 days ago'`/ga`date '+%y%m%d' --date '1 days ago'`.gif"
 	feh ga`date '+%y%m%d' --date '1 days ago'`.gif
+    else
+	echo "image déjà vue"
     fi
 for FILE in `echo ga*.gif | grep -v ga\*.gif`
     do

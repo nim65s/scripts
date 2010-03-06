@@ -1,10 +1,54 @@
 #! /bin/bash
 
+#valeurs par defaut des variables
 VOLINIT=30
 VOLMAX=60
 TIMEINC=1
 VOLINC=1
 PLAYER=amarok
+TIMEWAIT=180
+
+#modification par options
+while [ $# -ne 0 ]
+  do
+    case $1 in
+      volinit=*)
+        VOLINIT=`echo $1 | sed "s/volinit=//"`
+        ;;
+      volmax=*)
+        VOLMAX=`echo $1 | sed "s/volmax=//"`
+        ;;
+      timeinc=*)
+        TIMEINC=`echo $1 | sed "s/timeinc=//"`
+        ;;
+      volinc=*)
+        VOLINC=`echo $1 | sed "s/volinc=//"`
+        ;;
+      player=*)
+        PLAYER=`echo $1 | sed "s/player=//"`
+        ;;
+      timewait=*)
+        TIMEWAIT=`echo $1 | sed "s/timewait=//"`
+        ;;
+      var)
+	echo "morningbird variables :"
+	echo "VOLINIT=$VOLINIT"
+	echo "VOLMAX=$VOLMAX"
+	echo "TIMEINC=$TIMEINC"
+	echo "VOLINC=$VOLINC"
+	echo "PLAYER=$PLAYER"
+	echo "TIMEWAIT=$TIMEWAIT"
+	;;
+      *)
+	echo "morningbird : usage"
+	echo "    morningbird [volinit=P] [volmax=P] [volinc=P] [timeinc=N] [player=S] [timewait=N] [var]"
+	echo "    1 <= P <= 100"
+	echo "    N in seconds"
+	echo "    S = amarok | mpd"
+	;;
+      esac
+    shift
+  done
 
 ENMARCHE=`ps -ef | grep $PLAYER | grep -v grep | wc -l`
 
@@ -32,16 +76,14 @@ if [ $PLAYER = mpd ]
   then
     DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
     dcop amarok player stop
-#    sleep 1
-    until `dcop amarok player isPlaying`
-      do
-#	dcop amarok playlist togglePlaylist
 	dcop amarok playlist clearPlaylist
 	dcop amarok player enableRandomMode false
 	dcop amarok player enableRepeatPlaylist false
 	dcop amarok player setVolume $VOLINIT
         dcop amarok playlistbrowser loadPlaylist "Reveil"
-#	sleep 1
+    until `dcop amarok player isPlaying`
+      do
+	sleep 1
       done
     for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
 	do
@@ -50,7 +92,7 @@ if [ $PLAYER = mpd ]
 	done
     until [ `dcop amarok player isPlaying` = false ]
       do
-	sleep 180
+	sleep $TIMEWAIT
       done
     dcop amarok playlist clearPlaylist
     dcop amarok player enableRandomMode true
@@ -58,9 +100,5 @@ if [ $PLAYER = mpd ]
     sleep 1
     dcop amarok player stop
   fi
-
-#######	TODO
-#	-Verifier si awesome ou kdm, agir sur les variables en fonction
-#	-Zenity, of course
 
 exit 0

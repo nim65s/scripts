@@ -1,5 +1,5 @@
 #!/bin/bash
 cd $HOME/.config/awesome
 
-kompare kako.rc.lua kaok.rc.lua
+kompare kako.rc.lua rc.lua
 exit

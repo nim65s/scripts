@@ -18,17 +18,6 @@ if [ $NB != 0 ]
   fi
 cp rc.lua /home/nim/dotfiles/rc.lua
 
-FICHIER=`mktemp`
-for LIGNE in `cat $HOME/logs/nimscripts.log | grep -v 'Aucun fichier ou dossier de ce type'`
-  do
-    echo $LIGNE >> $FICHIER
-  done
-mv $FICHIER $HOME/logs/nimscripts.log
-
-if [ `cat $HOME/logs/nimscripts.log | wc -l` != 0 ]
-  then
-    echo -e "\\033[1;31m""ERREURS dans $HOME/logs/nimscripts.log :""\\033[0;39m"
-    cat $HOME/logs/nimscripts.log
-  fi
+$HOME/scripts/nimscriptslog.sh
 
 exit

@@ -5,12 +5,12 @@
 export DISPLAY=:0.1
 cd $HOME/images
 
-if [ ! -e ga`date '+%y%m%d' --date '1 days ago'`.gif ]
+if [ -e ga`date '+%y%m%d' --date '1 days ago'`.gif ]
     then
+	echo "image déjà vue"
+    else
 	wget "http://picayune.uclick.com/comics/ga/`date '+%Y' --date '1 days ago'`/ga`date '+%y%m%d' --date '1 days ago'`.gif"
 	feh ga`date '+%y%m%d' --date '1 days ago'`.gif
-    else
-	echo "image déjà vue"
     fi
 for FILE in `echo ga*.gif | grep -v ga\*.gif`
     do

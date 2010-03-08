@@ -12,7 +12,7 @@ case $NOMBRE in
 		echo $NOMBRE processus contenant $1 trouvés :
 		ps -ef | grep -v grep | grep -v meurs | grep $1
 		echo -en "          \033[1m[Sortir/Kill] ?\033[0m"
-		read reponse
+		read -n 1 reponse
 		case $reponse in
 			k* | K*)
 				for ATUER in `ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2`
@@ -33,7 +33,7 @@ case $NOMBRE in
 		;;
 	1)
 		echo -en "          \033[1m$1 pas mort. Sortir/Kill] ?\033[0m"
-		read reponse
+		read -n 1 reponse
 		case $reponse in
 			k* | K*)
 				kill -9 `ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2` && echo $1 est mort 9 fois. RIP.

@@ -17,7 +17,7 @@ ARGUMENTS=( "" "" x -xvf -zxvf -zxvf -jxvf e )
 mkdir NIMEWF
 for((i=1;i<${#EXTENSION[*]};i++))
   do
-    if [ -e *.${EXTENSION[$i]} ]
+    if [ `ls | grep .${EXTENSION[$i]}$ | wc -l` -ge 1 ]
       then
         for FILE in `ls *.${EXTENSION[$i]} | sed "s/.${EXTENSION[$i]}//"`
           do
@@ -43,7 +43,7 @@ for((i=1;i<${#EXTENSION[*]};i++))
       fi
 done
 
-if [ -e NIMEWF/* ]
+if [ `ls -A NIMEWF/ | wc -l` -ge 1 ]
   then
     mv NIMEWF/* .
   fi

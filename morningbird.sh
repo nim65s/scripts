@@ -1,8 +1,8 @@
 #! /bin/bash
 
 #valeurs par defaut des variables
-VOLINIT=30
-VOLMAX=60
+VOLINIT=20
+VOLMAX=30
 TIMEINC=1
 VOLINC=1
 PLAYER=amarok
@@ -45,13 +45,13 @@ while [ $# -ne 0 ]
 	echo "    1 <= P <= 100"
 	echo "    N in seconds"
 	echo "    S = amarok | mpd"
+	exit 0
 	;;
       esac
     shift
   done
 
 ENMARCHE=`ps -ef | grep $PLAYER | grep -v grep | wc -l`
-
 if [ $ENMARCHE = 0 ]
   then
     $PLAYER
@@ -59,7 +59,7 @@ if [ $ENMARCHE = 0 ]
 
 export DISPLAY=:0.0
 
-if [ $PLAYER = mpd ]
+if [ "$PLAYER" = "mpd" ]
   then
     mpc clear
     mpc repeat off
@@ -72,7 +72,7 @@ if [ $PLAYER = mpd ]
 	    sleep $TIMEINC
 	    mpc volume +$VOLINC
 	done
-  elif [ $PLAYER = amarok ]
+  elif [ "$PLAYER" = "amarok" ]
   then
     DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
     dcop amarok player stop
@@ -97,7 +97,7 @@ if [ $PLAYER = mpd ]
     dcop amarok playlist clearPlaylist
     dcop amarok player enableRandomMode true
     dcop amarok playlistbrowser loadPlaylist Toute\ la\ collection
-    sleep 1
+    sleep 2
     dcop amarok player stop
   fi
 

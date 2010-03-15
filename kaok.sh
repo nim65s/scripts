@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $HOME/.config/awesome
 
-if [ -e 12* ]
+if [ `ls | grep 12 | wc -l` -ge 1 ]
   then
     NB=`ls 12* | wc -l`
     I=1
@@ -17,5 +17,6 @@ if [ -e 12* ]
       done
   fi
 cp rc.lua /home/nim/dotfiles/rc.lua
+rm rc.lua~
 
 exit

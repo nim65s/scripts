@@ -1,26 +1,39 @@
 #!/bin/bash
 
-#option -m : déplace l'image plutôt que de la copier
-
 OLDIFS=$IFS
 IFS=$'\n'
 adresseactuelle=$PWD
 cd $HOME/images/wall/
-
+ACTION="cp"
 nombreactuel=`ls | cut --delimiter="." -f 1 | sort -g | tail -n 1`
-echo $nombreactuel
+echo "makewallpaper : $nombreactuel fonds d'écran déjà présents"
 
 while [ $1 ]
 	do
-		let "nombreactuel += 1"
-		if [[ "$1" == *m* ]]
-			then
-				mv $adresseactuelle/$1 $nombreactuel.$1
-			else
-				cp $adresseactuelle/$1 $nombreactuel.$1
-			fi
-		echo $1 ajouté en tant que $PWD/$nombreactuel.$1
-		shift
+		case $1 in
+			m | -m )
+				ACTION="mv"
+				shift
+				;;
+			c | -c )
+				ACTION="cp"
+				shift
+				;;
+			h | -h )
+				echo "usage : makewallpaper [ fichiers ] [ -m ] fichiers"
+				echo "        copie les fichiers dans le répertoire $HOME/images/wall en leur attribuant un numero"
+				echo "        puis met à jour le script wallpaper.sh avec le nouveau nombre de fonds d'écran"
+				echo "        les fichiers mentionnés après l'option -m seront déplacés plutôt que copiés"
+				echo "        les fichiers mentionnés après l'option -c seront à nouveau copiés plutôt que déplacés"
+				IFS=$OLDIFS
+				exit 0
+				;;
+			*)
+				let "nombreactuel += 1"
+				$ACTION -v $adresseactuelle/$1 $nombreactuel.$1
+				shift
+				;;
+			esac
 	done
 
 cd $HOME/scripts

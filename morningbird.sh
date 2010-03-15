@@ -1,8 +1,8 @@
 #! /bin/bash
 
 #valeurs par defaut des variables
-VOLINIT=20
-VOLMAX=30
+VOLINIT=30
+VOLMAX=60
 TIMEINC=1
 VOLINC=1
 PLAYER=amarok
@@ -74,7 +74,7 @@ if [ "$PLAYER" = "mpd" ]
 	done
   elif [ "$PLAYER" = "amarok" ]
   then
-    DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
+#    DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
     dcop amarok player stop
 	dcop amarok playlist clearPlaylist
 	dcop amarok player enableRandomMode false

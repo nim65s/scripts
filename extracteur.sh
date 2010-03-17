@@ -2,7 +2,7 @@
 
 # option : "-r" => détruit l'archive
 
-#TODO : bug avec des parentheses, notamment dans un rar ?
+#TODO : bug avec des parentheses, notamment dans un rar ? => fonction d'echappement des caractères spéciaux ?
 
 ODLIFS=$IFS
 IFS=$'\n'
@@ -10,12 +10,12 @@ IFS=$'\n'
 declare -a EXTENSION
 declare -a PROGRAMME
 declare -a ARGUMENTS
-EXTENSION=( 0 zip rar tar tgz tar.gz tar.bz2 7z )
-PROGRAMME=( 0 unzip unrar tar tar tar tar 7z )
-ARGUMENTS=( "" "" x -xvf -zxvf -zxvf -jxvf e )
+EXTENSION=( zip rar tar tgz tar.gz tar.bz2 7z )
+PROGRAMME=( unzip unrar tar tar tar tar 7z )
+ARGUMENTS=( "" x -xvf -zxvf -zxvf -jxvf e )
 
 mkdir NIMEWF
-for((i=1;i<${#EXTENSION[*]};i++))
+for((i=0;i<${#EXTENSION[*]};i++))
   do
     if [ `ls | grep .${EXTENSION[$i]}$ | wc -l` -ge 1 ]
       then

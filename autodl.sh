@@ -1,27 +1,76 @@
 #!/bin/bash
 # TODO : curl plutot que wget dans le cas où plus.php & index.php seraient dépassés
-# Options :
-# -l : lire puis archiver
-# -f : force la màj
-# TODO : on doit mettre -f avant -l
 # TODO : intégration à awesome en lancement avec Kalarm
 # TODO : gestion de toutes les erreurs possibles et imaginables
 # TODO : verification qu'on a pas manqué un chapitre
+# TODO : et si y'avait un lien direct vers MU ? ou autre chose ?
+# TODO : tomage automatique
+# TODO : http://www.n-c-team.com/flux_rss2.xml : rss => facile => le même ?
+# TODO : code d'erreur de plowshare
+# TODO : exploser les arguments avant de les regarder, qu'on puisse dire flo
 
 OLDIFS=$IFS
 IFS=$'\n'
+
 declare -a SITES
 declare -a ADDRSITES
 declare -a DATESSITES
 declare -a scantrad
 declare -a japanshin
+declare -a dossieralire
 SITES=( scantrad japanshin )
 ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ )
 DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> )
-scantrad=( Naruto OnePiece )
+scantrad=( Naruto OnePiece CodeBreaker)
 japanshin=( Kenichi )
 dlscantrad=0
 dljapanshin=0
+force=0
+lire=0
+sortie=0
+
+while [ $1 ]
+  do
+    case $1 in
+      l )
+	lire=1
+	;;
+      f )
+	force=1
+	;;
+      o )
+	if [ -e $HOME/scripts/autodl.stop ]
+	  then
+	    rm $HOME/scripts/autodl.stop
+	  fi
+	;;
+      * )
+	echo "nimautdl usage : "
+	echo '$HOME/scripts/nimautodl.sh [ o ] [ f ] [ l ]'
+	echo " options : "
+	echo "       o : outrepasse le vérou "
+	echo "       f : force la mise à jour sans tenir compte de la date "
+	echo "       l : lire puis archiver les mangas téléchargés "
+	echo " code de sortie : "
+	echo "              0 : le script s'est déroulé sans encombres "
+	echo "              1 : vérou présent, rien ne s'est passé "
+	echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/nimdl "
+	echo "              3 : mauvais arguments, affichage de l'aide et sortie"
+	IFS=$OLDIFS
+	exit 3
+	;;
+      esac
+    shift
+  done
+
+if [ -e $HOME/scripts/autodl.stop ]
+  then
+    IFS=$OLDIFS
+    exit 1
+  else
+    touch $HOME/scripts/autodl.stop
+  fi 
+
 for((i=0;i<${#scantrad[*]};i++))
   do
     declare ${scantrad[$i]}=`ls $HOME/Scans/${scantrad[$i]} | sort -g | tail -n 1`
@@ -30,13 +79,15 @@ for((i=0;i<${#scantrad[*]};i++))
 kenichi=`ls $HOME/Scans/Kenichi | sort -g | tail -n 1`
 echo Kenichi : $kenichi
 
-if [[ $1 = *f* ]]
+if [[ $force = 1 ]]
   then
     rm $HOME/scripts/autodl.txt
-    shift
   fi
 touch $HOME/scripts/autodl.txt
-mkdir NIMAUTODL
+if [ ! -d NIMAUTODL ]
+  then
+    mkdir NIMAUTODL
+  fi
 cd NIMAUTODL
 
 for((i=0;i<${#SITES[*]};i++))
@@ -69,10 +120,10 @@ if [ -e scantrad ]
     while read line
       do
 	titre=`echo $line | sed "s/<title>//" | sed "s/<.*//"`
-	serie=`echo $titre | sed "s/[ \t0-9]//g"`
-	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" ]]
+	serie=`echo $titre | sed "s/[ \t0-9:]//g"`
+	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" || "$serie" == "${scantrad[2]}" ]]
 	  then
-	    chapitre=`echo $titre | sed "s/[ a-zA-Z]//g"`
+	    chapitre=`echo $titre | sed "s/[ a-zA-Z:]//g"`
 	    if [ $chapitre -gt ${!serie} ]
 	      then
 		echo "$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !!!!!!!!!!"
@@ -119,7 +170,7 @@ if [ -e japanshin ]
 		dljapanshin=1
 		wget -nv `echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g'`
 	      else
-		echo "$titre trouvé mais pas plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi)"
+		echo "$titre trouvé mais < ($kenichi)"
 	      fi
 	  fi
       done < japanshin
@@ -143,41 +194,77 @@ if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
     for todl in `ls`
       do
 	mv ./$todl todl
-	$HOME/scripts/dl.sh `grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//'`
+	$HOME/scripts/dl.sh $PWD `grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//'`
+	if [ $? = 1 ]
+	  then
+	    echo "ATTENTION ! Le téléchargement a été placé en file d'attente. Les fichiers seront téléchargés dans $HOME/nimdl"
+	    sortie=2
+	  fi
       done
     rm todl
     echo "-------------- extraction --------------"
     $HOME/scripts/extracteur.sh -r
   fi
 
-if [[ $1 = *l* ]]
+if [[ $lire = 1 ]]
   then
     echo "-------------- place à la lecture et à l'archivage --------------"
-    for dos in `ls`
+    dossieralire=( $PWD )
+    for dos in nimdl nimautodl
       do
-	echo "feh -FrSname $dos" # TODO
-	case $dos in
-	  *enichi* )
-	    serie=Kenichi
-	    ;;
-	  *ne*iece* )
-	    serie=OnePiece
-	    ;;
-	  *aruto* )
-	    serie=Naruto 
-	    ;;
-	  * )
-	    serie=..
-	    ;;
-	  esac
-	chapitre=`echo $dos | sed "s/[][ a-zA-Z]//g"`
-	echo "mv $dos $HOME/Scans/$serie/$chapitre"
+	if [ -d $HOME/$dos ]
+	  then
+	    dossieralire=( ${dossieralire[*]} $HOME/$dos )
+	  fi
       done
+    for fold in ${dossieralire[*]}
+      do
+	cd $fold
+	for dos in `ls`
+	  do
+	    feh -FrSname $dos
+	    chapitre=`echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g"`
+	    case $dos in
+	      *enichi* )
+		serie=Kenichi
+		;;
+	      *ne*iece* )
+		serie=OnePiece
+		;;
+	      *aruto* )
+		serie=Naruto 
+		;;
+	      *de*reaker* )
+		serie=CodeBreaker
+		;;
+	      * )
+		serie=faux/chemin/plutot/improbable/a/moins/de/faire/expres
+		echo "ATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il restera donc dans ce dossier, et le déplacement ci-dessous va pas aimer." 
+		;;
+	      esac
+	    mv -v $dos $HOME/Scans/$serie/$chapitre
+	  done
+      done
+    cd ${dossieralire[0]}
+  else
+    if [ ! -d $HOME/nimautodl ]
+      then
+	mkdir $HOME/nimautodl
+      fi
+    if [ `ls | wc -l` -gt 0 ]
+      then
+	mv * $HOME/nimautodl
+      fi
   fi
 
 cd ..
-rmdir NIMAUTODL
+if [ `ls NIMAUTODL | wc -l` = 0 ]
+  then
+    rmdir NIMAUTODL
+  fi
 
 IFS=$OLDIFS
 
-exit
+rm $HOME/scripts/autodl.stop
+
+exit $sortie

@@ -5,6 +5,18 @@
 # GNU GPL v3
 # Écrit par Nim65s.
 
+if [ -d $1 ]
+	then
+		cd $1
+		shift
+	else
+		if [ ! -d $HOME/nimdl ]
+			then
+				mkdir $HOME/nimdl
+			fi
+		cd $HOME/nimdl
+	fi
+
 if [ $# -ne 0 ]
 	then
 		while [ $# -ne 0 ]
@@ -28,5 +40,6 @@ if [ `ps -ef | grep plowdown | grep -v grep | wc -l` = 0 ]
 			done
 	else
 		echo "plowdown est en cours de fonctionnement => ajout des fichers dans la liste et fin du script."
+		exit 1
 	fi
 exit 0

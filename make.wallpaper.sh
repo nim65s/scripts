@@ -47,7 +47,7 @@ while [ $1 ]
 				shift
 				;;
 			h | -h )
-				echo "usage : makewallpaper [ fichiers ] [ -m ] fichiers"
+				echo "usage : makewallpaper [ fichiers ] [ -m  fichiers [ -c ]] fichiers"
 				echo "          copie les fichiers dans le répertoire $HOME/images/wall en leur attribuant un numero"
 				echo "          puis met à jour le script wallpaper.sh avec le nouveau nombre de fonds d'écran"
 				echo "          les fichiers mentionnés après l'option -m seront déplacés plutôt que copiés"

@@ -1,21 +1,23 @@
 #!/bin/bash
 # TODO : curl plutot que wget dans le cas où plus.php & index.php seraient dépassés
-# Options : 
-# mettre directement à jour
-# 
+# Options :
+# -l : lire puis archiver
+# -f : force la màj
+# TODO : on doit mettre -f avant -l
+# TODO : intégration à awesome en lancement avec Kalarm
+# TODO : gestion de toutes les erreurs possibles et imaginables
+# TODO : verification qu'on a pas manqué un chapitre
 
 OLDIFS=$IFS
 IFS=$'\n'
-declare -a SCANS
 declare -a SITES
 declare -a ADDRSITES
 declare -a DATESSITES
 declare -a scantrad
 declare -a japanshin
-SCANS=( Naruto OnePiece Kenichi )
 SITES=( scantrad japanshin )
 ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ )
-DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> ) # TODO : passage des <>\ "# ?
+DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> )
 scantrad=( Naruto OnePiece )
 japanshin=( Kenichi )
 dlscantrad=0
@@ -28,7 +30,11 @@ for((i=0;i<${#scantrad[*]};i++))
 kenichi=`ls $HOME/Scans/Kenichi | sort -g | tail -n 1`
 echo Kenichi : $kenichi
 
-# TODO cd $HOME sur demande ou pas
+if [[ $1 = *f* ]]
+  then
+    rm $HOME/scripts/autodl.txt
+    shift
+  fi
 touch $HOME/scripts/autodl.txt
 mkdir NIMAUTODL
 cd NIMAUTODL
@@ -42,7 +48,7 @@ for((i=0;i<${#SITES[*]};i++))
 	echo "pas de mises à jour sur ${ADDRSITES[$i]}"
 	rm index.html
       else
-	echo "mises à jours disponibles sur ${ADDRSITES[$i]} !"
+	echo "mises à jours disponibles sur ${ADDRSITES[$i]} !!!"
 	echo "Ancienne date : `grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed \"s/${SITES[$i]}://\"`"
 	echo "Nouvelle date : $nouvelledate"
 	echo "${SITES[$i]}:" >> $HOME/scripts/autodl.txt
@@ -69,24 +75,25 @@ if [ -e scantrad ]
 	    chapitre=`echo $titre | sed "s/[ a-zA-Z]//g"`
 	    if [ $chapitre -gt ${!serie} ]
 	      then
-		echo "$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie})"
-	      else
-		# TODO : déplacer
+		echo "$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !!!!!!!!!!"
 		dlscantrad=1
-		echo "$titre trouvé mais pas plus récent que le dernier chapitre de $serie présent sur le disque (${!serie})"
 		wget -nv `echo $line | sed 's/.*<link>//' | sed 's/<.*//'`
+	      else
+		echo "$titre trouvé mais < ${!serie}"
 	      fi
 	  fi
       done < scantrad
-#      rm scantrad
+      rm scantrad
   fi
 
 if [ $dlscantrad = 1 ]
   then
     for todl in plus.php*
       do
-	wget -nv `grep 'class="telecharger"' $todl | sed 's/.*href="//' | sed 's/".*//'`
-	rm $todl
+	FICHIER=`mktemp`
+	grep 'class="telecharger"' $todl | sed 's/.*href="//' | sed 's/".*//' > $FICHIER
+	wget -nv -i $FICHIER
+	rm $todl $FICHIER
       done
   fi
 
@@ -108,15 +115,11 @@ if [ -e japanshin ]
 	    chapitre=`echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g"`
 	    if [ $chapitre -gt $kenichi ]
 	      then
-		echo "$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi)"
- 		dljapanshin=1
+		echo "$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !!!!!!!!!!"
+		dljapanshin=1
+		wget -nv `echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g'`
 	      else
 		echo "$titre trouvé mais pas plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi)"
-		if [ $dljapanshin = 0 ]
-		  then
-		    wget -nv `echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g'`
-		    dljapanshin=1 # TODO
-		  fi
 	      fi
 	  fi
       done < japanshin
@@ -134,18 +137,42 @@ if [ $dljapanshin = 1 ]
       done
   fi
 
-echo "-!-!-!-!-!-!-!-!-!-!-!-!-!- téléchargements des nouveaux chapitres !!! -!-!-!-!-!-!-!-!-!-!-!-!-!-"
-
-if [[ $dljapanshin = 1 || $dlscantrad = 1 ]]
+if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
   then
+    echo "-!-!-!-!-!-!-!-!-!-!-!-!-!- téléchargements des nouveaux chapitres !!! -!-!-!-!-!-!-!-!-!-!-!-!-!-"
     for todl in `ls`
       do
 	mv ./$todl todl
-	echo JE TELECHARGE `grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//'` 
 	$HOME/scripts/dl.sh `grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//'`
       done
     rm todl
-    mv * ..
+    echo "-------------- extraction --------------"
+    $HOME/scripts/extracteur.sh -r
+  fi
+
+if [[ $1 = *l* ]]
+  then
+    echo "-------------- place à la lecture et à l'archivage --------------"
+    for dos in `ls`
+      do
+	echo "feh -FrSname $dos" # TODO
+	case $dos in
+	  *enichi* )
+	    serie=Kenichi
+	    ;;
+	  *ne*iece* )
+	    serie=OnePiece
+	    ;;
+	  *aruto* )
+	    serie=Naruto 
+	    ;;
+	  * )
+	    serie=..
+	    ;;
+	  esac
+	chapitre=`echo $dos | sed "s/[][ a-zA-Z]//g"`
+	echo "mv $dos $HOME/Scans/$serie/$chapitre"
+      done
   fi
 
 cd ..
@@ -154,4 +181,3 @@ rmdir NIMAUTODL
 IFS=$OLDIFS
 
 exit
-

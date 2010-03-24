@@ -69,9 +69,9 @@ while [ $1 ]
 
 cd $HOME/scripts
 echo "nombre=$nombreactuel > wallpaper.sh"
-sed "s/nombre=[0-9]*/nombre=$nombreactuel/" wallpaper.sh > wallpaper2.sh
-cat wallpaper2.sh > wallpaper.sh
-rm wallpaper2.sh
+FICHIER=`mktemp
+sed "s/nombre=[0-9]*/nombre=$nombreactuel/" wallpaper.sh > $FICHIER
+mv $FICHIER wallpaper.sh
 IFS=$OLDIFS
 
 exit 0

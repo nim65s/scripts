@@ -8,6 +8,9 @@
 # TODO : http://www.n-c-team.com/flux_rss2.xml : rss => facile => le même ?
 # TODO : code d'erreur de plowshare
 # TODO : exploser les arguments avant de les regarder, qu'on puisse dire flo
+# TODO : option i : interactive
+# TODO : chercher dans les dossiers actuels si y'a pas déjà des trucs interessants, toussa.. peut être que le nom n'est pas approprié...
+
 
 OLDIFS=$IFS
 IFS=$'\n'
@@ -54,7 +57,7 @@ while [ $1 ]
 	echo " code de sortie : "
 	echo "              0 : le script s'est déroulé sans encombres "
 	echo "              1 : vérou présent, rien ne s'est passé "
-	echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/nimdl "
+	echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements "
 	echo "              3 : mauvais arguments, affichage de l'aide et sortie"
 	IFS=$OLDIFS
 	exit 3
@@ -69,7 +72,7 @@ if [ -e $HOME/scripts/autodl.stop ]
     exit 1
   else
     touch $HOME/scripts/autodl.stop
-  fi 
+  fi
 
 for((i=0;i<${#scantrad[*]};i++))
   do
@@ -222,7 +225,7 @@ if [[ $lire = 1 ]]
 	cd $fold
 	for dos in `ls`
 	  do
-	    feh -FrSname $dos
+	    feh -FZrSname $dos
 	    chapitre=`echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g"`
 	    case $dos in
 	      *enichi* )
@@ -232,14 +235,14 @@ if [[ $lire = 1 ]]
 		serie=OnePiece
 		;;
 	      *aruto* )
-		serie=Naruto 
+		serie=Naruto
 		;;
 	      *de*reaker* )
 		serie=CodeBreaker
 		;;
 	      * )
 		serie=faux/chemin/plutot/improbable/a/moins/de/faire/expres
-		echo "ATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il restera donc dans ce dossier, et le déplacement ci-dessous va pas aimer." 
+		echo "ATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il restera donc dans ce dossier ( $PWD ), et le déplacement ci-dessous va pas aimer."
 		;;
 	      esac
 	    mv -v $dos $HOME/Scans/$serie/$chapitre
@@ -253,7 +256,7 @@ if [[ $lire = 1 ]]
       fi
     if [ `ls | wc -l` -gt 0 ]
       then
-	mv * $HOME/nimautodl
+	mv -v * $HOME/nimautodl
       fi
   fi
 

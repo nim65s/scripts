@@ -5,39 +5,43 @@
 # GNU GPL v3
 # Écrit par Nim65s.
 
-if [ -d $1 ]
-	then
-		cd $1
-		shift
-	else
-		if [ ! -d $HOME/nimdl ]
-			then
-				mkdir $HOME/nimdl
-			fi
-		cd $HOME/nimdl
-	fi
-
 if [ $# -ne 0 ]
 	then
+		if [ -d $1 ]
+			then
+				cd $1
+				shift
+			else
+				if [ ! -d $HOME/Téléchargements ]
+					then
+						mkdir $HOME/Téléchargements
+					fi
+				cd $HOME/Téléchargements
+			fi
 		while [ $# -ne 0 ]
 			do
 				echo $1 >> $HOME/scripts/dl.txt
 				shift
 			done
 	else
-		kate $HOME/scripts/dl.txt
+		if [[ "`pidof -s -x -o %PPID /usr/share/apps/kate`" = "" ]]
+			then
+				kate $HOME/scripts/dl.txt
+			else
+				nano $HOME/scripts/dl.txt
+			fi
 	fi
 
-if [ `ps -ef | grep plowdown | grep -v grep | wc -l` = 0 ]
+if [[ "`pidof -s -x -o %PPID plowdown`" = "" ]]
 	then
 		while [ `cat $HOME/scripts/dl.txt | wc -l` != 0 ]
 			do
-				echo "TELECHARGEMENT DE `head $HOME/scripts/dl.txt -n 1`"
-				FICHIER=`mktemp`
-				plowdown -a $MUUA `head $HOME/scripts/dl.txt -n 1`
-				sed '1d' $HOME/scripts/dl.txt >> $FICHIER
-				mv $FICHIER $HOME/scripts/dl.txt
+				todl=$(head $HOME/scripts/dl.txt -n 1 | cut --delimiter="=" -f 2)
+				echo "TELECHARGEMENT DE http://www.megaupload.com/?d=$todl DANS $PWD"
+				plowdown -a $MUUA http://www.megaupload.com/?d=$todl || echo " !!!!!!!!! PLOWDOWN erreur # $? !!!!!!!!!!!!! "
+				sed -i "/$todl/d" $HOME/scripts/dl.txt
 			done
+		rm $HOME/scripts/dl.txt
 	else
 		echo "plowdown est en cours de fonctionnement => ajout des fichers dans la liste et fin du script."
 		exit 1

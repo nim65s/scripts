@@ -10,7 +10,7 @@ IFS=$'\n'
 adresseactuelle=$PWD
 cd $HOME/images/wall/
 ACTION="cp"
-nombreactuel=`ls | cut --delimiter="." -f 1 | sort -g | tail -n 1`
+nombreactuel=$(ls | cut --delimiter="." -f 1 | sort -g | tail -n 1)
 echo "makewallpaper : $nombreactuel fonds d'écran déjà présents"
 
 while [ $1 ]
@@ -30,7 +30,7 @@ while [ $1 ]
 				declare -a ORPHANS
 				for((i=1;i<=$nombreactuel;i++))
 					do
-						if [ `ls | grep ^$i[.] | wc -l` == 0 ]
+						if [[ $(ls | grep ^$i[.] | wc -l) == 0 ]]
 							then
 								ORPHANS=( ${ORPHANS[*]} $i )
 							fi
@@ -39,9 +39,9 @@ while [ $1 ]
 				let "nombreactuel -= ${#ORPHANS[*]}"
 				for((i=0;i<${#ORPHANS[*]};i++))
 					do
-						if [ `ls | sort -g | tail -n 1 | cut --delimiter="." -f 1 ` -gt ${ORPHANS[$i]} ]
+						if [[ $(ls | sort -g | tail -n 1 | cut --delimiter="." -f 1 ) -gt ${ORPHANS[$i]} ]]
 							then
-								mv -v `ls | sort -g | tail -n 1` ${ORPHANS[$i]}.`ls | sort -g | tail -n 1 | cut --delimiter="." -f 2-`
+								mv -v $(ls | sort -g | tail -n 1) ${ORPHANS[$i]}.$(ls | sort -g | tail -n 1 | cut --delimiter="." -f 2-)
 							fi
 					done
 				shift
@@ -69,9 +69,7 @@ while [ $1 ]
 
 cd $HOME/scripts
 echo "nombre=$nombreactuel > wallpaper.sh"
-FICHIER=`mktemp
-sed "s/nombre=[0-9]*/nombre=$nombreactuel/" wallpaper.sh > $FICHIER
-mv $FICHIER wallpaper.sh
+sed -i "s/nombre=[0-9]*/nombre=$nombreactuel/" wallpaper.sh
 IFS=$OLDIFS
 
 exit 0

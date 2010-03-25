@@ -17,7 +17,7 @@ case $1 in
     sudo ./foldingathome-smp restart
     ;;
   awesome)
-    if [[ "`pidof -o %PPID /opt/fah-smp/fah6`" != "" ]]
+    if [[ "$(pidof -o %PPID /opt/fah-smp/fah6)" != "" ]]
       then
 	echo "fahwidget.image = image(\"/home/nim/.config/awesome/fahstop.png\")" | awesome-client
 #	echo "fahgpuwidget:set_color(beautiful.bg_urgent)" | awesome-client

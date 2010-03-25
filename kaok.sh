@@ -1,13 +1,13 @@
 #!/bin/bash
 cd $HOME/.config/awesome
 
-if [ `ls | grep 12 | wc -l` -ge 1 ]
+if [[ $(ls | grep 12 | wc -l) -ge 1 ]]
   then
-    NB=`ls 12* | wc -l`
+    NB=$(ls 12* | wc -l)
     I=1
-    for FILE in `ls 12* | sort -r`
+    for FILE in $(ls 12* | sort -r)
       do
-        if [ $I = 1 ]
+        if [[ $I = 1 ]]
           then
             I=2
             mv $FILE kaok.rc.lua
@@ -17,6 +17,9 @@ if [ `ls | grep 12 | wc -l` -ge 1 ]
       done
   fi
 cp rc.lua /home/nim/dotfiles/rc.lua
-rm rc.lua~
+if [[ -f rc.lua~ ]]
+  then
+    rm rc.lua~
+  fi
 
 exit

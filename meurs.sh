@@ -1,4 +1,5 @@
 #!/bin/bash
+#TODO : script à la yaourt pour n'en tuer que quelques uns
 
 NOMBRE=$(ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2 | wc -l)
 case $NOMBRE in
@@ -32,8 +33,8 @@ case $NOMBRE in
 	0)
 		;;
 	1)
-# 		echo -en "          \033[1m$1 pas mort. Sortir/Kill] ?\033[0m"
-		read -n 1 -p "\033[1m$1 pas mort. Sortir/Kill] ?\033[0m" reponse
+ 		echo -en "          \033[1m$1 pas mort. Sortir/Kill] ?\033[0m"
+		read -n 1 reponse
 		case $reponse in
 			k* | K*)
 				kill -9 $(ps -ef | grep -v grep | grep -v meurs | grep $1 | sed 's/  */ /g' | cut --delimiter=" " -f 2) && echo $1 est mort 9 fois. RIP.

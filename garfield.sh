@@ -5,7 +5,7 @@
 export DISPLAY=:0.1
 cd $HOME/images
 
-if [[ -e ga`date '+%y%m%d' --date '1 days ago'`.gif ]]
+if [[ -e ga$(date '+%y%m%d' --date '1 days ago').gif ]]
     then
 	echo "image déjà vue"
     else

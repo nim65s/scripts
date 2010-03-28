@@ -10,7 +10,7 @@
 # TODO : exploser les arguments avant de les regarder, qu'on puisse dire flo
 # TODO : option i : interactive
 # TODO : chercher dans les dossiers actuels si y'a pas déjà des trucs interessants, toussa.. peut être que le nom n'est pas approprié...
-
+# TODO : exploser systematiquement toutes les pages web téléchargées avec sed '"s/>/>\n/g"' NON => faut garder une unité sur les blocs pour titre date, etc.
 
 OLDIFS=$IFS
 IFS=$'\n'
@@ -29,36 +29,37 @@ japanshin=( Kenichi )
 dlscantrad=0
 dljapanshin=0
 force=0
-lire=0
+lire=1
 sortie=0
 
-while [ $1 ]
+while [[ $1 ]]
   do
     case $1 in
-      l )
-	lire=1
+      d )
+	lire=0
 	;;
       f )
 	force=1
 	;;
       o )
-	if [ -e $HOME/scripts/autodl.stop ]
+	if [[ -e $HOME/scripts/autodl.stop ]]
 	  then
 	    rm $HOME/scripts/autodl.stop
 	  fi
 	;;
       * )
 	echo "nimautdl usage : "
-	echo '$HOME/scripts/nimautodl.sh [ o ] [ f ] [ l ]'
+	echo '$HOME/scripts/nimautodl.sh [o] [f] [d]'
 	echo " options : "
 	echo "       o : outrepasse le vérou "
 	echo "       f : force la mise à jour sans tenir compte de la date "
-	echo "       l : lire puis archiver les mangas téléchargés "
+	echo "       d : télécharger seulement, ne pas lire ni archiver "
 	echo " code de sortie : "
 	echo "              0 : le script s'est déroulé sans encombres "
 	echo "              1 : vérou présent, rien ne s'est passé "
 	echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements "
 	echo "              3 : mauvais arguments, affichage de l'aide et sortie"
+	echo "              4 : des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl"
 	IFS=$OLDIFS
 	exit 3
 	;;
@@ -66,7 +67,7 @@ while [ $1 ]
     shift
   done
 
-if [ -e $HOME/scripts/autodl.stop ]
+if [[ -e $HOME/scripts/autodl.stop ]]
   then
     IFS=$OLDIFS
     exit 1
@@ -76,10 +77,10 @@ if [ -e $HOME/scripts/autodl.stop ]
 
 for((i=0;i<${#scantrad[*]};i++))
   do
-    declare ${scantrad[$i]}=`ls $HOME/Scans/${scantrad[$i]} | sort -g | tail -n 1`
+    declare ${scantrad[$i]}=$(ls $HOME/Scans/${scantrad[$i]} | sort -g | tail -n 1)
     echo ${scantrad[$i]} : ${!scantrad[$i]}
   done
-kenichi=`ls $HOME/Scans/Kenichi | sort -g | tail -n 1`
+kenichi=$(ls $HOME/Scans/Kenichi | sort -g | tail -n 1)
 echo Kenichi : $kenichi
 
 if [[ $force = 1 ]]
@@ -87,135 +88,127 @@ if [[ $force = 1 ]]
     rm $HOME/scripts/autodl.txt
   fi
 touch $HOME/scripts/autodl.txt
-if [ ! -d NIMAUTODL ]
-  then
-    mkdir NIMAUTODL
-  fi
-cd NIMAUTODL
+WORKINGDIR=$(mktemp -d)
+cd $WORKINGDIR
 
 for((i=0;i<${#SITES[*]};i++))
   do
-    wget -nv ${ADDRSITES[$i]}
-    nouvelledate=`grep "${DATESSITES[$i]}" index.html | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//"`
-    if [ "${SITES[$i]}:$nouvelledate" == "`grep ${SITES[$i]} $HOME/scripts/autodl.txt`" ]
+    wget -nv "${ADDRSITES[$i]}"
+    nouvelledate=$(grep "${DATESSITES[$i]}" index.html | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")
+    if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
       then
 	echo "pas de mises à jour sur ${ADDRSITES[$i]}"
 	rm index.html
       else
 	echo "mises à jours disponibles sur ${ADDRSITES[$i]} !!!"
-	echo "Ancienne date : `grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed \"s/${SITES[$i]}://\"`"
+	echo "Ancienne date : $(grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed "s/${SITES[$i]}://")"
 	echo "Nouvelle date : $nouvelledate"
 	echo "${SITES[$i]}:" >> $HOME/scripts/autodl.txt
-	FICHIER=`mktemp`
+	FICHIER=$(mktemp)
 	sed "s/${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/autodl.txt | sort | uniq > $FICHIER
-	mv $FICHIER $HOME/scripts/autodl.txt
+	mv $FICHIER $HOME/scripts/autodl.txt # TODO ces trois lignes là, faut apprendre à le faire qu'avec un sed...
 	mv index.html ${SITES[$i]}
       fi
   done
 
-echo "-------------- analyse de scantrad --------------"
 
-if [ -e scantrad ]
+if [[ -e scantrad ]]
   then
-    FICHIER=`mktemp`
-    sed -e :a -e "/title>$/N; s/\n[ \t]*//; ta" scantrad | grep '<title>' > $FICHIER
-    mv $FICHIER scantrad
+    echo -en "\033[1m-------------- Analyse de scantrad --------------\033[0m\n"
+    FICHIER=$(mktemp)
+    sed -e :a -e "/title>$/N; s/\n[ \t]*//; ta" scantrad | grep '<title>' > $FICHIER # TODO : tenter un sed -i < grep ?
     while read line
       do
-	titre=`echo $line | sed "s/<title>//" | sed "s/<.*//"`
-	serie=`echo $titre | sed "s/[ \t0-9:]//g"`
-	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" || "$serie" == "${scantrad[2]}" ]]
+	titre=$(echo $line | sed "s/<title>//" | sed "s/<.*//" | sed "s/[[:space:]][[:space:]]*/ /g") # je viens d'ajouter le dernier sed
+	serie=$(echo $titre | sed "s/[ \t0-9:]//g")
+	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" || "$serie" == "${scantrad[2]}" ]] # TODO ça c'est moche :s
 	  then
-	    chapitre=`echo $titre | sed "s/[ a-zA-Z:]//g"`
-	    if [ $chapitre -gt ${!serie} ]
+	    chapitre=$(echo $titre | sed "s/[ a-zA-Z:]//g")
+	    if [[ $chapitre -gt ${!serie} ]]
 	      then
-		echo "$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !!!!!!!!!!"
+		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m\n"
 		dlscantrad=1
-		wget -nv `echo $line | sed 's/.*<link>//' | sed 's/<.*//'`
+		wget -nv $(echo $line | sed 's/.*<link>//' | sed 's/<.*//')
 	      else
-		echo "$titre trouvé mais < ${!serie}"
+		echo "$titre trouvé mais <= ${!serie}"
 	      fi
 	  fi
-      done < scantrad
-      rm scantrad
+      done < $FICHIER
+      rm scantrad $FICHIER
   fi
 
-if [ $dlscantrad = 1 ]
+if [[ $dlscantrad = 1 ]]
   then
     for todl in plus.php*
       do
-	FICHIER=`mktemp`
+	FICHIER=$(mktemp)
 	grep 'class="telecharger"' $todl | sed 's/.*href="//' | sed 's/".*//' > $FICHIER
 	wget -nv -i $FICHIER
 	rm $todl $FICHIER
       done
   fi
 
-echo "-------------- analyse de japanshin --------------"
-
 # TODO  : kenichi => $serie
 
-if [ -e japanshin ]
+if [[ -e japanshin ]]
   then
-    FICHIER=`mktemp`
+    echo -en "\033[1m-------------- Analyse de japanshin --------------\033[0m\n"
+    FICHIER=$(mktemp)
     sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="225" bgcolor="#333333">' > $FICHIER
-    mv $FICHIER japanshin
     while read line
       do
-	titre=`echo $line | cut --delimiter=">" -f 7 | sed "s/<\/td//"`
-	serie=`echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g"`
-	if [ $serie = Kenichi ]
+	titre=$(echo $line | cut --delimiter=">" -f 7 | sed "s/<\/td//") # ajouter le meme sed que dans scantrad ?
+	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
+	if [[ $serie = Kenichi ]]
 	  then
-	    chapitre=`echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g"`
-	    if [ $chapitre -gt $kenichi ]
+	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
+	    if [[ $chapitre -gt $kenichi ]]
 	      then
-		echo "$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !!!!!!!!!!"
+		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !\033[0m\n"
 		dljapanshin=1
-		wget -nv `echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g'`
+		wget -nv "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g')" # TODO c'est quoi ce # en plein milieu ? oO
 	      else
-		echo "$titre trouvé mais < ($kenichi)"
+		echo "$titre trouvé mais <= ($kenichi)"
 	      fi
 	  fi
-      done < japanshin
-    rm japanshin
+      done < $FICHIER
+    rm japanshin $FICHIER
   fi
 
-if [ $dljapanshin = 1 ]
+if [[ $dljapanshin = 1 ]]
   then
     for todl in index.php*
       do
-	FICHIER=`mktemp`
-	grep miroriii $todl | cut --delimiter=">" -f 7 | sed 's/<A href="//' | sed 's/".*//' | sed "s/ /\\\ /g" > $FICHIER
-	wget -nv -i $FICHIER
-	rm $todl $FICHIER
+	wget "$(sed "s/>/>\n/g" ./$todl | grep miroriii | sed 's/.*http:\/\///' | sed 's/".*//' | sed "s/ /\\\ /g")" # TODO au lieu de wget, on >> listeafileradlbot
+	rm ./$todl 
       done
   fi
 
 if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
   then
-    echo "-!-!-!-!-!-!-!-!-!-!-!-!-!- téléchargements des nouveaux chapitres !!! -!-!-!-!-!-!-!-!-!-!-!-!-!-"
-    for todl in `ls`
+    echo -en "\033[1m-------------- Téléchargements des nouveaux chapitres ! --------------\033[0m\n"
+    for todl in *
       do
 	mv ./$todl todl
-	$HOME/scripts/dl.sh $PWD `grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//'`
-	if [ $? = 1 ]
+	$HOME/scripts/dl.sh $PWD "$(grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//')" # TODO euh... NUL ! vive dlbot !
+	if [[ $? = 1 ]]
 	  then
-	    echo "ATTENTION ! Le téléchargement a été placé en file d'attente. Les fichiers seront téléchargés dans $HOME/nimdl"
+	    echo -en "\033[5;31m ATTENTION ! Le téléchargement a été placé en file d'attente. Les fichiers seront téléchargés dans $HOME/nimdl \033[0m\n"
 	    sortie=2
 	  fi
       done
     rm todl
-    echo "-------------- extraction --------------"
+    echo -en "\033[1m-------------- Extraction --------------\033[0m\n"
     $HOME/scripts/extracteur.sh -r
   fi
 
 if [[ $lire = 1 ]]
   then
-    echo "-------------- place à la lecture et à l'archivage --------------"
-    dossieralire=( $PWD )
-    for dos in nimdl nimautodl
+    echo -en "\033[1m-------------- Place à la lecture et à l'archivage --------------\033[0m\n"
+    dossieralire=( $WORKINGDIR )
+    for dos in nimautodl
       do
-	if [ -d $HOME/$dos ]
+	if [[ -d $HOME/$dos ]]
 	  then
 	    dossieralire=( ${dossieralire[*]} $HOME/$dos )
 	  fi
@@ -223,10 +216,10 @@ if [[ $lire = 1 ]]
     for fold in ${dossieralire[*]}
       do
 	cd $fold
-	for dos in `ls`
+	for dos in $(ls)
 	  do
 	    feh -FZrSname $dos
-	    chapitre=`echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g"`
+	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
 	    case $dos in
 	      *enichi* )
 		serie=Kenichi
@@ -241,33 +234,42 @@ if [[ $lire = 1 ]]
 		serie=CodeBreaker
 		;;
 	      * )
-		serie=faux/chemin/plutot/improbable/a/moins/de/faire/expres
-		echo "ATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il restera donc dans ce dossier ( $PWD ), et le déplacement ci-dessous va pas aimer."
+		if [[ ! -d $HOME/nimautodl ]]
+		  then
+		    mkdir $HOME/nimautodl
+		  fi
+		serie="../nimautodl"
+		chapitre=$dos
+		echo -en "\033[5;31mATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il ira donc dans \$HOME/nimautodl.\033[0m\n"
+		echo "Ceci est une faute de jeunesse du script et d'inexpérience de Nim65s. Il corrigera ça dès qu'il pourra."
+		sortie=4
 		;;
 	      esac
 	    mv -v $dos $HOME/Scans/$serie/$chapitre
 	  done
       done
-    cd ${dossieralire[0]}
+    cd $WORKINGDIR
   else
-    if [ ! -d $HOME/nimautodl ]
+    if [[ ! -d $HOME/nimautodl ]]
       then
 	mkdir $HOME/nimautodl
       fi
-    if [ `ls | wc -l` -gt 0 ]
+    if [[ $(ls | wc -l) -gt 0 ]]
       then
 	mv -v * $HOME/nimautodl
       fi
   fi
 
-cd ..
-if [ `ls NIMAUTODL | wc -l` = 0 ]
+if [[ $(ls $WORKINGDIR | wc -l) = 0 ]]
   then
-    rmdir NIMAUTODL
+    rmdir $WORKINGDIR
+  else
+    echo -en "\033[5;31m Il reste des fichiers dans $WORKINGDIR :\033[0m\n"
+    ls -A $WORKINGDIR
   fi
 
 IFS=$OLDIFS
 
-rm $HOME/scripts/autodl.stop
+rm -v $HOME/scripts/autodl.stop
 
 exit $sortie

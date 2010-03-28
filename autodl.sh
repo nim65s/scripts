@@ -268,8 +268,7 @@ if [[ $(ls $WORKINGDIR | wc -l) = 0 ]]
     ls -A $WORKINGDIR
   fi
 
-IFS=$OLDIFS
-
 rm -v $HOME/scripts/autodl.stop
 
+IFS=$OLDIFS
 exit $sortie

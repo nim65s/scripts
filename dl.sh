@@ -5,6 +5,9 @@
 # GNU GPL v3
 # Écrit par Nim65s.
 
+# bugreport : 
+#             soucis si la première ligne n'est pas correcte
+
 if [ $# -ne 0 ]
 	then
 		if [ -d $1 ]
@@ -39,7 +42,7 @@ if [[ "`pidof -s -x -o %PPID plowdown`" = "" ]]
 				todl=$(head $HOME/scripts/dl.txt -n 1 | cut --delimiter="=" -f 2)
 				echo "TELECHARGEMENT DE http://www.megaupload.com/?d=$todl DANS $PWD"
 				plowdown -a $MUUA http://www.megaupload.com/?d=$todl || echo " !!!!!!!!! PLOWDOWN erreur # $? !!!!!!!!!!!!! "
-				sed -i "/$todl/d" $HOME/scripts/dl.txt
+				sed -i "/$todl/d" $HOME/scripts/dl.txt # sed "/$(echo $todl | sed -i "s/[/]/\\\\\//g")/d" $HOME/scripts/dl.txt
 			done
 		rm $HOME/scripts/dl.txt
 	else

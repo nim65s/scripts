@@ -153,6 +153,3 @@ if [[ $rmok = 0 ]]
 
 IFS=$OLDIFS
 exit 0
-
-
-# sed "/$(echo $todl | sed "s/[/]/\\\\\//g")/d" dl.txt

@@ -11,6 +11,8 @@
 # TODO : option i : interactive
 # TODO : chercher dans les dossiers actuels si y'a pas déjà des trucs interessants, toussa.. peut être que le nom n'est pas approprié...
 # TODO : exploser systematiquement toutes les pages web téléchargées avec sed '"s/>/>\n/g"' NON => faut garder une unité sur les blocs pour titre date, etc.
+# TODO : ranger les codes de sortie proprement
+# TODO : passer $HOME/scripts/autodl.txt en autodl.rc, et déclarer les variables dans celui-ci.
 
 OLDIFS=$IFS
 IFS=$'\n'
@@ -29,50 +31,86 @@ japanshin=( Kenichi )
 dlscantrad=0
 dljapanshin=0
 force=0
-lire=1
+lire=0
+downloadonly=0
 sortie=0
+
+afficher_aide_et_sortir()
+  {
+    echo "nimautdl usage : "
+    echo '$HOME/scripts/nimautodl.sh [o] [f] [d]'
+    echo " options : "
+    echo "       o : outrepasse le vérou "
+    echo "       f : force la mise à jour sans tenir compte de la date "
+    echo "       d : télécharger seulement, ne pas lire ni archiver "
+    echo " code de sortie : "
+    echo "              0 : le script s'est déroulé sans encombres."
+    echo "              1 : vérou présent, rien ne s'est passé."
+    echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements."
+    echo "              3 : mauvais arguments, affichage de l'aide et sortie."
+    echo "              4 : des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl."
+    echo "              5 : plowdown est en fonctionnement, et l'utilisateur a décidé de sortir."
+    IFS=$OLDIFS
+    exit 3
+  }
 
 while [[ $1 ]]
   do
     case $1 in
       d )
-	lire=0
+	downloadonly=1
 	;;
       f )
 	force=1
 	;;
       o )
-	if [[ -e $HOME/scripts/autodl.stop ]]
+	if [[ -e /tmp/autodl/autodl.stop ]]
 	  then
-	    rm $HOME/scripts/autodl.stop
+	    rm /tmp/autodl/autodl.stop
 	  fi
 	;;
       * )
-	echo "nimautdl usage : "
-	echo '$HOME/scripts/nimautodl.sh [o] [f] [d]'
-	echo " options : "
-	echo "       o : outrepasse le vérou "
-	echo "       f : force la mise à jour sans tenir compte de la date "
-	echo "       d : télécharger seulement, ne pas lire ni archiver "
-	echo " code de sortie : "
-	echo "              0 : le script s'est déroulé sans encombres "
-	echo "              1 : vérou présent, rien ne s'est passé "
-	echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements "
-	echo "              3 : mauvais arguments, affichage de l'aide et sortie"
-	echo "              4 : des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl"
-	IFS=$OLDIFS
-	exit 3
+	afficher_aide_et_sortir
 	;;
       esac
     shift
   done
 
-if [[ -e $HOME/scripts/autodl.stop ]]
+if [[ ! -d /tmp/autodl ]]
+  then
+    mkdir /tmp/autodl
+  fi
+cd /tmp/autodl
+
+if [[ -e /tmp/autodl/autodl.stop ]]
   then
     IFS=$OLDIFS
     exit 1
   else
-    touch $HOME/scripts/autodl.stop
+    touch /tmp/autodl/autodl.stop
+    if [[ "`pidof -s -x -o %PPID plowdown`" != "" ]]
+      then
+	echo -en "\033[5;31mATTENTION ! Plowdown est en cours de fonctionnement. Que faire ?\033[0m\n" 
+	echo -en "          \033[1m Tuer / Sortir / Continuer ? \033[0m"
+	read -n 1 reponse
+	  case $reponse in
+	    T* | t* )
+	      $HOME/scripts/meurs.sh plowdown
+	      ;;
+	    S* | s* )
+	      rm -v /tmp/autodl/autodl.stop
+	      IFS=$OLDIFS
+	      exit 5
+	      ;;
+	    C* | c* )
+	      echo "\nReprise du script... À vos risques et périls ;)"
+	      ;;
+	    * )
+	      rm -v /tmp/autodl/autodl.stop
+	      afficher_aide_et_sortir
+	      ;;
+	    esac
+      fi
   fi
 
 for((i=0;i<${#scantrad[*]};i++))
@@ -88,13 +126,11 @@ if [[ $force = 1 ]]
     rm $HOME/scripts/autodl.txt
   fi
 touch $HOME/scripts/autodl.txt
-WORKINGDIR=$(mktemp -d)
-cd $WORKINGDIR
 
 for((i=0;i<${#SITES[*]};i++))
   do
     wget -nv "${ADDRSITES[$i]}"
-    nouvelledate=$(grep "${DATESSITES[$i]}" index.html | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")
+    nouvelledate=$(grep "${DATESSITES[$i]}" index.html | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//") # TODO cet index est un problème majeur... Et il faudrait exploser toutes les balises
     if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
       then
 	echo "pas de mises à jour sur ${ADDRSITES[$i]}"
@@ -105,12 +141,11 @@ for((i=0;i<${#SITES[*]};i++))
 	echo "Nouvelle date : $nouvelledate"
 	echo "${SITES[$i]}:" >> $HOME/scripts/autodl.txt
 	FICHIER=$(mktemp)
-	sed "s/${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/autodl.txt | sort | uniq > $FICHIER
+	sed "s/^${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/autodl.txt | sort | uniq > $FICHIER
 	mv $FICHIER $HOME/scripts/autodl.txt # TODO ces trois lignes là, faut apprendre à le faire qu'avec un sed...
 	mv index.html ${SITES[$i]}
       fi
   done
-
 
 if [[ -e scantrad ]]
   then
@@ -128,6 +163,7 @@ if [[ -e scantrad ]]
 	      then
 		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m\n"
 		dlscantrad=1
+		[[ $downloadonly = 0 ]] && lire=1
 		wget -nv $(echo $line | sed 's/.*<link>//' | sed 's/<.*//')
 	      else
 		echo "$titre trouvé mais <= ${!serie}"
@@ -166,6 +202,7 @@ if [[ -e japanshin ]]
 	      then
 		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !\033[0m\n"
 		dljapanshin=1
+		[[ $downloadonly = 0 ]] && lire=1
 		wget -nv "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/'# | sed 's/"//' | sed 's/\&amp;/\&/g')" # TODO c'est quoi ce # en plein milieu ? oO
 	      else
 		echo "$titre trouvé mais <= ($kenichi)"
@@ -187,9 +224,9 @@ if [[ $dljapanshin = 1 ]]
 if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
   then
     echo -en "\033[1m-------------- Téléchargements des nouveaux chapitres ! --------------\033[0m\n"
-    for todl in *
+    for todl in $(ls | grep -v autodl.stop) # TODO C'est mooooche x)
       do
-	mv ./$todl todl
+	mv -v "./$todl" todl
 	$HOME/scripts/dl.sh $PWD "$(grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//')" # TODO euh... NUL ! vive dlbot !
 	if [[ $? = 1 ]]
 	  then
@@ -205,7 +242,7 @@ if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
 if [[ $lire = 1 ]]
   then
     echo -en "\033[1m-------------- Place à la lecture et à l'archivage --------------\033[0m\n"
-    dossieralire=( $WORKINGDIR )
+    dossieralire=( /tmp/autodl )
     for dos in nimautodl
       do
 	if [[ -d $HOME/$dos ]]
@@ -216,7 +253,7 @@ if [[ $lire = 1 ]]
     for fold in ${dossieralire[*]}
       do
 	cd $fold
-	for dos in $(ls)
+	for dos in $(ls | grep -v autodl.stop)
 	  do
 	    feh -FZrSname $dos
 	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
@@ -242,33 +279,33 @@ if [[ $lire = 1 ]]
 		chapitre=$dos
 		echo -en "\033[5;31mATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il ira donc dans \$HOME/nimautodl.\033[0m\n"
 		echo "Ceci est une faute de jeunesse du script et d'inexpérience de Nim65s. Il corrigera ça dès qu'il pourra."
-		sortie=4
+		sortie=4 # bugreport : soucis avec le mv qui suit ca marche pas les ..
 		;;
 	      esac
 	    mv -v $dos $HOME/Scans/$serie/$chapitre
 	  done
       done
-    cd $WORKINGDIR
+    cd /tmp/autodl
   else
-    if [[ ! -d $HOME/nimautodl ]]
+    if [[ $(ls | grep -v autodl.stop | wc -l) -gt 0 ]]
       then
-	mkdir $HOME/nimautodl
-      fi
-    if [[ $(ls | wc -l) -gt 0 ]]
-      then
-	mv -v * $HOME/nimautodl
+	if [[ ! -d $HOME/nimautodl ]]
+	  then
+	    mkdir $HOME/nimautodl
+	  fi
+	mv -v $(ls | grep -v autodl.stop) $HOME/nimautodl
       fi
   fi
 
-if [[ $(ls $WORKINGDIR | wc -l) = 0 ]]
+rm -v /tmp/autodl/autodl.stop
+
+if [[ $(ls /tmp/autodl | wc -l) = 0 ]]
   then
-    rmdir $WORKINGDIR
+    rmdir /tmp/autodl
   else
-    echo -en "\033[5;31m Il reste des fichiers dans $WORKINGDIR :\033[0m\n"
-    ls -A $WORKINGDIR
+    echo -en "\033[5;31m Il reste des fichiers dans /tmp/autodl :\033[0m\n"
+    ls -A /tmp/autodl
   fi
-
-rm -v $HOME/scripts/autodl.stop
 
 IFS=$OLDIFS
 exit $sortie

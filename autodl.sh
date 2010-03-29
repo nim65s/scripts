@@ -13,6 +13,8 @@
 # TODO : exploser systematiquement toutes les pages web téléchargées avec sed '"s/>/>\n/g"' NON => faut garder une unité sur les blocs pour titre date, etc.
 # TODO : ranger les codes de sortie proprement
 # TODO : passer $HOME/scripts/autodl.txt en autodl.rc, et déclarer les variables dans celui-ci.
+# TODO : pour éviter tous ces horribles "ls | grep -v autodl.stop"on pourrait créer un dossier par site et bosser dans celui-ci.
+# TODO : fonction lire pour avoir la possibilité de la lancer avant la MàJ ? En attendant, faut lancer le script tant que y'a pas de MàJ, ou le lancer et le stopper dès que le fichier autodl.txt a été écrit...
 
 OLDIFS=$IFS
 IFS=$'\n'
@@ -39,17 +41,18 @@ afficher_aide_et_sortir()
   {
     echo "nimautdl usage : "
     echo '$HOME/scripts/nimautodl.sh [o] [f] [d]'
-    echo " options : "
-    echo "       o : outrepasse le vérou "
-    echo "       f : force la mise à jour sans tenir compte de la date "
-    echo "       d : télécharger seulement, ne pas lire ni archiver "
-    echo " code de sortie : "
-    echo "              0 : le script s'est déroulé sans encombres."
-    echo "              1 : vérou présent, rien ne s'est passé."
-    echo "              2 : vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements."
-    echo "              3 : mauvais arguments, affichage de l'aide et sortie."
-    echo "              4 : des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl."
-    echo "              5 : plowdown est en fonctionnement, et l'utilisateur a décidé de sortir."
+    echo " Options : "
+    echo "       o : Outrepasse le vérou "
+    echo "       f : Force la mise à jour sans tenir compte de la date "
+    echo "       l : Lire et archiver en prenant en compte les anciens téléchargements "
+    echo "       d : Télécharger seulement, ne pas lire ni archiver "
+    echo " Code de sortie : "
+    echo "              0 : Le script s'est déroulé sans encombres."
+    echo "              1 : Vérou présent, rien ne s'est passé."
+    echo "              2 : Vérou présent sur dl.sh, les fichiers sont téléchargés dans \$HOME/Téléchargements."
+    echo "              3 : Mauvais arguments, affichage de l'aide et sortie."
+    echo "              4 : Des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl."
+    echo "              5 : Plowdown est en fonctionnement, et l'utilisateur a décidé de sortir."
     IFS=$OLDIFS
     exit 3
   }
@@ -59,6 +62,9 @@ while [[ $1 ]]
     case $1 in
       d )
 	downloadonly=1
+	;;
+      l )
+	lire=1
 	;;
       f )
 	force=1
@@ -237,17 +243,18 @@ if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
     rm todl
     echo -en "\033[1m-------------- Extraction --------------\033[0m\n"
     $HOME/scripts/extracteur.sh -r
+    rm */*/Thumbs.db 2>> /dev/null
   fi
 
 if [[ $lire = 1 ]]
   then
     echo -en "\033[1m-------------- Place à la lecture et à l'archivage --------------\033[0m\n"
     dossieralire=( /tmp/autodl )
-    for dos in nimautodl
+    for dos in $HOME/nimautodl
       do
-	if [[ -d $HOME/$dos ]]
+	if [[ -d $dos ]]
 	  then
-	    dossieralire=( ${dossieralire[*]} $HOME/$dos )
+	    dossieralire=( ${dossieralire[*]} $dos )
 	  fi
       done
     for fold in ${dossieralire[*]}

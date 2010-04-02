@@ -232,7 +232,9 @@ if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
     echo -en "\033[1m-------------- Téléchargements des nouveaux chapitres ! --------------\033[0m\n"
     for todl in $(ls | grep -v autodl.stop) # TODO C'est mooooche x)
       do
+	echo -e "\n\n"
 	mv -v "./$todl" todl
+	echo -e "\n"
 	$HOME/scripts/dl.sh $PWD "$(grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//')" # TODO euh... NUL ! vive dlbot !
 	if [[ $? = 1 ]]
 	  then
@@ -260,7 +262,7 @@ if [[ $lire = 1 ]]
     for fold in ${dossieralire[*]}
       do
 	cd $fold
-	for dos in $(ls | grep -v autodl.stop)
+	for dos in $(ls | grep -v autodl.stop) # TODO : vérifier que c'est des dossiers, éventuellement avec des images...
 	  do
 	    feh -FZrSname $dos
 	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
@@ -306,13 +308,19 @@ if [[ $lire = 1 ]]
 
 rm -v /tmp/autodl/autodl.stop
 
-if [[ $(ls /tmp/autodl | wc -l) = 0 ]]
-  then
-    rmdir /tmp/autodl
-  else
-    echo -en "\033[5;31m Il reste des fichiers dans /tmp/autodl :\033[0m\n"
-    ls -A /tmp/autodl
-  fi
+for DOS in /tmp/autodl $HOME/nimautodl
+  do
+    if [[ -d $DOS ]]
+      then
+	if [[ $(ls $DOS | wc -l) = 0 ]]
+	  then
+	    rmdir $DOS
+	  else
+	    echo -en "\033[5;31m Il reste des fichiers dans $DOS :\033[0m\n"
+	    ls -A $DOS
+	  fi
+      fi
+  done
 
 IFS=$OLDIFS
 exit $sortie

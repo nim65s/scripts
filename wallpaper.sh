@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nombre=324
+nombre=331
 export DISPLAY=:0.1
 pif=0
 pif=$RANDOM

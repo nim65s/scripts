@@ -1,0 +1,30 @@
+Ce fichier indique les changements des autres fichiers de ce dossier.
+Parceque j'ai la flemme de le faire dans git.
+
+make.wallpaper
+  gestion des cas de mauvais arguments
+  les cd inutiles sont supprimés
+  ajout du code de sortie 1 ( mauvais argument ) et des dépendances dans l'aide
+  passage de l'aide en fonction, pour réutilisation si mauvais argument ( NB : on ne sort plus immédiatement après l'aide )
+  wallpaper.sh est modifié que si c'est nécessaire
+  déplace par défaut
+
+audodl
+  euh... je sais plus trop :x c'est d'ailleurs pour ça que j'ai décidé de créer ce fichier :)
+  sinon, c'est essentiellement de l'ajout d'options INutiles donc INdispensables
+  simplification de la routine de recherche des derniers chapitres
+  prise en compte du changement de méthode de japan-shin
+  basculement vers dlbot
+  suppression des Thumbs.db
+
+dlbot
+  ajout de la possibilité d'avoir un lien minoriii dans une page qcq. C'est moche, mais ça marche ^^
+  vérification des multis ( ie sont-ils vraiment des multis ? ^^' )  
+  rendu fonctionnel. arrive à paralléliser, mais ne prends pas encore en compte les multis
+
+dl
+  `..` => $(..) && [..] => [[..]]
+
+make.wallpaper & dl & autodl & dlbot
+  passage de l'indentation de 8 à 2 espaces
+  passage de tous les mkdir & rmdir en -pv et suppression des test [[ -d $dos ]] en conséquence

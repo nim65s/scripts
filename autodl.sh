@@ -25,16 +25,17 @@ declare -a ADDRSITES
 declare -a DATESSITES
 declare -a scantrad
 declare -a japanshin
+declare -a mmt
 declare -a dossieralire
 declare -a todlbot
-SITES=( scantrad japanshin )
-ADDRSITES=( http://www.scantrad.fr/rss/ http://www.miroriii.com/dossier/2304/kenichi%20release.html )
-DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> )
+SITES=( scantrad japanshin mmt )
+# ADDRSITES=( http://www.scantrad.fr/rss/ http://www.miroriii.com/dossier/2304/kenichi%20release.html )
+ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ http://www.miammiam-team.com/index.php?file=Download\&op=categorie\&cat=8)
+DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> nodate )
 scantrad=( Naruto OnePiece CodeBreaker )
 japanshin=( Kenichi )
+mmt=( Bakuman )
 todlbot=()
-dlscantrad=0
-dljapanshin=0
 force=0
 lire=0
 downloadonly=0
@@ -57,15 +58,16 @@ codesortie()
 afficher_aide_et_sortir()
   {
     echo "nimautdl usage : "
-    echo '$HOME/scripts/nimautodl.sh [ofldviq]'
+    echo '$HOME/scripts/nimautodl.sh [ofldviqh]'
     echo " Options : "
     echo "       o : Outrepasse le vérou "
     echo "       f : Force la mise à jour sans tenir compte de la date "
     echo "       l : Prend en compte les anciens téléchargements "
     echo "       d : Télécharge seulement "
-    echo "       v : Vérifie seulement si tous les chapitres sout bien là "
+    echo "       v : Vérifie seulement si tous les chapitres sont bien là "
     echo "       i : Archivage Interactif " # TODO : what else ?
     echo "       q : Quick : ne pas vérifier les chapitres " # TODO : what else ?
+    echo "       h : Help "
     echo " NB : tout autre argument affiche cette aide "
     echo " Code de sortie : "
     echo "              0 : Le script s'est déroulé sans encombres."
@@ -78,16 +80,13 @@ afficher_aide_et_sortir()
     echo "             65 : Plusieurs erreurs ! :p "
     echo " Dépendances : 'meurs.sh', 'extracteur.sh' et provisoirement 'dl.sh'."
     echo "             : à situer dans \$HOME/scripts/" # TODO : pas top ^^'
-    IFS=$OLDIFS
-    codesortie 3
-    exit $sortie
   }
 
 verification_manque_chapitre()
   {
     echo -e "\033[1m-------------- Vérification des chapitres --------------\033[0m"
     manqueoverall=0
-    for dos in ${scantrad[*]} ${japanshin[*]}
+    for dos in ${scantrad[*]} ${japanshin[*]} ${mmt[*]}
       do
 	manque=0
 	cd $HOME/Scans/$dos
@@ -147,8 +146,16 @@ for args in ${arguments[*]}
       q )
 	quick=1
 	;;
+      h )
+	afficher_aide_et_sortir
+	IFS=$OLDIFS
+	exit $sortie
+	;;
       * )
 	afficher_aide_et_sortir
+	IFS=$OLDIFS
+	codesortie 3
+	exit $sortie
 	;;
       esac
   done
@@ -190,25 +197,29 @@ if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]]
 	esac
   fi
 
-for var in ${scantrad[*]}
+for var in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} # TODO ${${SITES[*]}[*]}
   do
     declare $var=$(ls $HOME/Scans/$var | sort -g | tail -n 1)
     echo $var : ${!var}
   done
-kenichi=$(ls $HOME/Scans/Kenichi | sort -g | tail -n 1)
-echo Kenichi : $kenichi
 [[ $force = 1 ]] && rm $HOME/scripts/autodl.txt
 touch $HOME/scripts/autodl.txt
 
-# for((i=0;i<${#SITES[*]};i++))
-#   do
-i=0 # modif à cause de JS
-    wget -nv "${ADDRSITES[$i]}"
-    nouvelledate=$(grep "${DATESSITES[$i]}" index.html | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//") # TODO cet index est un problème majeur... Et il faudrait exploser toutes les balises
+for((i=0;i<${#SITES[*]};i++))
+  do
+    wget -nv -O ${SITES[$i]} "${ADDRSITES[$i]}"
+    if [[ "${SITES[$i]}" = "mmt" ]]
+      then
+	wget -nv -O mmtn "http://www.miammiam-team.com/$(grep 'file=Download&amp;op=description' mmt | head -n 1 | cut --delim='"' -f 2 | sed 's/&amp;/\&/g')"
+	nouvelledate="$(grep 'Ajout' mmtn | cut --delim=">" -f 5 | sed 's/[<].*//')"
+	rm mmtn
+      else
+	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")"
+      fi
     if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
       then
 	echo "pas de mises à jour sur ${ADDRSITES[$i]}"
-	rm index.html
+	rm ${SITES[$i]}
       else
 	echo "mises à jours disponibles sur ${ADDRSITES[$i]} !!!"
 	echo "Ancienne date : $(grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed "s/${SITES[$i]}://")"
@@ -217,9 +228,8 @@ i=0 # modif à cause de JS
 	FICHIER=$(mktemp)
 	sed "s/^${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/autodl.txt | sort | uniq > $FICHIER
 	mv $FICHIER $HOME/scripts/autodl.txt # TODO ces trois lignes là, faut apprendre à le faire qu'avec un sed...
-	mv index.html ${SITES[$i]}
       fi
-#   done
+  done
 
 if [[ -e scantrad ]]
   then
@@ -236,7 +246,6 @@ if [[ -e scantrad ]]
 	    if [[ $chapitre -gt ${!serie} ]]
 	      then
 		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m"
-		dlscantrad=1
 		[[ $downloadonly = 0 ]] && lire=1
 		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//' | sed 's/<.*//')")
 	      else
@@ -247,50 +256,115 @@ if [[ -e scantrad ]]
       rm scantrad $FICHIER
   fi
 
-echo -e "\033[1m-------------- Analyse de japanshin --------------\033[0m"
-wget -nv "http://www.miroriii.com/dossier/2304/kenichi%20release.html"
-FICHIER=$(mktemp)
-sed "s/>/>\n/g" kenichi\ release.html | grep miroriii | grep Kenichi | grep -v Tome | sed 's/.*http:\/\///' | sed "s/'.*//" | sed "s/ /\\\ /" > $FICHIER
-while read line
-  do
-    chapitre=$(cut --delimiter=" " -f 2 <<< $line | sed "s/-.*//")
-    if [[ "$chapitre" -gt "$kenichi" ]]
-      then
-	echo -e "\033[1m$line trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !\033[0m"
-	dljapanshin=1
-	[[ $downloadonly = 0 ]] && lire=1
-# 	    $HOME/scripts/dlbot.sh $PWD "$(grep "$chapitre" "$FICHIER")"
-	todlbot=( ${todlbot[*]} "$(grep "$chapitre" "$FICHIER")")
-      else
-	echo "$line trouvé mais <= ($kenichi)"
-      fi
-  done < $FICHIER
-rm kenichi\ release.html $FICHIER
+# {{{ avait été enlevé pour plutôt utiliser le dossier de JS, mais pas au point ( pour la team )
 
+# TODO  : kenichi => $serie
 
-if [[ $dljapanshin == 1 || $dlscantrad == 1 ]]
+if [[ -e japanshin ]]
+  then
+    echo -en "\033[1m-------------- Analyse de japanshin --------------\033[0m\n"
+    FICHIER=$(mktemp)
+    sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="225" bgcolor="#333333">' > $FICHIER
+    while read line
+      do
+	titre=$(echo $line | cut --delimiter=">" -f 7 | sed "s/<\/td//") # ajouter le meme sed que dans scantrad ?
+	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
+	if [[ $serie = Kenichi ]]
+	  then
+	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
+	    if [[ $chapitre -gt $Kenichi ]]
+	      then
+		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) !\033[0m\n"
+		[[ $downloadonly = 0 ]] && lire=1
+		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/' | sed 's/"//' | sed 's/\&amp;/\&/g')" ) # TODO c'est quoi ce # en plein milieu ? oO
+	      else
+		echo "$titre trouvé mais <= ($Kenichi)"
+	      fi
+	  fi
+      done < $FICHIER
+    rm japanshin $FICHIER
+  fi
+
+# if [[ $dljapanshin = 1 ]]
+#   then
+#     for todl in index.php*
+#       do
+# 	wget "$(sed "s/>/>\n/g" ./$todl | grep miroriii | sed 's/.*http:\/\///' | sed 's/".*//' | sed "s/ /\\\ /g")" # TODO au lieu de wget, on >> listeafileradlbot
+# 	rm ./$todl 
+#       done
+#   fi
+
+# echo -e "\033[1m-------------- Analyse de japanshin --------------\033[0m"
+# wget -nv "http://www.miroriii.com/dossier/2304/kenichi%20release.html"
+# FICHIER=$(mktemp)
+# sed "s/>/>\n/g" kenichi\ release.html | grep miroriii | grep Kenichi | grep -v Tome | sed 's/.*http:\/\///' | sed "s/'.*//" | sed "s/ /\\\ /" > $FICHIER
+# while read line
+#   do
+#     chapitre=$(cut --delimiter=" " -f 2 <<< $line | sed "s/-.*//")
+#     if [[ "$chapitre" -gt "$kenichi" ]]
+#       then
+# 	echo -e "\033[1m$line trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !\033[0m"
+# 	dljapanshin=1
+# 	[[ $downloadonly = 0 ]] && lire=1
+# # 	    $HOME/scripts/dlbot.sh $PWD "$(grep "$chapitre" "$FICHIER")"
+# 	todlbot=( ${todlbot[*]} "$(grep "$chapitre" "$FICHIER")")
+#       else
+# 	echo "$line trouvé mais <= ($kenichi)"
+#       fi
+#   done < $FICHIER
+# rm kenichi\ release.html $FICHIER
+
+# }}}
+
+if [[ -e mmt ]]
+  then
+    echo -en "\033[1m-------------- Analyse de mmt --------------\033[0m\n"
+    FICHIER=$(mktemp)
+    grep 'Bakuman - Chapitre' mmt > $FICHIER
+    while read l
+      do 
+	titre=$(echo $l | cut --delim=">" -f 8 | sed 's/<\/b//')
+	chapitre=$(echo $titre | sed "s/[^0-9]//g" | sed 's/0//')
+	if [[ $chapitre -gt $Bakuman ]]
+	  then
+	    echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Bakuman présent sur le disque ($Bakuman) !\033[0m\n"
+	    [[ $downloadonly = 0 ]] && lire=1
+	    dlmmt=1
+	    wget -nv -O page "http://www.miammiam-team.com/$(echo $l | cut --delim='"' -f 2 | sed 's/&amp;/\&/g')"
+	    wget -nv -O page2 "http://www.miammiam-team.com/$(grep window page | grep -v 'Vote\|Comment' | cut --delim="'" -f 2 | sed 's/&amp;/\&/g')" # TODO : op=popup => op=do_dl ?
+	    declare -a bakudl
+	    bakudl=( "$(grep '&amp;' page2 | cut --delim='"' -f 6 | sed 's/&amp;/\&/g')" )
+	    cestbon=0
+	    for lines in ${bakudl[*]}
+	      do
+		if [[ $cestbon = 0 ]]
+		  then
+		    echo -e "\033[1m-------------- Téléchargements de $titre ! --------------\033[0m"
+		    wget "http://www.miammiam-team.com/$lines" && cestbon=1
+		  fi
+	      done
+	    [[ $downloadonly = 0 ]] && lire=1
+	    rm page page2
+	  else
+	    echo "$titre trouvé mais <= ($Bakuman)"
+	  fi
+      done < $FICHIER
+    rm mmt $FICHIER
+  fi
+
+if [[ ${#todlbot[*]} -gt 0 ]]
   then
     echo -e "\033[1m-------------- Téléchargements des nouveaux chapitres ! --------------\033[0m"
     echo -e "\033[1m.............. Passage du flambeau à dlbot ..............\033[0m"
-#     for todl in $(ls | grep -v autodl.stop) # TODO C'est mooooche x)
-#       do
-# 	echo -en "\n\n"
-# 	mv -v "./$todl" todl
-# 	echo -en "\n"
-# 	$HOME/scripts/dl.sh $PWD "$(grep http://www.megaupload.com todl | sed "s/.*http:\/\/www.megaupload.com/http:\/\/www.megaupload.com/" | sed 's/".*//')" # TODO euh... NUL ! vive dlbot !
-# 	if [[ $? = 1 ]]
-# 	  then
-# 	    echo -e "\033[5;31m ATTENTION ! Le téléchargement a été placé en file d'attente. Les fichiers seront téléchargés dans $HOME/nimdl \033[0m"
-# 	    sortie=2
-# 	  fi
-#       done
-#     rm todl
-    $HOME/scripts/dlbot.sh $PWD ${todlbot[*]}
+    $HOME/scripts/dlbot.sh $PWD ${todlbot[*]} # TODO : erreur dlbot ?
     echo -e "\033[1m.............. Reprise du flambeau à dlbot ..............\033[0m"
     echo -e "\033[1m-------------- Extraction --------------\033[0m"
+#     $HOME/scripts/extracteur.sh -r
+#     rm */*/Thumbs.db 2>> /dev/null
+  fi
+
     $HOME/scripts/extracteur.sh -r
     rm */*/Thumbs.db 2>> /dev/null
-  fi
 
 if [[ $lire = 1 ]]
   then
@@ -305,7 +379,7 @@ if [[ $lire = 1 ]]
 	cd $fold
 	for dos in $(ls | grep -v autodl.stop) # TODO : vérifier que c'est des dossiers, éventuellement avec des images...
 	  do
-	    rm -v */Thumbs.db
+	    [[ $( ls */* | grep Thumbs.db | wc -l ) != 0 ]] && rm -v */Thumbs.db
 	    feh -FZrSname $dos
 	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
 	    case $dos in
@@ -320,6 +394,9 @@ if [[ $lire = 1 ]]
 		;;
 	      *de*reaker* )
 		serie=CodeBreaker
+		;;
+	      *akuman* )
+		serie=Bakuman
 		;;
 	      * )
 		mkdir -pv $HOME/nimautodl

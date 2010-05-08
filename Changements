@@ -2,15 +2,14 @@ Ce fichier indique les changements des autres fichiers de ce dossier.
 Parceque j'ai la flemme de le faire dans git.
 
 audodl
-  repassage à l'ancien mode de fonctionnement pour JS
-  modifs mineures
-  correction du !=0
-  ajout d'un option h qui ne renvoie pas l'erreur 3 en sortant
+  '!' => '\!'
+  possibilité de descendre dans Tomes pour la vérification des chapitres... en commentaires pour l'instant, c'est pas au point, et du coup il manque trop de chapitres
 
-dlbot
-  ajout d'un TODO
-  suppression du case pour la gestion des options MU & RS, mais c'est tout buggé :(
+autodl, dlbot, dlbot refonte,
+  'sed "a" | sed "b"' => 'sed "a;b"'
 
-meurs
-  ajout de l'option d
-  lifting du code
+garfield, meurs
+  grep | grep => grep '\|'
+
+kaok
+  ligne inutile...

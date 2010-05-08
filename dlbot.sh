@@ -143,9 +143,9 @@ if [[ $(ls | wc -l) != 0 ]]
   then
     for files in $(ls)
       do
-	nom=$(echo "./$files" | sed "s/[][ -._\/]*//g" | sed "s/html//").nimed
-	sed "s/>/>\n/g" ./$files | grep href | sed 's/.*<a href="[ ]*//I' | sed 's/".*//' > $nom
-	sed "s/>/>\n/g" ./$files | grep src | sed 's/.*src="[ ]*//I' | sed 's/".*//' >> $nom
+	nom=$(echo "./$files" | sed "s/[][ -._\/]*//g;s/html//").nimed
+	sed "s/>/>\n/g" ./$files | grep href | sed 's/.*<a href="[ ]*//I;s/".*//' > $nom
+	sed "s/>/>\n/g" ./$files | grep src | sed 's/.*src="[ ]*//I;s/".*//' >> $nom
 	sort $nom | uniq > $nom.uniq
 	mv $nom.uniq $nom
 	INMOD=0
@@ -178,8 +178,8 @@ if [[ $MIRORIII = 1 ]]
   then
     for files in $(ls)
       do
-	nom=$(echo "./$files" | sed "s/[][ -._\/]*//g" | sed "s/html//").nimed
-	sed "s/>/>\n/g" ./$files | grep href | sed 's/.*<a href="//I' | sed 's/".*//' | sed 's/^ //' > $nom
+	nom=$(echo "./$files" | sed "s/[][ -._\/]*//g;s/html//").nimed
+	sed "s/>/>\n/g" ./$files | grep href | sed 's/.*<a href="//I;s/".*//;s/^ //' > $nom
 	INMOD=0
 	while read line
 	  do

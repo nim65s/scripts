@@ -90,8 +90,10 @@ verification_manque_chapitre()
       do
 	manque=0
 	cd $HOME/Scans/$dos
-	FIRST=$( ls | grep -v Tome | sort -g | head -n 1)
+	FIRST=$( ls | grep -v Tome | sort -g | head -n 1) 
+# 	FIRST=$( ls . Tome\ * | sed '/^$/d;/Tome/d;/.:/d' | sort -g | head -n 1 )
 	LAST=$( ls | grep -v Tome | sort -g | tail -n 1)
+# 	LAST=$( ls . Tome\ * | sed '/^$/d;/Tome/d;/.:/d' | sort -g | tail -n 1 )
 	echo "vérification des chapitres dans $HOME/Scans/$dos, de $FIRST à $LAST"
 	for((i=$FIRST;i<=$LAST;i++))
 	  do 
@@ -104,7 +106,7 @@ verification_manque_chapitre()
 		echo -en "\033[5;31m-$i\033[0m"
 	      fi
 	  done
-	[[ $manque = 0 ]] && echo "OK" || echo -e "\033[5;31m Il semblerait qu'il manque $manque chapitre(s) de $dos !!!\033[0m"
+	[[ $manque = 0 ]] && echo "OK" || echo -e "\033[5;31m Il semblerait qu'il manque $manque chapitre(s) de $dos \!\!\! \033[0m"
       done
     if [[ $manqueoverall = 0 ]]
       then
@@ -214,7 +216,8 @@ for((i=0;i<${#SITES[*]};i++))
 	nouvelledate="$(grep 'Ajout' mmtn | cut --delim=">" -f 5 | sed 's/[<].*//')"
 	rm mmtn
       else
-	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")"
+# 	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")"
+	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//;s/<.*//")"
       fi
     if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
       then
@@ -238,7 +241,8 @@ if [[ -e scantrad ]]
     sed -e :a -e "/title>$/N; s/\n[ \t]*//; ta" scantrad | grep '<title>' > $FICHIER # TODO : tenter un sed -i < grep ?
     while read line
       do
-	titre=$(echo $line | sed "s/<title>//" | sed "s/<.*//" | sed "s/[[:space:]][[:space:]]*/ /g")
+# 	titre=$(echo $line | sed "s/<title>//" | sed "s/<.*//" | sed "s/[[:space:]][[:space:]]*/ /g")
+	titre=$(echo $line | sed "s/<title>//;s/<.*//;s/[[:space:]][[:space:]]*/ /g")
 	serie=$(echo $titre | sed "s/[ \t0-9:]//g")
 	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" || "$serie" == "${scantrad[2]}" ]] # TODO ça c'est moche :s
 	  then
@@ -247,7 +251,8 @@ if [[ -e scantrad ]]
 	      then
 		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m"
 		[[ $downloadonly = 0 ]] && lire=1
-		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//' | sed 's/<.*//')")
+# 		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//' | sed 's/<.*//')")
+		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//;s/<.*//')")
 	      else
 		echo "$titre trouvé mais <= ${!serie}"
 	      fi
@@ -264,19 +269,22 @@ if [[ -e japanshin ]]
   then
     echo -en "\033[1m-------------- Analyse de japanshin --------------\033[0m\n"
     FICHIER=$(mktemp)
-    sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="225" bgcolor="#333333">' > $FICHIER
+    sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="225" bgcolor="#333333">' > $FICHIER # sed | sed, mais... comment dire .. XD
     while read line
       do
 	titre=$(echo $line | cut --delimiter=">" -f 7 | sed "s/<\/td//") # ajouter le meme sed que dans scantrad ?
-	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
-	if [[ $serie = Kenichi ]]
+# 	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
+	serie=$(echo $titre | sed "s/\/Tome//;s/[/ 0-9]//g")
+	if [[ $serie = Kenichi || $serie = kenichi ]]
 	  then
-	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
+# 	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
+	    chapitre=$(echo $titre | sed "s/[/].*//;s/[ a-zA-Z/]//g")
 	    if [[ $chapitre -gt $Kenichi ]]
 	      then
 		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) !\033[0m\n"
 		[[ $downloadonly = 0 ]] && lire=1
-		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/' | sed 's/"//' | sed 's/\&amp;/\&/g')" ) # TODO c'est quoi ce # en plein milieu ? oO
+# 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/' | sed 's/"//' | sed 's/\&amp;/\&/g')" )
+		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
 	      else
 		echo "$titre trouvé mais <= ($Kenichi)"
 	      fi
@@ -324,7 +332,8 @@ if [[ -e mmt ]]
     while read l
       do 
 	titre=$(echo $l | cut --delim=">" -f 8 | sed 's/<\/b//')
-	chapitre=$(echo $titre | sed "s/[^0-9]//g" | sed 's/0//')
+# 	chapitre=$(echo $titre | sed "s/[^0-9]//g" | sed 's/0//')
+	chapitre=$(echo $titre | sed "s/[^0-9]//g;s/0//") # TODO le 0 du second sed, c'est quoi ?
 	if [[ $chapitre -gt $Bakuman ]]
 	  then
 	    echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Bakuman présent sur le disque ($Bakuman) !\033[0m\n"
@@ -381,7 +390,8 @@ if [[ $lire = 1 ]]
 	  do
 	    [[ $( ls */* | grep Thumbs.db | wc -l ) != 0 ]] && rm -v */Thumbs.db
 	    feh -FZrSname $dos
-	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
+# 	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
+	    chapitre=$(echo $dos | sed "s/\xf8//;s/[^0-9]//g")
 	    case $dos in
 	      *enichi* )
 		serie=Kenichi

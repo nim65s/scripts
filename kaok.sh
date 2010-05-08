@@ -3,7 +3,6 @@ cd $HOME/.config/awesome
 
 if [[ $(ls | grep 12 | wc -l) -ge 1 ]]
   then
-    NB=$(ls 12* | wc -l)
     I=1
     for FILE in $(ls 12* | sort -r)
       do

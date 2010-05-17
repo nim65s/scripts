@@ -61,6 +61,7 @@ case $NOMBRE in
 	    ;;
 	  esac
       fi
+    ;;
   *)
     echo $NOMBRE processus contenant $1 trouvés :
     ps -ef | grep -v 'grep\|meurs' | grep $1

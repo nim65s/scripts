@@ -269,22 +269,22 @@ if [[ -e japanshin ]]
   then
     echo -en "\033[1m-------------- Analyse de japanshin --------------\033[0m\n"
     FICHIER=$(mktemp)
-    sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="225" bgcolor="#333333">' > $FICHIER # sed | sed, mais... comment dire .. XD
+    sed "s/<\/td>.*/<\/td>\\\/" japanshin | sed -e :a -e '/\\$/N; s/\\\n[ \t]*//; ta ' | grep '<td width="319" bgcolor="#CCCCCC">' > $FICHIER # sed | sed, mais... comment dire .. XD
     while read line
       do
-	titre=$(echo $line | cut --delimiter=">" -f 7 | sed "s/<\/td//") # ajouter le meme sed que dans scantrad ?
+	titre=$(echo $line | cut --delimiter=">" -f 8 | sed "s/<.*//") # ajouter le meme sed que dans scantrad ?
 # 	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
-	serie=$(echo $titre | sed "s/\/Tome//;s/[/ 0-9]//g")
-	if [[ $serie = Kenichi || $serie = kenichi ]]
+	serie=$(echo $titre | sed "s/\/Tome//;s/ .*//")
+	if [[ $serie = *en*chi ]]
 	  then
 # 	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
-	    chapitre=$(echo $titre | sed "s/[/].*//;s/[ a-zA-Z/]//g")
+	    chapitre=$(echo $titre | sed "s/[/].*//;s/[^0-9]//g")
 	    if [[ $chapitre -gt $Kenichi ]]
 	      then
 		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) !\033[0m\n"
 		[[ $downloadonly = 0 ]] && lire=1
 # 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/' | sed 's/"//' | sed 's/\&amp;/\&/g')" )
-		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
+		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
 	      else
 		echo "$titre trouvé mais <= ($Kenichi)"
 	      fi

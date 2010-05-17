@@ -15,10 +15,11 @@
 #        puis afficher tous les noms des fichiers à télécharger suivi de tous les hébergeurs disponibles
 # TODO : le destdir sera toujours celui qui a été lancé en preums => génération d'un script éxécuté à la fin du daemon qui déplace les fichiers qui sont pas où il faut ?
 # TODO : gestion des !
+# BUG : 404 pour un miroriii => exit status 8 pour wget, cf le man.
 
-# options : 
+# options :
 #       o : overpasser le verrou TODO
-# codes de sortie : 
+# codes de sortie :
 #               1 : déjà en fonctionnement => ajout des adresses dans la liste d'attente
 
 # variables issues de plowshare v 0.9.2

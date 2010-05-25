@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de gestion d'une "base de données" de fond d'écrans.
+# Script de gestion d'une collection de fond d'écrans.
 # Utilise findup de fslint, Copyright 2000-2009 by Padraig Brady <P@draigBrady.com>,
 # donc sous licence GNU GPL v3.
 # Écrit par Nim65s.
@@ -9,7 +9,6 @@ OLDIFS=$IFS
 IFS=$'\n'
 ACTION="mv"
 sortie=0
-modif=0
 nombreactuel=$(ls $HOME/images/wall/ | cut --delimiter="." -f 1 | sort -g | tail -n 1)
 echo "makewallpaper : $nombreactuel fonds d'écran déjà présents"
 
@@ -70,7 +69,6 @@ while [ $1 ]
 	  then
 	    let "nombreactuel += 1"
 	    $ACTION -v $1 $HOME/images/wall/$nombreactuel.$1
-	    modif=1
 	  else
 	    echo -e "\033[5;31mMauvais arugment ! ($1)\033[0m"
 	    afficher_aide
@@ -80,12 +78,6 @@ while [ $1 ]
 	;;
       esac
   done
-
-if [[ $modif = 1 ]]
-  then
-    echo "nombre=$nombreactuel > wallpaper.sh"
-    sed -i "s/nombre=[0-9]*/nombre=$nombreactuel/" $HOME/scripts/wallpaper.sh
-  fi
 
 IFS=$OLDIFS
 exit $sortie

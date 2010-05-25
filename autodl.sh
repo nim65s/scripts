@@ -16,6 +16,8 @@
 # TODO : par défaut, tout est excessivement verbeux... Créer des niveaux verbosity ?
 #        la verbosité peut agir sur cp mv mkdir rmdir wget ( qui a l'option -v par défaut et qu'on enlève avec -nv ) et plowdown ( -q )
 
+
+# BUG : il m'a dl keni tome 35 et giant killing 1 oO
 OLDIFS=$IFS
 IFS=$'\n'
 
@@ -26,15 +28,16 @@ declare -a DATESSITES
 declare -a scantrad
 declare -a japanshin
 declare -a mmt
+declare -a nct
 declare -a dossieralire
 declare -a todlbot
-SITES=( scantrad japanshin mmt )
-# ADDRSITES=( http://www.scantrad.fr/rss/ http://www.miroriii.com/dossier/2304/kenichi%20release.html )
-ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ http://www.miammiam-team.com/index.php?file=Download\&op=categorie\&cat=8)
-DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> nodate )
-scantrad=( Naruto OnePiece CodeBreaker )
+SITES=( scantrad japanshin mmt nct )
+ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ http://www.miammiam-team.com/index.php?file=Download\&op=categorie\&cat=8 http://www.n-c-team.com/flux_rss2.xml)
+DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> nodate \<pubDate\>)
+scantrad=( OnePiece CodeBreaker )
 japanshin=( Kenichi )
 mmt=( Bakuman )
+nct=( Naruto Claymore SilveryCrow )
 todlbot=()
 force=0
 lire=0
@@ -86,7 +89,7 @@ verification_manque_chapitre()
   {
     echo -e "\033[1m-------------- Vérification des chapitres --------------\033[0m"
     manqueoverall=0
-    for dos in ${scantrad[*]} ${japanshin[*]} ${mmt[*]}
+    for dos in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]}
       do
 	manque=0
 	cd $HOME/Scans/$dos
@@ -174,7 +177,7 @@ while [[ -f /tmp/autodl/autodl.stop ]]
 echo .
 echo "Ce fichier est un verrou servant au script autodl de ne pas s'embrouiller dans la recherche des fichiers à télécharger.
 Si une autre instance du script est lancée tant que le verrou est actif, elle patientera gentiment en remplissant la page de petits points." > /tmp/autodl/autodl.stop
-if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]]
+if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]] # TODO autodl.stop ?
   then
     echo -e "\033[5;31mATTENTION ! Plowdown est en cours de fonctionnement. Que faire ?\033[0m" 
     echo -en "          \033[1m Tuer / Sortir / Continuer ? \n ==> \033[0m"
@@ -199,7 +202,7 @@ if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]]
 	esac
   fi
 
-for var in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} # TODO ${${SITES[*]}[*]}
+for var in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} # TODO ${${SITES[*]}[*]}
   do
     declare $var=$(ls $HOME/Scans/$var | sort -g | tail -n 1)
     echo $var : ${!var}
@@ -216,7 +219,6 @@ for((i=0;i<${#SITES[*]};i++))
 	nouvelledate="$(grep 'Ajout' mmtn | cut --delim=">" -f 5 | sed 's/[<].*//')"
 	rm mmtn
       else
-# 	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//" | sed "s/<.*//")"
 	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//;s/<.*//")"
       fi
     if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
@@ -241,17 +243,15 @@ if [[ -e scantrad ]]
     sed -e :a -e "/title>$/N; s/\n[ \t]*//; ta" scantrad | grep '<title>' > $FICHIER # TODO : tenter un sed -i < grep ?
     while read line
       do
-# 	titre=$(echo $line | sed "s/<title>//" | sed "s/<.*//" | sed "s/[[:space:]][[:space:]]*/ /g")
 	titre=$(echo $line | sed "s/<title>//;s/<.*//;s/[[:space:]][[:space:]]*/ /g")
 	serie=$(echo $titre | sed "s/[ \t0-9:]//g")
-	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" || "$serie" == "${scantrad[2]}" ]] # TODO ça c'est moche :s
+	if [[ "$serie" == "${scantrad[0]}" || "$serie" == "${scantrad[1]}" ]] # TODO ça c'est moche :s
 	  then
 	    chapitre=$(echo $titre | sed "s/[ a-zA-Z:]//g")
 	    if [[ $chapitre -gt ${!serie} ]]
 	      then
 		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m"
 		[[ $downloadonly = 0 ]] && lire=1
-# 		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//' | sed 's/<.*//')")
 		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//;s/<.*//')")
 	      else
 		echo "$titre trouvé mais <= ${!serie}"
@@ -273,17 +273,14 @@ if [[ -e japanshin ]]
     while read line
       do
 	titre=$(echo $line | cut --delimiter=">" -f 8 | sed "s/<.*//") # ajouter le meme sed que dans scantrad ?
-# 	serie=$(echo $titre | sed "s/\/Tome//" | sed "s/[/ 0-9]//g")
-	serie=$(echo $titre | sed "s/\/Tome//;s/ .*//")
+	serie=$(echo $titre | sed "s/ .*//;s/\/Tome//")
 	if [[ $serie = *en*chi ]]
 	  then
-# 	    chapitre=$(echo $titre | sed "s/[/].*//" | sed "s/[ a-zA-Z/]//g")
 	    chapitre=$(echo $titre | sed "s/[/].*//;s/[^0-9]//g")
 	    if [[ $chapitre -gt $Kenichi ]]
 	      then
 		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) !\033[0m\n"
 		[[ $downloadonly = 0 ]] && lire=1
-# 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 14 | sed 's/<a href="/http:\/\/www.japan-shin.com/' | sed 's/"//' | sed 's/\&amp;/\&/g')" )
 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
 	      else
 		echo "$titre trouvé mais <= ($Kenichi)"
@@ -332,8 +329,7 @@ if [[ -e mmt ]]
     while read l
       do 
 	titre=$(echo $l | cut --delim=">" -f 8 | sed 's/<\/b//')
-# 	chapitre=$(echo $titre | sed "s/[^0-9]//g" | sed 's/0//')
-	chapitre=$(echo $titre | sed "s/[^0-9]//g;s/0//") # TODO le 0 du second sed, c'est quoi ?
+	chapitre=$(echo $titre | sed "s/[^0-9]//g;s/^0//")
 	if [[ $chapitre -gt $Bakuman ]]
 	  then
 	    echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Bakuman présent sur le disque ($Bakuman) !\033[0m\n"
@@ -359,6 +355,33 @@ if [[ -e mmt ]]
 	  fi
       done < $FICHIER
     rm mmt $FICHIER
+  fi
+
+if [[ -e nct ]]
+  then
+    echo -en "\033[1m-------------- Analyse de nct --------------\033[0m\n"
+    FICHIER=$(mktemp)
+    grep '<title\|<link' nct | sed "s/^[[:space:]]*//;s/[[:space:]]$//" | sed '$!N;s/\n//' | grep Chapitre | grep -v Spoils > $FICHIER
+    while read l
+      do
+	titre=$(echo $l | cut --delim=">" -f 2 | sed "s/<.*//" )
+	chapitre=$(echo $titre | sed "s/[^0-9]//g;s/^0//")
+	serie=$(echo $titre | cut --delim=":" -f 1 | sed "s/ //g")
+	if [[ "$serie" == "${nct[0]}" || "$serie" == "${nct[1]}" || "$serie" == "${nct[2]}" ]]
+	  then
+	    if [[ $chapitre -gt ${!serie} ]]
+	      then
+		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) \033[0m"
+		[[ $downloadonly = 0 ]] && lire=1
+		wget -nv -O page3 $(echo $l | cut --delim=">" -f 4 | sed "s/<.*//")
+		wget -nv -O page4 $(sed 's/"/\n/g' page3 | grep DDL/ddl)
+		chromium $(grep zip page4 | sed 's/"/\n/g' | grep $chapitre | uniq)  --user-data-dir=/home/nim/scripts/chromautodl/ # TODO
+	      else
+		echo "$titre trouvé mais <= ${!serie}"
+	      fi
+	  fi
+      done < $FICHIER
+    rm nct* $FICHIER page3 page4
   fi
 
 if [[ ${#todlbot[*]} -gt 0 ]]
@@ -390,7 +413,6 @@ if [[ $lire = 1 ]]
 	  do
 	    [[ $( ls */* | grep Thumbs.db | wc -l ) != 0 ]] && rm -v */Thumbs.db
 	    feh -FZrSname $dos
-# 	    chapitre=$(echo $dos | sed "s/\xf8//" | sed "s/[^0-9]//g")
 	    chapitre=$(echo $dos | sed "s/\xf8//;s/[^0-9]//g")
 	    case $dos in
 	      *enichi* )
@@ -407,6 +429,12 @@ if [[ $lire = 1 ]]
 		;;
 	      *akuman* )
 		serie=Bakuman
+		;;
+	      *laymore* )
+		serie=Claymore
+		;;
+	      *ilvery*row* )
+		serie=SilveryCrow
 		;;
 	      * )
 		mkdir -pv $HOME/nimautodl

@@ -15,6 +15,7 @@
 # TODO : prendre en compte les fichiers/dossiers déjà présent devrait influer sur les fichiers à télécharger
 # TODO : par défaut, tout est excessivement verbeux... Créer des niveaux verbosity ?
 #        la verbosité peut agir sur cp mv mkdir rmdir wget ( qui a l'option -v par défaut et qu'on enlève avec -nv ) et plowdown ( -q )
+# TODO : paralelliser
 
 
 # BUG : il m'a dl keni tome 35 et giant killing 1 oO
@@ -80,7 +81,7 @@ afficher_aide_et_sortir()
     echo "              4 : Des dossiers n'ont pas pu être classés, ils sont allés dans \$HOME/nimautodl."
     echo "              5 : Plowdown est en fonctionnement, et l'utilisateur a décidé de sortir."
     echo "              6 : Il manque un/des chapitre(s). "
-    echo "             65 : Plusieurs erreurs ! :p "
+    echo "             65 : Plusieurs erreurs :p "
     echo " Dépendances : 'meurs.sh', 'extracteur.sh' et provisoirement 'dl.sh'."
     echo "             : à situer dans \$HOME/scripts/" # TODO : pas top ^^'
   }
@@ -109,13 +110,13 @@ verification_manque_chapitre()
 		echo -en "\033[5;31m-$i\033[0m"
 	      fi
 	  done
-	[[ $manque = 0 ]] && echo "OK" || echo -e "\033[5;31m Il semblerait qu'il manque $manque chapitre(s) de $dos \!\!\! \033[0m"
+	[[ $manque = 0 ]] && echo "OK" || echo -e "\033[5;31m Il semblerait qu'il manque $manque chapitre(s) de $dos \033[0m"
       done
     if [[ $manqueoverall = 0 ]]
       then
-	echo -e "\033[1m Il semblerait que tous les chapitres soient là ! \033[0m"
+	echo -e "\033[1m Il semblerait que tous les chapitres soient là \033[0m"
       else
-	echo -e "\033[5;31m Il semblerait qu'il manque en tout $manqueoverall chapitre(s) !!!\033[0m"
+	echo -e "\033[5;31m Il semblerait qu'il manque en tout $manqueoverall chapitre(s) \033[0m"
 	codesortie 6
       fi
   }
@@ -179,7 +180,7 @@ echo "Ce fichier est un verrou servant au script autodl de ne pas s'embrouiller 
 Si une autre instance du script est lancée tant que le verrou est actif, elle patientera gentiment en remplissant la page de petits points." > /tmp/autodl/autodl.stop
 if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]] # TODO autodl.stop ?
   then
-    echo -e "\033[5;31mATTENTION ! Plowdown est en cours de fonctionnement. Que faire ?\033[0m" 
+    echo -e "\033[5;31mATTENTION... Plowdown est en cours de fonctionnement. Que faire ?\033[0m" 
     echo -en "          \033[1m Tuer / Sortir / Continuer ? \n ==> \033[0m"
     read -n 1 reponse
       case $reponse in
@@ -218,6 +219,9 @@ for((i=0;i<${#SITES[*]};i++))
 	wget -nv -O mmtn "http://www.miammiam-team.com/$(grep 'file=Download&amp;op=description' mmt | head -n 1 | cut --delim='"' -f 2 | sed 's/&amp;/\&/g')"
 	nouvelledate="$(grep 'Ajout' mmtn | cut --delim=">" -f 5 | sed 's/[<].*//')"
 	rm mmtn
+    elif [[ "${SITES[$i]}" = "nct" ]]
+      then
+	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | sed '2!d;s/[\t]*//;s/<[/]*pubDate>//g')"
       else
 	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//;s/<.*//")"
       fi
@@ -226,7 +230,7 @@ for((i=0;i<${#SITES[*]};i++))
 	echo "pas de mises à jour sur ${ADDRSITES[$i]}"
 	rm ${SITES[$i]}
       else
-	echo "mises à jours disponibles sur ${ADDRSITES[$i]} !!!"
+	echo "mises à jours disponibles sur ${ADDRSITES[$i]}"
 	echo "Ancienne date : $(grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed "s/${SITES[$i]}://")"
 	echo "Nouvelle date : $nouvelledate"
 	echo "${SITES[$i]}:" >> $HOME/scripts/autodl.txt
@@ -250,7 +254,7 @@ if [[ -e scantrad ]]
 	    chapitre=$(echo $titre | sed "s/[ a-zA-Z:]//g")
 	    if [[ $chapitre -gt ${!serie} ]]
 	      then
-		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) !\033[0m"
+		echo -e "\033[1m$titre trouvé et plus récent que le dernier chapitre de $serie présent sur le disque (${!serie}) \033[0m"
 		[[ $downloadonly = 0 ]] && lire=1
 		todlbot=( ${todlbot[*]} "$(echo $line | sed 's/.*<link>//;s/<.*//')")
 	      else
@@ -276,10 +280,10 @@ if [[ -e japanshin ]]
 	serie=$(echo $titre | sed "s/ .*//;s/\/Tome//")
 	if [[ $serie = *en*chi ]]
 	  then
-	    chapitre=$(echo $titre | sed "s/[/].*//;s/[^0-9]//g")
+	    chapitre=$(echo $titre | sed "s/[/,].*//;s/[^0-9]//g")
 	    if [[ $chapitre -gt $Kenichi ]]
 	      then
-		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) !\033[0m\n"
+		echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) \033[0m\n"
 		[[ $downloadonly = 0 ]] && lire=1
 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
 	      else
@@ -308,7 +312,7 @@ if [[ -e japanshin ]]
 #     chapitre=$(cut --delimiter=" " -f 2 <<< $line | sed "s/-.*//")
 #     if [[ "$chapitre" -gt "$kenichi" ]]
 #       then
-# 	echo -e "\033[1m$line trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) !\033[0m"
+# 	echo -e "\033[1m$line trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($kenichi) \033[0m"
 # 	dljapanshin=1
 # 	[[ $downloadonly = 0 ]] && lire=1
 # # 	    $HOME/scripts/dlbot.sh $PWD "$(grep "$chapitre" "$FICHIER")"
@@ -332,7 +336,7 @@ if [[ -e mmt ]]
 	chapitre=$(echo $titre | sed "s/[^0-9]//g;s/^0//")
 	if [[ $chapitre -gt $Bakuman ]]
 	  then
-	    echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Bakuman présent sur le disque ($Bakuman) !\033[0m\n"
+	    echo -en "\033[1m$titre trouvé et plus récent que le dernier chapitre de Bakuman présent sur le disque ($Bakuman) \033[0m\n"
 	    [[ $downloadonly = 0 ]] && lire=1
 	    dlmmt=1
 	    wget -nv -O page "http://www.miammiam-team.com/$(echo $l | cut --delim='"' -f 2 | sed 's/&amp;/\&/g')"
@@ -344,7 +348,7 @@ if [[ -e mmt ]]
 	      do
 		if [[ $cestbon = 0 ]]
 		  then
-		    echo -e "\033[1m-------------- Téléchargements de $titre ! --------------\033[0m"
+		    echo -e "\033[1m-------------- Téléchargements de $titre --------------\033[0m"
 		    wget "http://www.miammiam-team.com/$lines" && cestbon=1
 		  fi
 	      done
@@ -386,7 +390,7 @@ if [[ -e nct ]]
 
 if [[ ${#todlbot[*]} -gt 0 ]]
   then
-    echo -e "\033[1m-------------- Téléchargements des nouveaux chapitres ! --------------\033[0m"
+    echo -e "\033[1m-------------- Téléchargements des nouveaux chapitres --------------\033[0m"
     echo -e "\033[1m.............. Passage du flambeau à dlbot ..............\033[0m"
     $HOME/scripts/dlbot.sh $PWD ${todlbot[*]} # TODO : erreur dlbot ?
     echo -e "\033[1m.............. Reprise du flambeau à dlbot ..............\033[0m"
@@ -440,20 +444,39 @@ if [[ $lire = 1 ]]
 		mkdir -pv $HOME/nimautodl
 		serie="../nimautodl"
 		chapitre=$dos
-		echo -e "\033[5;31mATTENTION ! Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il ira donc dans \$HOME/nimautodl.\033[0m"
+		echo -e "\033[5;31mATTENTION... Autodl n'a pas pu déterminer de quelle série il s'agissait pour $dos, il ira donc dans \$HOME/nimautodl.\033[0m"
 		echo "Ceci est une faute de jeunesse du script et d'inexpérience de Nim65s. Il corrigera ça dès qu'il pourra."
 		sortie=4 # bugreport : soucis avec le mv qui suit ca marche pas les ..
 		;;
 	      esac
 	    if [[ $interactif = 0 ]]
 	      then
-		mv -v $dos $HOME/Scans/$serie/$chapitre
+		if [[ -d $HOME/Scans/$serie/$chapitre ]]
+		  then
+		    echo -en "          \033[1m Déplacer $dos dans $HOME/Scans/$serie/$chapitre, alors qu'il existe déjà ? (Oui/Non/Delete) [O] \n ==> \033[0m"
+		    read -n 1 reponse
+		    case $reponse in
+		      n | N )
+			echo -en "\033[1m Veuillez entrez le chemin complet de destination. \n ==> \033[0m"
+			read -r dossier
+			[[ $dossier != "" ]] && mv -v $dos $dossier
+			;;
+		      d | D )
+			rm -r $dos
+			;;
+		      * )
+			mv -v $dos $HOME/Scans/$serie/$chapitre
+			;;
+		      esac
+		  else
+		    mv -v $dos $HOME/Scans/$serie/$chapitre
+		  fi
 	      else
 		echo -en "          \033[1m Déplacer $dos dans $HOME/Scans/$serie/$chapitre ? [O/n] \n ==> \033[0m"
 		read -n 1 reponse
 		case $reponse in
 		  n | N )
-		    echo -en "\033[1m Veuillez entrez le chemin complet de destination. [$HOME/nimautodl] \n ==> \033[0m"
+		    echo -en "\033[1m Veuillez entrez le chemin complet de destination. \n ==> \033[0m"
 		    read -r reponse
 		    [[ $reponse != "" ]] && mv -v $dos $reponse
 		    ;;

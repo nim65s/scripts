@@ -287,7 +287,10 @@ if [[ -e japanshin ]]
 	      then
 		echo -en "\033[1m $titre trouvé et plus récent que le dernier chapitre de Kenichi présent sur le disque ($Kenichi) \033[0m\n"
 		[[ $downloadonly = 0 ]] && lire=1
-		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
+# 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
+		wget -nv -O page5 $(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')
+		todlbot=( ${todlbot[*]} "$(sed 's/"/\n/g' page5 | grep miroriii.com | head -n 1)" )
+		rm page5
 	      else
 		echo -e "\033[0;37m $titre trouvé mais <= ($Kenichi)\033[0m"
 	      fi

@@ -22,9 +22,9 @@
 # codes de sortie :
 #               1 : déjà en fonctionnement => ajout des adresses dans la liste d'attente
 
-# variables issues de plowshare v 0.9.2
+# variables issues de plowshare v 0.9.3
 declare -a MODULES
-MODULES=(rapidshare megaupload 2shared badongo mediafire 4shared zshare depositfiles storage_to uploaded_to uploading netload_in usershare sendspace x7_to hotfile divshare dl_free_fr humyo filefactory data_hu)
+MODULES=(rapidshare megaupload 2shared badongo mediafire 4shared zshare depositfiles storage_to uploaded_to uploading netload_in usershare sendspace x7_to hotfile divshare dl_free_fr humyo filefactory data_hu 115)
 MODULE_2SHARED_REGEXP_URL="http://\(www\.\)\?2shared\.com/file/"
 MODULE_4SHARED_REGEXP_URL="http://\(www\.\)\?4shared\.com/file/"
 MODULE_BADONGO_REGEXP_URL="http://\(www\.\)\?badongo\.com/"
@@ -47,8 +47,12 @@ MODULE_UPLOADING_REGEXP_URL="http://\(\w\+\.\)\?uploading\.com/"
 MODULE_USERSHARE_REGEXP_URL="http://\(www\.\)\?usershare\.net/"
 MODULE_X7_TO_REGEXP_URL="^http://\(www\.\)\?x7\.to/"
 MODULE_ZSHARE_REGEXP_URL="^http://\(www\.\)\?zshare\.net/\(download\|delete\)"
+MODULE_115_REGEXP_URL="http://\(\w\+\.\)\?115\.com/file/"
 
-miroriii_regexp_url="^http://\(www\.\)\?miroriii.com/"
+# miroriii_regexp_url="^http://\(www\.\)\?miroriii.com/"
+miroriii_regexp_url='gestdown.info\|mirorii'
+
+
 OLDIFS=$IFS
 IFS=$'\n'
 
@@ -285,12 +289,12 @@ for dos in "/tmp/dlbot/wd" "/tmp/dlbot/todl" "/tmp/dlbot/multi" "/tmp/dlbot/mult
 echo -e "\n\033[1m Fin du script. \033[0m"
 if [[ ${#DLOK[*]} -gt 0 ]]
   then
-    echo -e "\n\033[1m téléchargés avec succés : \033[0m"
+    echo -e "\n\033[1m Téléchargés avec succés : \033[0m"
     echo ${DLOK[*]}
   fi
 if [[ ${#DLKO[*]} -gt 0 ]]
   then
-    echo -e "\033[5;31m téléchargés avec succés : \033[0m"
+    echo -e "\033[5;31m Téléchargements ratés : \033[0m"
     echo ${DLKO[*]}
   fi
 

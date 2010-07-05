@@ -32,9 +32,9 @@ declare -a dossieralire
 declare -a todlbot
 SITES=( scantrad japanshin mmt nct )
 ADDRSITES=( http://www.scantrad.fr/rss/ http://www.japan-shin.com/ http://www.miammiam-team.com/index.php?file=Download\&op=categorie\&cat=8 http://www.n-c-team.com/flux_rss2.xml)
-DATESSITES=( \<pubDate\> \<td\ width=\"150\"\ bgcolor=\"#333333\"\>\<\em\> nodate \<pubDate\>)
+DATESSITES=( \<pubDate\> \<td\ width=\"95\"\ bgcolor=\"#333333\"\>\<\em\> nodate \<pubDate\>)
 scantrad=( OnePiece CodeBreaker Naruto )
-japanshin=( Kenichi )
+japanshin=( Kenichi MetallicaMetalluca)
 mmt=( Bakuman )
 nct=( Naruto Claymore SilveryCrow )
 todlbot=()
@@ -203,7 +203,12 @@ if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]] # TODO autodl.stop ?
 
 for var in  $(echo ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} | sed "s/ /\n/g" | sort | uniq ) # TODO ${${SITES[*]}[*]}
   do
-    declare $var=$(ls $HOME/Scans/$var | sort -g | tail -n 1)
+    if [[ $( ls $HOME/Scans/$var | wc -l ) -gt 0 ]]
+      then
+	declare $var=$(ls $HOME/Scans/$var | sort -g | tail -n 1)
+      else
+	declare $var=0
+      fi
     echo " $var : ${!var}"
   done
 [[ $force = 1 ]] && rm $HOME/scripts/autodl.txt
@@ -289,10 +294,24 @@ if [[ -e japanshin ]]
 		[[ $downloadonly = 0 ]] && lire=1
 # 		todlbot=( ${todlbot[*]} "$(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')" )
 		wget -nv -O page5 $(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')
-		todlbot=( ${todlbot[*]} "$(sed 's/"/\n/g' page5 | grep miroriii.com | head -n 1)" )
+# 		todlbot=( ${todlbot[*]} "$(sed 's/"/\n/g' page5 | sed 's/ *//g' | grep mirorii | head -n 1)" )
+		todlbot=( ${todlbot[*]} "$(sed 's/"/\n/g' page5 | sed 's/ *//g' | grep mirorii | grep -v Tome)" )
 		rm page5
 	      else
 		echo -e "\033[0;37m $titre trouvé mais <= ($Kenichi)\033[0m"
+	      fi
+	elif [[ $serie = *etall*ca* ]]
+	  then
+	    chapitre=$(echo $titre | sed "s/[/,].*//;s/[^0-9]//g")
+	    if [[ $chapitre -gt $MetallicaMetalluca ]]
+	      then
+		echo -en "\033[1m $titre trouvé et plus récent que le dernier chapitre de Metallica Metalluca présent sur le disque ($MetallicaMetalluca) \033[0m\n"
+		[[ $downloadonly = 0 ]] && lire=1
+		wget -nv -O page5 $(echo $line | cut --delimiter=">" -f 7 | sed 's/<a href="/http:\/\/www.japan-shin.com/;s/"//;s/\&amp;/\&/g')
+		todlbot=( ${todlbot[*]} "$(sed 's/"/\n/g' page5 | sed 's/ *//g' | grep mirorii | head -n 1)" )
+		rm page5
+	      else
+		echo -e "\033[0;37m $titre trouvé mais <= ($MetallicaMetalluca)\033[0m"
 	      fi
 	  fi
       done < $FICHIER
@@ -448,6 +467,9 @@ if [[ $lire = 1 ]]
 	      *ilvery*row* )
 		serie=SilveryCrow
 		;;
+	      *eta*ca* )
+		serie=MetallicaMetalluca
+		;;
 	      * )
 		mkdir -pv $HOME/nimautodl
 		serie="../nimautodl"
@@ -486,6 +508,7 @@ if [[ $lire = 1 ]]
 		  n | N )
 		    echo -en "\033[1m Veuillez entrez le chemin complet de destination. \n ==> \033[0m"
 		    read -r reponse
+		    echo
 		    [[ $reponse != "" ]] && mv -v $dos $reponse
 		    ;;
 		  * )

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DISPLAY=:0.1
+export DISPLAY=:0.0
 cd $HOME/images
 
 if [[ -e ga$(date '+%y%m%d' --date '1 days ago').gif ]]

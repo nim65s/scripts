@@ -69,6 +69,7 @@ afficher_aide_et_sortir()
     echo "       v : Vérifie seulement si tous les chapitres sont bien là "
     echo "       i : Archivage Interactif " # TODO : what else ?
     echo "       q : Quick : ne pas vérifier les chapitres " # TODO : what else ?
+    echo "       s : Vérivie les mises à jour, et télécharge, les scans de Seikirei"
     echo "       h : Help "
     echo " NB : tout autre argument affiche cette aide "
     echo " Code de sortie : "
@@ -88,7 +89,7 @@ verification_manque_chapitre()
   {
     echo -e "\033[1m-------------- Vérification des chapitres --------------\033[0m"
     manqueoverall=0
-    for dos in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]}
+    for dos in ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} Seikirei
       do
 	manque=0
 	cd $HOME/Scans/$dos
@@ -155,6 +156,9 @@ for args in ${arguments[*]}
 	IFS=$OLDIFS
 	exit $sortie
 	;;
+      s )
+	seikirei=1
+	;;
       * )
 	afficher_aide_et_sortir
 	IFS=$OLDIFS
@@ -201,7 +205,7 @@ if [[ "$(pidof -s -x -o %PPID plowdown)" != "" ]] # TODO autodl.stop ?
 	esac
   fi
 
-for var in  $(echo ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} | sed "s/ /\n/g" | sort | uniq ) # TODO ${${SITES[*]}[*]}
+for var in  $(echo ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} Seikirei | sed "s/ /\n/g" | sort | uniq ) # TODO ${${SITES[*]}[*]}
   do
     if [[ $( ls $HOME/Scans/$var | wc -l ) -gt 0 ]]
       then
@@ -414,6 +418,21 @@ if [[ -e nct ]]
     rm nct* $FICHIER
   fi
 
+if [[ $seikirei = 1 ]]
+  then
+    wget -nv -O seikirei 'http://www.funcenter.fr/forum/mangas_listing.php?sup=Seikirei'
+    while [[ $( grep $(($Seikirei+1)) seikirei ) ]]
+      do
+	echo -e "\033[1m $( grep $(($Seikirei+1)) seikirei | cut -d ">" -f 3| sed "s/<.*//") trouvé et plus récent que le dernier chapitre de Seikirei présent sur le disque \033[0m"
+	((Seikirei++))
+	echo "wget -nv -O SEK $(grep $Seikirei seikirei | cut --delimiter='"' -f 2)"
+	wget -nv -O SEK $(grep $Seikirei seikirei | cut --delimiter='"' -f 2)
+	mv -v SEK Seikirei$Seikirei.zip
+	lire=1
+      done
+    rm seikirei
+  fi
+
 if [[ ${#todlbot[*]} -gt 0 ]]
   then
     echo -e "\033[1m-------------- Téléchargements des nouveaux chapitres --------------\033[0m"
@@ -469,6 +488,9 @@ if [[ $lire = 1 ]]
 		;;
 	      *eta*ca* )
 		serie=MetallicaMetalluca
+		;;
+	      Seikirei* )
+		serie=Seikirei
 		;;
 	      * )
 		mkdir -pv $HOME/nimautodl

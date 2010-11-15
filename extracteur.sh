@@ -3,6 +3,10 @@
 # option : "-r" => détruit l'archive
 
 #TODO : bug avec des parentheses, notamment dans un rar ? => fonction d'echappement des caractères spéciaux ?
+#mv: impossible d'évaluer « mpckbd.bz2.tar.tar »: Aucun fichier ou dossier de ce type
+#tar: mpckbd.bz2.tar.tar : la fonction open a échoué: Aucun fichier ou dossier de ce type
+#tar: Error is not recoverable: exiting now
+
 
 ODLIFS=$IFS
 IFS=$'\n'

@@ -15,6 +15,7 @@
 #        puis afficher tous les noms des fichiers à télécharger suivi de tous les hébergeurs disponibles
 # TODO : le destdir sera toujours celui qui a été lancé en preums => génération d'un script éxécuté à la fin du daemon qui déplace les fichiers qui sont pas où il faut ?
 # TODO : gestion des !
+# TODO : sharabee == megaup
 # BUG : 404 pour un miroriii => exit status 8 pour wget, cf le man.
 
 # options :
@@ -119,7 +120,12 @@ unite_de_telechargement()
 
 if [[ -d $1 ]]
   then
-    DESTDIR="$1"
+    if [[ $(echo $1 | cut -d / -f 1) ]]
+      then
+	DESTDIR="$PWD/$1"
+      else
+	DESTDIR="$1"
+      fi
     shift
   else
     mkdir -pv $HOME/Téléchargements

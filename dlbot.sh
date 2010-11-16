@@ -104,11 +104,13 @@ unite_de_telechargement()
 	    if [[ $ERROR_UT -gt 0 ]]
 	      then
 		echo " !!!!!!!!! PLOWDOWN FAIL : unité de téléchargement : $TODL_UT => $ERROR_UT !!!!!!!!!!!!! "
-		echo "FAIL : unité de téléchargement : $TODL_UT => $ERROR_UT " >> $HOME/dlbot.log
+		date +"%x %X" >> $HOME/scripts/nim.error.log
+		echo "FAIL : unité de téléchargement : $TODL_UT => $ERROR_UT " >> $HOME/scripts/nim.error.log
 		sed -i "/$(echo $TODL_UT | sed "s/.*[/]//g")/d" $MODULE_UT
 		DLKO=( ${DLKO[*]} $TODL_UT )
 	      else
-		echo "SUCCESS : unité de téléchargement : $TODL_UT => $DESTDIR_UT" >> $HOME/dlbot.log
+		date +"%x %X" >> $HOME/scripts/nim.log
+		echo "SUCCESS : unité de téléchargement : $TODL_UT => $DESTDIR_UT" >> $HOME/scripts/nim.log
 		sed -i "/$(echo $TODL_UT | sed "s/.*[/]//g")/d" $MODULE_UT
 		DLOK=( ${DLOK[*]} $TODL_UT )
 	      fi

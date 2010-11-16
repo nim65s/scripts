@@ -9,9 +9,9 @@
 # TODO : chercher dans les dossiers actuels si y'a pas déjà des trucs interessants, toussa.. peut être que le nom n'est pas approprié...
 # TODO : exploser systematiquement toutes les pages web téléchargées avec sed '"s/>/>\n/g"' NON => faut garder une unité sur les blocs pour titre date, etc.
 # TODO : ranger les codes de sortie proprement
-# TODO : passer $HOME/scripts/autodl.txt en autodl.rc, et déclarer les variables dans celui-ci.
+# TODO : passer $HOME/scripts/tbdd.autodl en autodl.rc, et déclarer les variables dans celui-ci.
 # TODO : pour éviter tous ces horribles "ls | grep -v autodl.stop"on pourrait créer un dossier par site et bosser dans celui-ci.
-# TODO : fonction lire pour avoir la possibilité de la lancer avant la MàJ ? En attendant, faut lancer le script tant que y'a pas de MàJ, ou le lancer et le stopper dès que le fichier autodl.txt a été écrit...
+# TODO : fonction lire pour avoir la possibilité de la lancer avant la MàJ ? En attendant, faut lancer le script tant que y'a pas de MàJ, ou le lancer et le stopper dès que le fichier tbdd.autodl a été écrit...
 # TODO : prendre en compte les fichiers/dossiers déjà présent devrait influer sur les fichiers à télécharger
 # TODO : par défaut, tout est excessivement verbeux... Créer des niveaux verbosity ?
 #        la verbosité peut agir sur cp mv mkdir rmdir wget ( qui a l'option -v par défaut et qu'on enlève avec -nv ) et plowdown ( -q )
@@ -215,8 +215,8 @@ for var in  $(echo ${scantrad[*]} ${japanshin[*]} ${mmt[*]} ${nct[*]} Seikirei |
       fi
     echo " $var : ${!var}"
   done
-[[ $force = 1 ]] && rm $HOME/scripts/autodl.txt
-touch $HOME/scripts/autodl.txt
+[[ $force = 1 ]] && rm $HOME/scripts/tbdd.autodl
+touch $HOME/scripts/tbdd.autodl
 
 OLDIFS=$IFS
 IFS=$'\n'
@@ -236,18 +236,18 @@ for((i=0;i<${#SITES[*]};i++))
       else
 	nouvelledate="$(grep "${DATESSITES[$i]}" ${SITES[$i]} | head -n 1 | sed "s/[ \t]*${DATESSITES[$i]}//;s/<.*//")"
       fi
-    if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/autodl.txt)" ]]
+    if [[ "${SITES[$i]}:$nouvelledate" == "$(grep ${SITES[$i]} $HOME/scripts/tbdd.autodl)" ]]
       then
 	echo -e "\033[0;37m pas de mises à jour sur ${ADDRSITES[$i]}\033[0m"
 	rm ${SITES[$i]}
       else
 	echo -e "\033[0m mises à jours disponibles sur ${ADDRSITES[$i]}"
-	echo -e "\033[0;37m Ancienne date : $(grep ${SITES[$i]} $HOME/scripts/autodl.txt | sed "s/${SITES[$i]}://")\033[0m"
+	echo -e "\033[0;37m Ancienne date : $(grep ${SITES[$i]} $HOME/scripts/tbdd.autodl | sed "s/${SITES[$i]}://")\033[0m"
 	echo " Nouvelle date : $nouvelledate"
-	echo "${SITES[$i]}:" >> $HOME/scripts/autodl.txt
+	echo "${SITES[$i]}:" >> $HOME/scripts/tbdd.autodl
 	FICHIER=$(mktemp)
-	sed "s/^${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/autodl.txt | sort | uniq > $FICHIER
-	mv $FICHIER $HOME/scripts/autodl.txt # TODO ces trois lignes là, faut apprendre à le faire qu'avec un sed...
+	sed "s/^${SITES[$i]}:.*/${SITES[$i]}:$nouvelledate/" $HOME/scripts/tbdd.autodl | sort | uniq > $FICHIER
+	mv $FICHIER $HOME/scripts/tbdd.autodl # TODO ces trois lignes là, faut apprendre à le faire qu'avec un sed...
       fi
   done
 

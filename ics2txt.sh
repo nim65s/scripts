@@ -7,7 +7,7 @@ MIN=78
 CMD="$HOME/scripts/morningbird.sh"
 DAEMON="kalarm"
 
-if [[ "$(date +%H)" -ge 17 ]]
+if [[ "$(date +%H)" -ge 16 ]]
 then
 	SDATE="$(date -d tomorrow +%Y%m%d)"
 else
@@ -125,6 +125,7 @@ fi
 if [[ "$NOTIFY" == 1 ]]
 then
 	notify-send -t 15000 "`cat edt-du-jour.txt`"
+	cat edt-du-jour.txt
 fi
 
 if [[ "$ALARM" == 1 ]]
@@ -141,6 +142,7 @@ then
 	if [[ "$DAEMON" == "kalarm" ]]
 	then
 		DATE="$(date -d $SDATE +%d)-$H:$M"
+		[[ "$ne" != 0 ]] && echo "k-alarme @ $DATE"
 		kalarm -t $DATE -e $CMD
 	elif [[ "$DAEMON" == "at" ]]
 	then

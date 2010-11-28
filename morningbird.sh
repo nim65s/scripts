@@ -1,8 +1,8 @@
 #! /bin/bash
 
 #valeurs par defaut des variables
-VOLINIT=15
-VOLMAX=30
+VOLINIT=50
+VOLMAX=100
 TIMEINC=3
 VOLINC=1
 PLAYER=mpd

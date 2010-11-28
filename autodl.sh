@@ -17,7 +17,10 @@
 #        la verbosité peut agir sur cp mv mkdir rmdir wget ( qui a l'option -v par défaut et qu'on enlève avec -nv ) et plowdown ( -q )
 # TODO : paralelliser
 # TODO : couleurs en variables
-
+#
+# http://www.japan-shin.com/DDL/%5BJS%5DKenichi%20406.rar; done 
+# http://www.japan-shin.com/DDL/[JS]Metallica%20Metalluca%2009.rar
+#
 # BUG : il m'a dl keni tome 35 et giant killing 1 oO
 
 declare -a arguments

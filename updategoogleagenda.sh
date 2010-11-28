@@ -40,7 +40,7 @@ done < g80
 
 rm g80 g80.ics
 
-sed -i "$(wc -l edt.ics | cut -d" " -f 1)d" edt.ics
+sed -i "$(wc -l edt.ics | cut -d" " -f 1)d;/UID/d" edt.ics
 
 echo "END:VCALENDAR" >> edt.ics
 

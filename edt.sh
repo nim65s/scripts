@@ -108,8 +108,6 @@ then
 		echo "TODO : le 'at', marche pas sur mon pc -_-' "
 	elif [[ "$DAEMON" == "cron" ]]
 	then
-			[[ $(crontab -l | wc -l | cut -d" " -f 1) -gt 1 ]] && exit 1
-			crontab -d
 			DATE="$M $H $(date -d $SDATE +%d) * *"
 			echo "$DATE $CMD" | crontab -
 			[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "$(crontab -l)"

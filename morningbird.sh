@@ -1,12 +1,14 @@
 #! /bin/bash
 
 #valeurs par defaut des variables
-VOLINIT=50
+VOLINIT=80
 VOLMAX=100
 TIMEINC=3
 VOLINC=1
 PLAYER=mpd
 TIMEWAIT=180
+
+crontab -l | grep -q morningbird && crontab -l | grep -v morningbird | crontab -
 
 #modification par options
 while [ $# -ne 0 ]

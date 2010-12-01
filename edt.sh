@@ -8,7 +8,7 @@ CMD2="mpc crop; DISPLAY:=0.1 notify-send -t 20000 'bouge-toi !'"
 CMD3="mpc stop; DISPLAY:=0.1 notify-send -u urgent -t 20000 'DÉGAGE!'"
 DAEMON="cron"
 
-export DISPLAY:=0.1
+[[ -n "$DISPLAY" ]] || export DISPLAY:=0.1
 
 if [[ "$(date +%H)" -ge 16 ]]
 then
@@ -66,6 +66,8 @@ then
 
 wget -O edt.ics $ICS
 
+sed 's/\r//g' edt.ics > edt
+
 sed -i "1,3d;
 s/[\]n/\n/g;
 /END:VCALENDAR/d;
@@ -74,9 +76,10 @@ s/BEGIN:VEVENT//;
 /LOCATION/d;
 s/DESCRIPTION://;
 s/SUMMARY://;
-/^$/d" edt.ics
+/^$/d" edt
 
 echo $SDATE > edt-du-jour.txt
+echo '----------------------------------' >> edt-du-jour.txt
 
 while read line
 do
@@ -87,9 +90,11 @@ do
 	else
 		echo $line >> edt-du-jour.txt
 	fi
-done < edt.ics
+done < edt
 
-rm edt.ics 
+rm edt.ics edt
+
+sed -i "/^$/d" edt-du-jour.txt
 
 fi
 

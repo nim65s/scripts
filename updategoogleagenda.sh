@@ -12,8 +12,9 @@ else
 fi
 
 cd $HOME/www_public
-wget --user=$USER --password=$PASSWORD $ICS
-sed 's/\x0D$//' g80.ics > g80
+wget --user=$USER --password=$PASSWORD -O net.ics $ICS
+sed 's/\x0D$//' net.ics > ics
+sed -i 's/[\]n/\n\r/g' ics
 
 echo "BEGIN:VCALENDAR
 VERSION:2.0
@@ -36,11 +37,11 @@ do
 		then
 				echo $line >> edt.ics
 		fi
-done < g80
+done < ics
 
-rm g80 g80.ics
+rm ics net.ics
 
-sed -i "$(wc -l edt.ics | cut -d" " -f 1)d;/UID/d" edt.ics
+sed -i "$(wc -l edt.ics | cut -d" " -f 1)d;/UID/d;/CATEGORIES/d" edt.ics
 
 echo "END:VCALENDAR" >> edt.ics
 

@@ -43,6 +43,8 @@ case $1 in
 		notify)
 				notify-send $([[ -f /var/run/daemons/foldingathome-gpu ]] && echo GPU_:_RUNNING || echo GPU_:_STOPPED) "$(cat /opt/fah-gpu/alpha/unitinfo.txt)"
 				notify-send $([[ -f /var/run/daemons/foldingathome-smp ]] && echo SMP_:_RUNNING || echo SMP_:_STOPPED) "$(cat /opt/fah-smp/unitinfo.txt)"
+				[[ -f /var/run/daemons/foldingathome-gpu || -f /var/run/daemons/foldingathome-smp ]] && BG='normal' || BG='urgent'
+				echo "fahwidget.bg = beautiful.bg_$BG" | awesome-client
 				;;
 		*)
 				echo "usage : start | stop | restart | ssta | ssto | gsta | gsto | awesome | notify"

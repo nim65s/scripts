@@ -1,14 +1,20 @@
 #!/bin/bash
 ICS="http://bde.enseeiht.fr/~saurelg/edt.ics"
 MIN=78
+MIN2=23
+MIN3=18
 CMD="$HOME/scripts/morningbird.sh"
+CMD2="mpc crop; DISPLAY:=0.1 notify-send -t 20000 'bouge-toi !'"
+CMD3="mpc stop; DISPLAY:=0.1 notify-send -u urgent -t 20000 'DÉGAGE!'"
 DAEMON="cron"
+
+export DISPLAY:=0.1
 
 if [[ "$(date +%H)" -ge 16 ]]
 then
-	SDATE="$(date -d tomorrow +%Y%m%d)"
+	SDATE="$(date -d tomorrow +%Y-%m-%d)"
 else
-	SDATE="$(date +%Y%m%d)"
+	SDATE="$(date +%Y-%m-%d)"
 fi
 
 NOTIFY=0
@@ -40,19 +46,25 @@ do
 			echo "                 update : force la mise à jour, même si le fichier existe et date du jour actuel "
 			echo "                 alarm  : programme votre réveil" 
 			echo "                 date   : utilise 'yyyymmdd'"
-			echo "                          ( défaut : aujourd'hui s'il est moins de 17h, demain sinon )"
+			echo "                          ( défaut : aujourd'hui s'il est moins de 16h, demain sinon )"
 			echo " Configuration :"
-			echo "                 Pour l'instant, il vous faut éditer les cinq premières variables de ce fichier."
+			echo "                 Pour l'instant, il vous faut éditer les huit premières variables de ce fichier."
 			echo "                 'ICS' : adresse du .ics à télécharger"
-			echo "                 'MIN' : Nombre de minutes dont vous avez besoin entre le moement où l'alarme se déclenche et le moment où vous devez entrer en cours"
-			echo "                 'CMD' : Commande à executer pour que vous vous réveilliez"
-			echo "                 'DAEMON' : utilitaire qui execute votre 'CMD' : cron, at ou kalarm"
+			echo "                 'MIN', 'MIN2' et 'MIN3' : le nombre de minutes entre l'execution de la commande 'CMD', 'CMD2' et 'CMD3' et l'heure de début de votre emploi du temps"
+			echo "                                           ce nombre ne peut exceder une journée moins votre décalage horaire ( donc en UTC +0200, c'est 1320 max... )"
+			echo "                 'CMD', 'CMD2' et 'CMD3' : Commandes à executer à ces heures"
+			echo "                 'DAEMON' : utilitaire qui execute vos 'CMD' à l'heure H-'MIN' : cron ou kalarm"
 			exit 1
 			;;
 	esac
 done
 
-wget $ICS
+cd $HOME/scripts/textfiles
+
+if [[ ! -e edt-du-jour.txt || $UPDATE == 1  || "$(head -n 1 edt-du-jour.txt)" != "$SDATE" ]]
+then
+
+wget -O edt.ics $ICS
 
 sed -i "1,3d;
 s/[\]n/\n/g;
@@ -61,11 +73,10 @@ s/END:VEVENT/----------------------------------/;
 s/BEGIN:VEVENT//;
 /LOCATION/d;
 s/DESCRIPTION://;
-s/SUMMARY://" edt.ics
-sed -i "/^$/d" edt.ics
-# le LOCATION peut servir... sais pas
-[[ -e edt-du-jour.txt ]] && rm edt-du-jour.txt
-afficher=0
+s/SUMMARY://;
+/^$/d" edt.ics
+
+echo $SDATE > edt-du-jour.txt
 
 while read line
 do
@@ -80,37 +91,38 @@ done < edt.ics
 
 rm edt.ics 
 
-if [[ "$NOTIFY" == 1 ]]
-then
-	notify-send -t 15000 "`cat edt-du-jour.txt`"
-	cat edt-du-jour.txt
 fi
+
+[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "`cat edt-du-jour.txt`" || cat edt-du-jour.txt
 
 if [[ "$ALARM" == 1 ]]
 then
 	HEURE="$(sed "/^[^0-9]/d" edt-du-jour.txt | sort -n | head -n 1)"
-	H="$(echo $HEURE | cut -d":" -f1)"
-	M="$(echo $HEURE | cut -d":" -f2)"
-	let "DM = MIN % 60"
-	let "DH = MIN / 60"
-	let "M -= DM"
-	[[ $M -lt 0 ]] && let "M += 60" && let "H -= 1"
-	let "H -= DH"
-
 	if [[ "$DAEMON" == "kalarm" ]]
 	then
-		DATE="$(date -d $SDATE +%d)-$H:$M"
-		[[ "$ne" != 0 ]] && echo "k-alarme @ $DATE"
+		DATE="$(date -d "$SDATE $HEURE +01:$MIN" +"%Y-%m-%d-%H:%M")"
+		DATE="$(date -d "$SDATE $HEURE +01:$MIN2" +"%Y-%m-%d-%H:%M")"
+		DATE="$(date -d "$SDATE $HEURE +01:$MIN3" +"%Y-%m-%d-%H:%M")"
 		kalarm -t $DATE -e $CMD
-		[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "k-alarme @ $DATE"
+		kalarm -t $DATE2 -e $CMD2
+		kalarm -t $DATE3 -e $CMD3
+		[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "k-alarme @ $DATE" || echo "k-alarm @ $DATE"
 	elif [[ "$DAEMON" == "at" ]]
 	then
 		echo "TODO : le 'at', marche pas sur mon pc -_-' "
 	elif [[ "$DAEMON" == "cron" ]]
 	then
-			DATE="$M $H $(date -d $SDATE +%d) * *"
-			echo "$DATE $CMD" | crontab -
-			[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "$(crontab -l)"
+			FICHIERTEMP=$(mktemp)
+			DATE="$(date -d "$SDATE $HEURE +01:$MIN" +'%M %H %d %m *')"
+			DATE2="$(date -d "$SDATE $HEURE +01:$MIN2" +'%M %H %d %m *')"
+			DATE3="$(date -d "$SDATE $HEURE +01:$MIN3" +'%M %H %d %m *')"
+			echo "$DATE $CMD" > $FICHIERTEMP
+			echo "$DATE2 $CMD2" >> $FICHIERTEMP
+			echo "$DATE3 $CMD3" >> $FICHIERTEMP
+			crontab -l >> $FICHIERTEMP
+			crontab $FICHIERTEMP
+			rm $FICHIERTEMP
+			[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "$(crontab -l)" || crontab -l
 	fi
 fi
 

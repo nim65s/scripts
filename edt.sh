@@ -3,9 +3,11 @@ ICS="http://bde.enseeiht.fr/~saurelg/edt.ics"
 MIN=78
 MIN2=23
 MIN3=18
+MIN4=15
 CMD="$HOME/scripts/morningbird.sh"
-CMD2="mpc crop; DISPLAY:=0.1 notify-send -t 20000 'bouge-toi !'"
-CMD3="mpc stop; DISPLAY:=0.1 notify-send -u urgent -t 20000 'DÉGAGE!'"
+CMD2="mpc crop; DISPLAY=:0.1 notify-send -t 20000 'Bouge Toi !'"
+CMD3="mpc stop; DISPLAY=:0.1 notify-send -u urgent -t 20000 'DÉGAGE!'"
+CMD4="crontab -l | egrep -v 'morningbird|notify-send' | crontab -"
 DAEMON="cron"
 
 [[ -n "$DISPLAY" ]] || export DISPLAY:=0.1
@@ -61,7 +63,7 @@ done
 
 cd $HOME/scripts/textfiles
 
-if [[ ! -e edt-du-jour.txt || $UPDATE == 1  || "$(head -n 1 edt-du-jour.txt)" != "$SDATE" ]]
+if [[ ! -e edt-du-jour.txt || $UPDATE == 1  || "$(date -d $(head -n 1 edt-du-jour.txt) +%s)" -lt "$(date -d $SDATE +%s)" ]]
 then
 
 wget -O edt.ics $ICS
@@ -121,9 +123,11 @@ then
 			DATE="$(date -d "$SDATE $HEURE +01:$MIN" +'%M %H %d %m *')"
 			DATE2="$(date -d "$SDATE $HEURE +01:$MIN2" +'%M %H %d %m *')"
 			DATE3="$(date -d "$SDATE $HEURE +01:$MIN3" +'%M %H %d %m *')"
+			DATE4="$(date -d "$SDATE $HEURE +01:$MIN4" +'%M %H %d %m *')"
 			echo "$DATE $CMD" > $FICHIERTEMP
 			echo "$DATE2 $CMD2" >> $FICHIERTEMP
 			echo "$DATE3 $CMD3" >> $FICHIERTEMP
+			echo "$DATE4 $CMD4" >> $FICHIERTEMP
 			crontab -l >> $FICHIERTEMP
 			crontab $FICHIERTEMP
 			rm $FICHIERTEMP

@@ -60,6 +60,8 @@ if [ "$PLAYER" = "mpd" ]
     mpc clear
     mpc repeat off
     mpc random off
+	mpc consume off
+	echo "mpdmode.text = 'N'" | awesome-client
     mpc load Reveil
     mpc volume $VOLINIT
     mpc play

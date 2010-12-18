@@ -5,8 +5,8 @@ MIN2=23
 MIN3=18
 MIN4=15
 CMD="$HOME/scripts/morningbird.sh"
-CMD2="mpc crop; DISPLAY=:0.1 notify-send -t 20000 'Bouge Toi !'"
-CMD3="mpc stop; DISPLAY=:0.1 notify-send -u urgent -t 20000 'DÉGAGE!'"
+CMD2="mpc crop; DISPLAY=:0.1 notify-send -t 20000 '<br/><br/><br/><br/>            Bouge Toi !            <br/><br/><br/><br/>'"
+CMD3="mpc stop; DISPLAY=:0.1 notify-send -u urgent -t 20000 '<br/><br/><br/><br/>            DÉGAGE !            <br/><br/><br/><br/>'"
 CMD4="crontab -l | egrep -v 'morningbird|notify-send' | crontab -"
 DAEMON="cron"
 

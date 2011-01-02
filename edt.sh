@@ -1,5 +1,5 @@
 #!/bin/bash
-ICS="http://bde.enseeiht.fr/~saurelg/edt.ics"
+#ICS="http://bde.enseeiht.fr/~saurelg/edt.ics"
 MIN=78
 MIN2=23
 MIN3=18
@@ -66,7 +66,7 @@ cd $HOME/scripts/textfiles
 if [[ ! -e edt-du-jour.txt || $UPDATE == 1  || "$(date -d $(head -n 1 edt-du-jour.txt) +%s)" -lt "$(date -d $SDATE +%s)" ]]
 then
 
-wget -O edt.ics $ICS
+#wget -O edt.ics $ICS
 
 sed 's/\r//g' edt.ics > edt
 

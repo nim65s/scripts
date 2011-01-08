@@ -18,7 +18,7 @@ EXTENSION=( zip rar tar tgz tar.gz tar.bz2 7z )
 PROGRAMME=( unzip unrar tar tar tar tar 7z )
 ARGUMENTS=( "" x -xvf -zxvf -zxvf -jxvf e )
 
-if [[ "$1" == *d* || "$1" == *v* ]]
+if [[ "$1" == *d* || "$1" == *v* || "$1" == *l* ]]
 then
 	for((i=0;i<${#EXTENSION[*]};i++))
 	do

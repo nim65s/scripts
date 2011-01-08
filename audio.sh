@@ -113,22 +113,6 @@ case $1 in
 						add_random
 				fi
 				;;
-		z)
-				if [[ "$player" == "mpd" ]]
-				then
-						UPPER=$(mpc playlist | wc -l)
-						for X in `seq 1 $UPPER`
-						do
-								RANFROM=$RANDOM
-								RANTO=$RANDOM
-								let "RANFROM %= $UPPER"
-								let "RANFROM += 1"
-								let "RANTO %= $UPPER"
-								let "RANTO += 1"
-								mpc move $RANFROM $RANTO
-						done
-				fi
-				;;
 		*) # help
 				echo " Nim's Zik controler "
 				echo " usage : zik [+|-|m|t|s|n|nn|nnn|r|p|ar|z]"
@@ -145,7 +129,6 @@ case $1 in
 				echo "     r : enter in Nim's random mode"
 				echo "     p : play the previous song"
 				echo "    ar : add a random song from the database"
-				echo "     z : shuffle the current playlist"
 				echo "     * : print this help"
 				;;
 esac

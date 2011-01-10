@@ -50,12 +50,10 @@ cd $HOME/scripts/textfiles
 
 if [[ ! -e edt.txt || $UPDATE == 1 || "$(stat -c %X edt.txt)" -lt "$(date -d 'today 00:00' +%s)" ]]
 then
-	../gcalclin --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;/.*1 day.*/d' > edt.txt
-	sed -i '1d' edt.txt
-	sed -i '1d' edt.txt
+	../gcalclin --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;/.*1 day.*/d;/<b>00:00-00:00<\/b> Semaine/d' > edt.txt
+	[[ "`head -n 1 edt.txt`" == "" ]] && sed -i '1d' edt.txt
+	[[ "`head -n 1 edt.txt`" == "" ]] && sed -i '1d' edt.txt
 fi
-
-# [[ "$(head -n 1 edt.txt)" == "" ]] && sed -i '1,2d' edt.txt
 
 [[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "`cat edt.txt`" || cat edt.txt
 

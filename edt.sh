@@ -59,7 +59,11 @@ fi
 
 if [[ "$ALARM" == 1 ]]
 then
-	HEURE="$(sed "/^[^0-9]/d" edt.txt | sort -n | head -n 1)"
+	HEURE="$(sed "/^[ +]/d;/^$/d;s/<b>//;s/-.*//" edt.txt | head -n 1)"
+	DATE="$(head -n 1 edt.txt | cut -d" " -f 3-4)"
+	JOUR="$(echo $DATE | cut -d" " -f 1)"
+	MOIS="$(echo $DATE | cut -d" " -f 2)"
+	SDATE="$MOIS/$JOUR"
 	if [[ "$DAEMON" == "kalarm" ]]
 	then
 		echo TODO
@@ -84,10 +88,11 @@ then
 			echo "$DATE2 $CMD2" >> $FICHIERTEMP
 			echo "$DATE3 $CMD3" >> $FICHIERTEMP
 			echo "$DATE4 $CMD4" >> $FICHIERTEMP
-			crontab -l >> $FICHIERTEMP
-			crontab $FICHIERTEMP
+			#crontab -l >> $FICHIERTEMP
+			#crontab $FICHIERTEMP
+			cat $FICHIERTEMP
 			rm $FICHIERTEMP
-			[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "$(crontab -l)" || crontab -l
+			#[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "$(crontab -l)" || crontab -l
 	fi
 fi
 

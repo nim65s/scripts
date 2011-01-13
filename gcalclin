@@ -602,7 +602,7 @@ class GoogleCalendar:
             return
 
         timeFormat = '%R'
-        dayFormat = '\n\n+------------------<b>%a %_d</b>------------------+'
+        dayFormat = '\n\n+------------------<b> %a %_d %m </b>------------------+'
         indent = ''
         detailsIndent = '  '
         day = ''
@@ -621,7 +621,7 @@ class GoogleCalendar:
             if (tmpDayStr != day): day = prefix = tmpDayStr
             PrintMsg(self.dateColor, prefix)
             PrintMsg(self._CalendarColor(event.gcalcli_cal),
-					'%-5s %s\n' % (tmpTimeStr, event.title.text))
+                    '%-5s %s\n' % (tmpTimeStr, event.title.text))
 
             if self.details:
 
@@ -709,6 +709,57 @@ class GoogleCalendar:
                                  default=defaultDateTime).astimezone(tzlocal())))
 
         return eventList
+
+    def SetAlarm(self, startText=''): # NIM
+
+        today = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        if (startText == ''):
+            start = today
+        else:
+            try:
+                start = parse(startText, default=today)
+            except:
+                PrintErrMsg('\nError: failed to parse start time\n')
+                return
+
+        end = (start + timedelta(days=1))
+        
+        eventList = []
+        count = 0
+
+        while len(eventList) < 1 and count < 8:
+            eventList = self._SearchForCalEvents(start, end, start, None)
+
+            for i in range(len(eventList)-1,-1,-1):
+                eventStartDateTime = parse(eventList[i].when[0].start_time, default=start).astimezone(tzlocal())
+                eventEndDateTime = parse(eventList[i].when[0].end_time, default=end).astimezone(tzlocal())
+                diffDateTime = (eventEndDateTime - eventStartDateTime)
+                #if (eventStartDateTime == start.astimezone(tzlocal()) or diffDateTime == timedelta(days=1) or eventStartDateTime.strftime('%Y%m%d%H%M') < self.now.strftime('%Y%m%d%H%M')):
+                if diffDateTime == timedelta(days=1) or eventStartDateTime.strftime('%Y%m%d%H%M') < self.now.strftime('%Y%m%d%H%M'):
+                    eventList.remove(eventList[i])
+
+            start = (start + timedelta(days=1))
+            end = (end + timedelta(days=1))
+            count += 1
+            if count == 8:
+                sys.stdout.write("T'es en vacances, gros !")
+                return
+
+        sys.stdout.write('\n event trouvé : %s \n' % eventList[0].title.text)
+
+        premiereHeure = parse(eventList[0].when[0].start_time, default=today).astimezone(tzlocal())
+        #premiereHeure = (premiereHeure - timedelta(minutes=78))
+        #premiereHeure = premiereHeure.strftime('%M %k %d %m %u')
+        sys.stdout.write("Première Heure : %s \n" % premiereHeure)
+
+
+    def CalQuery(self, cmd, startText='', count=1):
+
+        # convert now to midnight this morning and use for default
+        today = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
+        eventList = self._SearchForCalEvents(start, end, start, None)
+        self._PrintEvents(today, start, eventList)
 
 
     def ListAllCalendars(self):
@@ -1017,6 +1068,12 @@ def DoooooItHippieMonster():
 
     if (args[0] == 'list'):
         gcal.ListAllCalendars()
+
+    elif (args[0] == 'setalarm'): # NIM
+        if (len(args) == 2):
+            gcal.SetAlarm(startText=args[1])
+        else:
+            gcal.SetAlarm()
 
     elif (args[0] == 'search'):
         if (len(args) != 2):

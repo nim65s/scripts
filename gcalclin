@@ -242,6 +242,9 @@ class GoogleCalendar:
     dateColor           = CLR_YLW()
     borderColor         = CLR_WHT()
 
+    alarmCommand = ''
+    alarmDelta   = 60
+
     ACCESS_ALL         = 'all'      # non-google access level
     ACCESS_DEFAULT     = 'default'  # non-google access level
     ACCESS_NONE        = 'none'
@@ -267,7 +270,9 @@ class GoogleCalendar:
                  calReadColor=CLR_MAG(),
                  calFreeBusyColor=CLR_NRM(),
                  dateColor=CLR_GRN(),
-                 borderColor=CLR_WHT()):
+                 borderColor=CLR_WHT(),
+                 alarmCommand='',
+                 alarmDelta=60):
 
         self.gcal          = CalendarService()
         self.username      = username
@@ -286,6 +291,9 @@ class GoogleCalendar:
         self.calFreeBusyColor    = calFreeBusyColor
         self.dateColor           = dateColor
         self.borderColor         = borderColor
+
+        self.alarmCommand = alarmCommand
+        self.alarmDelta   = alarmDelta
 
         # authenticate and login to google calendar
         try:
@@ -728,14 +736,13 @@ class GoogleCalendar:
         eventList = []
         count = 0
 
-        while len(eventList) < 1 and count < 8:
+        while len(eventList) < 1 and count < 8: # il peut y avoir un event dans la journée en cours qui n'a pas encore commencé...
             eventList = self._SearchForCalEvents(start, end, start, None)
 
             for i in range(len(eventList)-1,-1,-1):
                 eventStartDateTime = parse(eventList[i].when[0].start_time, default=start).astimezone(tzlocal())
                 eventEndDateTime = parse(eventList[i].when[0].end_time, default=end).astimezone(tzlocal())
                 diffDateTime = (eventEndDateTime - eventStartDateTime)
-                #if (eventStartDateTime == start.astimezone(tzlocal()) or diffDateTime == timedelta(days=1) or eventStartDateTime.strftime('%Y%m%d%H%M') < self.now.strftime('%Y%m%d%H%M')):
                 if diffDateTime == timedelta(days=1) or eventStartDateTime.strftime('%Y%m%d%H%M') < self.now.strftime('%Y%m%d%H%M'):
                     eventList.remove(eventList[i])
 
@@ -746,12 +753,9 @@ class GoogleCalendar:
                 sys.stdout.write("T'es en vacances, gros !")
                 return
 
-        sys.stdout.write('\n event trouvé : %s \n' % eventList[0].title.text)
-
         premiereHeure = parse(eventList[0].when[0].start_time, default=today).astimezone(tzlocal())
-        #premiereHeure = (premiereHeure - timedelta(minutes=78))
-        #premiereHeure = premiereHeure.strftime('%M %k %d %m %u')
-        sys.stdout.write("Première Heure : %s \n" % premiereHeure)
+        cronDate = (premiereHeure - timedelta(minutes=self.alarmDelta)).strftime('%M %k %d %m * ')
+        print(cronDate + self.alarmCommand)
 
 
     def CalQuery(self, cmd, startText='', count=1):
@@ -987,7 +991,9 @@ def DoooooItHippieMonster():
                                     "cal-read-color=",
                                     "cal-freebusy-color=",
                                     "date-color=",
-                                    "border-color="])
+                                    "border-color=",
+                                    "alarm-commande=",
+                                    "alarm-delta="])
     except getopt.error:
         Usage()
 
@@ -1017,8 +1023,11 @@ def DoooooItHippieMonster():
     calFreeBusyColor    = GetColor(GetConfig(cfg, 'cal-freebusy-color', 'default'))
     dateColor           = GetColor(GetConfig(cfg, 'date-color', 'yellow'))
     borderColor         = GetColor(GetConfig(cfg, 'border-color', 'white'))
+                                                                                        # NIM
+    alarmCommand        = GetConfig(cfg,'alarm-command', 'Your alarm\'s command goes here')
+    alarmDelta          = int(GetConfig(cfg,'alarm-delta', '60'))
 
-    # fix wokCalNames when not specified in config file
+    # fix workCalNames when not specified in config file
     if ((len(workCalNames) == 1) and (workCalNames[0] == None)):
         workCalNames = []
 
@@ -1041,6 +1050,8 @@ def DoooooItHippieMonster():
         elif (opt == "--cal-freebusy-color"): calFreeBusyColor = GetColor(arg)
         elif (opt == "--date-color"): dateColor = GetColor(arg)
         elif (opt == "--border-color"): borderColor = GetColor(arg)
+        elif (opt == "--alarm-command"): alarmCommand = arg                             # NIM
+        elif (opt == "--alarm-delta"): alarmDelta = int(arg)
 
     if ((usr == '') or (pwd == '')):
         PrintErrMsg('\nError: must specify username and password\n')
@@ -1064,7 +1075,9 @@ def DoooooItHippieMonster():
                           calReadColor=calReadColor,
                           calFreeBusyColor=calFreeBusyColor,
                           dateColor=dateColor,
-                          borderColor=borderColor)
+                          borderColor=borderColor,
+                          alarmCommand=alarmCommand,
+                          alarmDelta=alarmDelta)
 
     if (args[0] == 'list'):
         gcal.ListAllCalendars()

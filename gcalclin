@@ -38,6 +38,7 @@
 #  - Google's GData Python module - http://code.google.com/p/gdata-python-client
 #  - ElementTree Python module - http://effbot.org/zone/element-index.htm
 #  - dateutil Python module - http://www.labix.org/python-dateutil
+#  - python-crontab - http://pypi.python.org/pypi/python-crontab/ # J'ai rien trouvé d'autre comme adresse ^^'
 #
 # TODO (maybe):
 #  - import meeting.ics Outlook events ("gcalcli import <file|stdin>")
@@ -63,6 +64,7 @@ from gdata.calendar.service import *
 from datetime import *
 from dateutil.tz import *
 from dateutil.parser import *
+from crontab import CronTab
 import locale
 locale.setlocale(locale.LC_ALL, '')
 
@@ -120,6 +122,12 @@ gcalcli [options] command [command args]
   --date-color             brightmagenta, cyan, brightcyan, white,
   --border-color           brightwhite ]
 
+  --alarm-command <cmd>    règle la commande de votre réveil
+  --alarm-delta <time>     règle le nombre de minute dont vous avez besoin
+                           pour être à l'heure on peut aussi ajouter 
+                                            --alarm-command2 & --alarm-delta2,
+                                      voire --alarm-command3 & --alarm-delta3
+
  Commands:
 
   list                     list all calendars
@@ -160,6 +168,9 @@ gcalcli [options] command [command args]
                            - default command:
                               'gxmessage -display :0 -center \\
                                          -title "Ding, Ding, Ding!" %s'
+
+  setalarm [start]         Ajoute une tache cron à un delta de temps
+                           prédéterminé du prochain rendez-vous à compter de "start"
 ''')
     sys.exit(1)
 
@@ -242,8 +253,12 @@ class GoogleCalendar:
     dateColor           = CLR_YLW()
     borderColor         = CLR_WHT()
 
-    alarmCommand = ''
-    alarmDelta   = 60
+    alarmCommand  = ''
+    alarmDelta    = 60
+    alarmCommand2 = ''
+    alarmDelta2   = 60
+    alarmCommand3 = ''
+    alarmDelta3   = 60
 
     ACCESS_ALL         = 'all'      # non-google access level
     ACCESS_DEFAULT     = 'default'  # non-google access level
@@ -272,7 +287,11 @@ class GoogleCalendar:
                  dateColor=CLR_GRN(),
                  borderColor=CLR_WHT(),
                  alarmCommand='',
-                 alarmDelta=60):
+                 alarmDelta=60,
+                 alarmCommand2='',
+                 alarmDelta2=60,
+                 alarmCommand3='',
+                 alarmDelta3=60):
 
         self.gcal          = CalendarService()
         self.username      = username
@@ -292,8 +311,12 @@ class GoogleCalendar:
         self.dateColor           = dateColor
         self.borderColor         = borderColor
 
-        self.alarmCommand = alarmCommand
-        self.alarmDelta   = alarmDelta
+        self.alarmCommand  = alarmCommand
+        self.alarmDelta    = alarmDelta
+        self.alarmCommand2 = alarmCommand2
+        self.alarmDelta2   = alarmDelta2
+        self.alarmCommand3 = alarmCommand3
+        self.alarmDelta3   = alarmDelta3
 
         # authenticate and login to google calendar
         try:
@@ -754,8 +777,43 @@ class GoogleCalendar:
                 return
 
         premiereHeure = parse(eventList[0].when[0].start_time, default=today).astimezone(tzlocal())
-        cronDate = (premiereHeure - timedelta(minutes=self.alarmDelta)).strftime('%M %k %d %m * ')
-        print(cronDate + self.alarmCommand)
+        cronDate = (premiereHeure - timedelta(minutes=self.alarmDelta))
+        
+        tab = CronTab()
+        tab.remove_all(self.alarmCommand)
+        cron = tab.new(command=self.alarmCommand,comment='GcalcliN\'s alarm')
+        cron.clear()
+        cron.minute().on(int(cronDate.strftime('%M')))
+        cron.hour().on(int(cronDate.strftime('%k')))
+        cron.dom().on(int(cronDate.strftime('%d')))
+        cron.month().on(int(cronDate.strftime('%m')))
+        cron.parse(cron.render())
+        if self.alarmCommand2 != 'NONE':
+                tab.remove_all(self.alarmCommand2)
+                cronDate2 = (premiereHeure - timedelta(minutes=self.alarmDelta2))
+                cron2 = tab.new(command=self.alarmCommand2,comment='2')
+                cron2.clear()
+                cron2.minute().on(int(cronDate2.strftime('%M')))
+                cron2.hour().on(int(cronDate2.strftime('%k')))
+                cron2.dom().on(int(cronDate2.strftime('%d')))
+                cron2.month().on(int(cronDate2.strftime('%m')))
+                cron2.parse(cron2.render())
+                if self.alarmCommand3 != 'NONE':
+                        tab.remove_all(self.alarmCommand3)
+                        cronDate3 = (premiereHeure - timedelta(minutes=self.alarmDelta3))
+                        cron3 = tab.new(command=self.alarmCommand3,comment='3')
+                        cron3.clear()
+                        cron3.minute().on(int(cronDate3.strftime('%M')))
+                        cron3.hour().on(int(cronDate3.strftime('%k')))
+                        cron3.dom().on(int(cronDate3.strftime('%d')))
+                        cron3.month().on(int(cronDate3.strftime('%m')))
+                        cron3.parse(cron3.render())
+                        print('SUCCESS')
+
+        tab.write()
+
+        print('Votre nouvelle crontab : ')
+        print(tab.render())
 
 
     def CalQuery(self, cmd, startText='', count=1):
@@ -1026,6 +1084,10 @@ def DoooooItHippieMonster():
                                                                                         # NIM
     alarmCommand        = GetConfig(cfg,'alarm-command', 'Your alarm\'s command goes here')
     alarmDelta          = int(GetConfig(cfg,'alarm-delta', '60'))
+    alarmCommand2        = GetConfig(cfg,'alarm-command2', 'NONE')
+    alarmDelta2          = int(GetConfig(cfg,'alarm-delta2', '60'))
+    alarmCommand3        = GetConfig(cfg,'alarm-command3', 'NONE')
+    alarmDelta3          = int(GetConfig(cfg,'alarm-delta3', '60'))
 
     # fix workCalNames when not specified in config file
     if ((len(workCalNames) == 1) and (workCalNames[0] == None)):
@@ -1052,6 +1114,10 @@ def DoooooItHippieMonster():
         elif (opt == "--border-color"): borderColor = GetColor(arg)
         elif (opt == "--alarm-command"): alarmCommand = arg                             # NIM
         elif (opt == "--alarm-delta"): alarmDelta = int(arg)
+        elif (opt == "--alarm-command2"): alarmCommand2 = arg                             # NIM
+        elif (opt == "--alarm-delta2"): alarmDelta2 = int(arg)
+        elif (opt == "--alarm-command3"): alarmCommand3 = arg                             # NIM
+        elif (opt == "--alarm-delta3"): alarmDelta3 = int(arg)
 
     if ((usr == '') or (pwd == '')):
         PrintErrMsg('\nError: must specify username and password\n')
@@ -1077,7 +1143,11 @@ def DoooooItHippieMonster():
                           dateColor=dateColor,
                           borderColor=borderColor,
                           alarmCommand=alarmCommand,
-                          alarmDelta=alarmDelta)
+                          alarmDelta=alarmDelta,
+                          alarmCommand2=alarmCommand2,
+                          alarmDelta2=alarmDelta2,
+                          alarmCommand3=alarmCommand3,
+                          alarmDelta3=alarmDelta3)
 
     if (args[0] == 'list'):
         gcal.ListAllCalendars()

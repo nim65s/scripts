@@ -8,8 +8,6 @@ VOLINC=1
 PLAYER=mpd
 TIMEWAIT=180
 
-crontab -l | grep -q morningbird && crontab -l | grep -v morningbird | crontab -
-
 #modification par options
 while [ $# -ne 0 ]
   do
@@ -61,6 +59,7 @@ if [ "$PLAYER" = "mpd" ]
     mpc repeat off
     mpc random off
 	mpc consume off
+	mpc single off
 	echo "mpdmode.text = 'N'" | awesome-client
     mpc load Reveil
     mpc volume $VOLINIT

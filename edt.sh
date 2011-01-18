@@ -9,7 +9,7 @@ CMD3="mpc stop; DISPLAY=:0.1 notify-send -u urgent -t 20000 '<br/><br/><br/><br/
 CMD4="crontab -l | egrep -v 'morningbird|notify-send' | crontab -"
 DAEMON="cron"
 
-[[ -n "$DISPLAY" ]] || export DISPLAY:=0.1
+#[[ -n "$DISPLAY" ]] || export DISPLAY:=0.1
 
 NOTIFY=0
 UPDATE=0
@@ -46,21 +46,22 @@ do
 	esac
 done
 
-cd $HOME/scripts/textfiles
+cd 
 
-if [[ ! -e edt.txt || $UPDATE == 1 || "$(stat -c %X edt.txt)" -lt "$(date -d 'today 00:00' +%s)" ]]
+if [[ ! -e .edt.txt || $UPDATE == 1 ]]
 then
-	../gcalclin --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;/.*1 day.*/d;/<b>00:00-00:00<\/b> Semaine/d' > edt.txt
-	[[ "`head -n 1 edt.txt`" == "" ]] && sed -i '1d' edt.txt
-	[[ "`head -n 1 edt.txt`" == "" ]] && sed -i '1d' edt.txt
+	./scripts/gcalclin --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;
+    /.*1 day.*/d;/<b>00:00-00:00<\/b> Semaine/d;s/<b>00:00-00:00<\/b>/                  /' > .edt.txt
+	[[ "`head -n 1 .edt.txt`" == "" ]] && sed -i '1d' .edt.txt
+	[[ "`head -n 1 .edt.txt`" == "" ]] && sed -i '1d' .edt.txt
 fi
 
-[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "`cat edt.txt`" || cat edt.txt
+[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "`cat .edt.txt`" || cat .edt.txt
 
 if [[ "$ALARM" == 1 ]]
 then
-	HEURE="$(sed "/^[ +]/d;/^$/d;s/<b>//;s/-.*//" edt.txt | head -n 1)"
-	DATE="$(head -n 1 edt.txt | cut -d" " -f 3-4)"
+	HEURE="$(sed "/^[ +]/d;/^$/d;s/<b>//;s/-.*//" .edt.txt | head -n 1)"
+	DATE="$(head -n 1 .edt.txt | cut -d" " -f 3-4)"
 	JOUR="$(echo $DATE | cut -d" " -f 1)"
 	MOIS="$(echo $DATE | cut -d" " -f 2)"
 	SDATE="$MOIS/$JOUR"

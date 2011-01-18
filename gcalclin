@@ -880,7 +880,7 @@ class GoogleCalendar:
 
         eventList = self._SearchForCalEvents(start, end, start, None)
 
-        self._PrintEvents(today, start, eventList)
+        self._PrintEvents(today, self.now, eventList)
 
 
     def CalQuery(self, cmd, startText='', count=1):

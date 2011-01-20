@@ -133,7 +133,7 @@ case $1 in
 						add_random
 				fi
 				;;
-        a)
+        a) # start your alarm
                 if [ "$player" == "mpd" ]]
                 then
                         mpc clear

@@ -1,9 +1,13 @@
 #! /bin/bash
 # script de gestion de l'audio
 player=mpd
-server=oss
+server=alsa
+#server=oss
 
-[[ -e $HOME/.zikrc ]] && source $HOME/.zikrc
+alarm_playlist_name=Reveil
+alarm_volume_init=80
+alarm_volume_max=100
+alarm_time_inc=1
 
 add_random()
 {
@@ -15,9 +19,12 @@ case $1 in
 				if [[ "$server" == "oss" ]]
 				then 
 						ossmix vmix0-outvol -- +2
+				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
+				elif [[ "$server" == "alsa" ]]
+				then 
+                        amixer set Master 3dB+
+				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d[ -f3 | sed 's/dB\]//')+30)" | awesome-client
 				fi
-				[[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
-				#echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
 				;;
 		p+) # player's volume up
 				if [[ "$player" == "mpd" ]]
@@ -29,9 +36,12 @@ case $1 in
 				if [[ "$server" == "oss" ]]
 				then 
 						ossmix vmix0-outvol -- -2
+				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
+                elif [[ "$server" == "alsa" ]]
+                then
+                        amixer set Master 3dB-
+                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d[ -f3 | sed 's/dB\]//')+30)" | awesome-client
 				fi
-				[[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
-				#echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
 				;;
 		p-)
 				if [[ "$player" == "mpd" ]]
@@ -49,6 +59,16 @@ case $1 in
 						else
 								ossmix misc.front-mute ON
 								[[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.mute_icon)" | awesome-client
+						fi
+                elif [[ "$server" == "alsa" ]]
+                then
+                        if [[ "$(amixer get Master | tail -n 1 | cut -d[ -f 4)" == "on]" ]]
+                        then
+                                amixer set Master off
+								[[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.mute_icon)" | awesome-client
+						else
+                                amixer set Master on
+								[[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.spkr_icon)" | awesome-client
 						fi
 				fi
 				;;
@@ -113,9 +133,27 @@ case $1 in
 						add_random
 				fi
 				;;
+        a)
+                if [ "$player" == "mpd" ]]
+                then
+                        mpc clear
+                        mpc repeat off
+                        mpc random off
+                        mpc consume off
+                        mpc single off
+                        mpc load $alarm_playlist_name
+                        mpc volume $alarm_volume_init
+                        mpc play
+                        for((vol=$alarm_volume_init;vol < $alarm_volume_max;vol++))
+                        do
+                                sleep $alarm_time_inc
+                                mpc volume +1
+                        done
+                fi
+                ;;
 		*) # help
 				echo " Nim's Zik controler "
-				echo " usage : zik [+|-|m|t|s|n|nn|nnn|r|p|ar|z]"
+				echo " usage : zik [+|-|m|t|s|n|nn|nnn|r|p|ar|a]"
 				echo "     + : raise volume"
 				echo "    p+ : raise player's volume"
 				echo "     - : lower volume"
@@ -129,6 +167,7 @@ case $1 in
 				echo "     r : enter in Nim's random mode"
 				echo "     p : play the previous song"
 				echo "    ar : add a random song from the database"
+                echo "     a : start your alarm"
 				echo "     * : print this help"
 				;;
 esac

@@ -50,7 +50,7 @@ cd
 
 if [[ ! -e .edt.txt || $UPDATE == 1 ]]
 then
-	./scripts/gcalclin --ignore-started --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;
+	./scripts/gcalclin --nc agenda $(date +%m/%d) $(date -d '+2 day' +%m/%d) | sed 's/<b>00:00-00:00<\/b> Prévisions pour Toulouse/        <i>Toulouse<\/i>/;
     /.*1 day.*/d;/<b>00:00-00:00<\/b> Semaine/d;s/<b>00:00-00:00<\/b>/                  /' > .edt.txt
 	[[ "`head -n 1 .edt.txt`" == "" ]] && sed -i '1d' .edt.txt
 	[[ "`head -n 1 .edt.txt`" == "" ]] && sed -i '1d' .edt.txt

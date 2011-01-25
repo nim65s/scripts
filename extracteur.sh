@@ -14,9 +14,9 @@ IFS=$'\n'
 declare -a EXTENSION
 declare -a PROGRAMME
 declare -a ARGUMENTS
-EXTENSION=( zip rar tar tgz tar.gz tar.bz2 7z xz lzma)
-PROGRAMME=( unzip unrar tar tar tar tar 7z unxz unlzma)
-ARGUMENTS=( "" x -xvf -zxvf -zxvf -jxvf e "" "")
+EXTENSION=( zip rar tar tgz tar.gz tar.bz2 tar.xz 7z xz lzma)
+PROGRAMME=( unzip unrar tar tar tar tar tar 7z unxz unlzma)
+ARGUMENTS=( "" x -xvf -zxvf -zxvf -jxvf -Jxvf e "" "")
 
 if [[ "$1" == *d* || "$1" == *v* || "$1" == *l* ]]
 then

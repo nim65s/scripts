@@ -25,7 +25,8 @@ def uiLoop(datas):
     background = pygame.image.load(background_file_name).convert()
     font = pygame.font.Font(None, 30)
 
-    maximum = lent = datas.moyenne
+    maximum = datas.moyenne
+    lent = datas.moyenne
 
     while True:
         # Update data & moy
@@ -35,17 +36,19 @@ def uiLoop(datas):
         if datas.moyenne > lent:
             lent = datas.moyenne
         else:
-            lent += 1
+            lent -= 100
 
         for event in pygame.event.get():
             if event.type == 2 and event.key == 27:
      	        pygame.quit()
                 return
+            if event.type == 2 and event.key == 'r':
+                maximum = 0
 
         text = font.render(str(datas.moyenne),1,BLACK,GREEN)
         text2 = font.render(str(maximum),1,BLACK,RED)
-        text3 = font.render(str(maximum),1,BLACK,BLUE)
-        text4 = font.render(str(maximum),1,BLACK,WHITE)
+        text3 = font.render(str(lent),1,BLACK,BLUE)
+        text4 = font.render(str(datas.val),1,BLACK,WHITE)
         textpos = text.get_rect()
         textpos2 = text2.get_rect()
         textpos3 = text3.get_rect()
@@ -63,13 +66,13 @@ def uiLoop(datas):
         pygame.draw.line(windowSurface, WHITE, (94,514),(372,514))
         pygame.draw.line(windowSurface, GREEN, (84,395),(385,395))
         pygame.draw.line(windowSurface, RED, (69,222),(402,222))
-        pygame.draw.rect(windowSurface, WHITE, (50,70,400,727-datas.moyenne/50))
+        pygame.draw.rect(windowSurface, WHITE, (56,0,362,727-datas.moyenne/50))
         pygame.draw.line(windowSurface, RED, (50,727-maximum/50),(400, 727-maximum/50))
         pygame.draw.line(windowSurface, BLACK, (231, 727-datas.val/50),(231,727))
-        pygame.draw.line(windowSurface, BLUE, (50, 727-lent), (400, 727-lent))
-# 727 ou 654 ?
+        pygame.draw.line(windowSurface, BLUE, (50, 727-lent/50), (400, 727-lent/50))
+
         pygame.display.flip()
-        time.sleep(5)
+        time.sleep(0.2)
 
 
 class DataMgr(threading.Thread):

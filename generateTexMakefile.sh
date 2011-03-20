@@ -18,12 +18,18 @@ done
 
 echo '%.pdf: %.tex' >> Makefile
 echo -en "\t" >> Makefile
-echo '( pdflatex $< || ( rm $@ && false ) ) && pdflatex $<' >> Makefile
+echo '( ( pdflatex $< || ( rm $@ && false ) ) && pdflatex $< || ( rm $@ && false ) ) && pdflatex $<' >> Makefile
 echo >> Makefile
 echo 'clean:' >> Makefile
 echo -en "\t" >> Makefile
 echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *~ 2> /dev/null' >> Makefile
 
-chmod +x Makefile
 
+sed 's/( ( pdflatex $< || ( rm $@ && false ) ) && pdflatex $< || ( rm $@ && false ) ) && pdflatex $</pdflatex $</' Makefile >> Makefile.quick
+
+chmod +x Makefile Makefile.quick
+
+echo "---------Makefile---------"
 cat Makefile
+echo "------Makefile.quick------"
+cat Makefile.quick

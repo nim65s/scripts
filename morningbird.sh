@@ -1,12 +1,16 @@
 #! /bin/bash
 
 #valeurs par defaut des variables
-VOLINIT=80
+VOLINIT=0
 VOLMAX=100
-TIMEINC=3
+TIMEINC=1
 VOLINC=1
 PLAYER=mpd
 TIMEWAIT=180
+RAND=false
+
+#modification par fichier de conf
+[[ -f $HOME/.morningbirdrc ]] && . $HOME/.morningbirdrc || echo 'Pas de $HOME/.morningbirdrc'
 
 #modification par options
 while [ $# -ne 0 ]
@@ -51,13 +55,21 @@ while [ $# -ne 0 ]
     shift
   done
 
+echo "VOLINIT=$VOLINIT"
+echo "VOLMAX=$VOLMAX"
+echo "TIMEINC=$TIMEINC"
+echo "VOLINC=$VOLINC"
+echo "PLAYER=$PLAYER"
+echo "TIMEWAIT=$TIMEWAIT"
+echo "RAND=$RAND"
+
 export DISPLAY=:0.1
 
 if [ "$PLAYER" = "mpd" ]
   then
     mpc clear
     mpc repeat off
-    mpc random off
+    $RAND && mpc random on || mpc random off
 	mpc consume off
 	mpc single off
 	echo "mpdmode.text = 'N'" | awesome-client

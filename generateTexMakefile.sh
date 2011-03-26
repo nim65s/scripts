@@ -10,12 +10,6 @@ done
 echo clean >> Makefile
 echo >> Makefile
 
-for FILE in *.tex
-do
-        echo "$( echo $FILE | sed 's/tex/pdf/'): $FILE" >> Makefile
-        echo >> Makefile
-done
-
 echo '%.pdf: %.tex' >> Makefile
 echo -en "\t" >> Makefile
 echo '( ( pdflatex $< || ( rm $@ && false ) ) && pdflatex $< || ( rm $@ && false ) ) && pdflatex $<' >> Makefile

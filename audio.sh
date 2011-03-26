@@ -23,7 +23,7 @@ case $1 in
 				elif [[ "$server" == "alsa" ]]
 				then 
                         amixer set Master 3dB+
-				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d[ -f3 | sed 's/dB\]//')+30)" | awesome-client
+                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//'))" | awesome-client
 				fi
 				;;
 		p+) # player's volume up
@@ -40,7 +40,7 @@ case $1 in
                 elif [[ "$server" == "alsa" ]]
                 then
                         amixer set Master 3dB-
-                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d[ -f3 | sed 's/dB\]//')+30)" | awesome-client
+                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//'))" | awesome-client
 				fi
 				;;
 		p-)

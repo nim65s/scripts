@@ -27,6 +27,7 @@ echo -e "add_executable(" >> build/CMakeLists.txt
 echo -e "\t../bin/$nom" >> build/CMakeLists.txt
 echo -e "\t\${source_files}" >> build/CMakeLists.txt
 echo -e "\t)" >> build/CMakeLists.txt
+echo -e 'set(CMAKE_CXX_FLAGS "-g -Wall -pedantic -Wextra")' >> build/CMakeLists.txt
 touch src/main.cpp
 cd build
 cmake . -G "Unix Makefiles"

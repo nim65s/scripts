@@ -61,7 +61,7 @@ declare -a DLOK
 declare -a DLKO
 DLOK=()
 DLKO=()
-megaupload="-a $MUUA"
+#megaupload="-a $MUUA"
 NOMBRE=0
 RUNNING=0
 MIRORIII=0
@@ -99,7 +99,8 @@ unite_de_telechargement()
 	  do
 	    TODL_UT="$(head -n 1 /tmp/dlbot/todl/$MODULE_UT)"
 	    echo -e "\n\033[1mTéléchargement de $TODL_UT ===> $DESTDIR_UT\n\033[0m"
-	    plowdown -a $MUUA "$TODL_UT" -o $DESTDIR_UT
+	    #plowdown -a $MUUA "$TODL_UT" -o $DESTDIR_UT
+	    plowdown "$TODL_UT" -o $DESTDIR_UT
 	    ERROR_UT=$?
 	    if [[ $ERROR_UT -gt 0 ]]
 	      then

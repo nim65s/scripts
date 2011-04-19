@@ -3,6 +3,7 @@
 player=mpd
 server=alsa
 #server=oss
+WM=awesome
 
 alarm_playlist_name=Reveil
 alarm_volume_init=80
@@ -49,7 +50,7 @@ case $1 in
 						mpc volume -2
 				fi
 				;;
-		m) # volume mute
+		m) # toggle volume mute
 				if [[ "$server" == "oss" ]]
 				then
 						if [[ "$(ossmix misc.front-mute | cut -d" " -f 10)" == "ON" ]]
@@ -70,6 +71,17 @@ case $1 in
                                 amixer set Master on
 								[[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.spkr_icon)" | awesome-client
 						fi
+				fi
+				;;
+        um) # volume umute
+				if [[ "$server" == "oss" ]]
+				then
+                        ossmix misc.front-mute OFF
+                        [[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.spkr_icon)" | awesome-client
+                elif [[ "$server" == "alsa" ]]
+                then
+                        amixer set Master off
+                        [[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.mute_icon)" | awesome-client
 				fi
 				;;
 		t) # play/pause
@@ -158,7 +170,8 @@ case $1 in
 				echo "    p+ : raise player's volume"
 				echo "     - : lower volume"
 				echo "    p- : lower player's volume"
-				echo "     m : mute volume"
+				echo "     m : toggle mute volume"
+                echo "    um : unmute volume"
 				echo "     t : toggle play/pause"
 				echo "     s : stop music"
 				echo "     n : play the next song"

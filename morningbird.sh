@@ -65,6 +65,8 @@ echo "RAND=$RAND"
 
 export DISPLAY=:0.1
 
+$HOME/scripts/audio.sh um # faut le script... 
+
 if [ "$PLAYER" = "mpd" ]
   then
     mpc clear

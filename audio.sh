@@ -76,11 +76,11 @@ case $1 in
         um) # volume umute
 				if [[ "$server" == "oss" ]]
 				then
-                        ossmix misc.front-mute OFF
+                        ossmix misc.front-mute ON
                         [[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.spkr_icon)" | awesome-client
                 elif [[ "$server" == "alsa" ]]
                 then
-                        amixer set Master off
+                        amixer set Master on
                         [[ "$WM" == "awesome" ]] && echo "spkricone.image = image(beautiful.mute_icon)" | awesome-client
 				fi
 				;;

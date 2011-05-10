@@ -18,5 +18,5 @@ git push origin master
 if [[ "$(hostname)" != "totoro" ]]
 then
     echo -e "\t\t === goto totoro ==="
-    ssh nim@nim65s.dyndns.org majgit
+    ssh nim@nim65s.dyndns.org /home/nim/scripts/majgit.sh
 fi

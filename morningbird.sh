@@ -77,6 +77,7 @@ if [ "$PLAYER" = "mpd" ]
 	echo "mpdmode.text = 'N'" | awesome-client
     mpc load Reveil
     mpc volume $VOLINIT
+    mpc enable 1
     mpc play
     for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
 	do

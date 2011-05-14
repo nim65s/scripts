@@ -9,8 +9,11 @@ class vecteur {
     float coef[100];
     void afficher() {
         cout << "[";
-        for(int i=0;i<n;i++) printf("%5.2g",coef[i]);
-        cout << "    ]" << endl;
+        for(int i=0;i<n;i++) {
+            printf("%5.2g",coef[i]);
+            cout << " ";
+        }
+        cout << "  ]" << endl;
     }
 };
 
@@ -80,11 +83,11 @@ class matricecreuseun {
     float coef[100]; 
     void afficher() {
         cout << "  i  | ";
-        for(int k=0;k<m;k++) printf("%5d",i[k]);
+        for(int k=0;k<o;k++) printf("%5d",i[k]);
         cout << endl << "  j  | ";
-        for(int k=0;k<m;k++) printf("%5d",j[k]);
+        for(int k=0;k<o;k++) printf("%5d",j[k]);
         cout << endl << "coef | ";
-        for(int k=0;k<m;k++) printf("%5.2g",coef[k]);
+        for(int k=0;k<o;k++) printf("%5.2g",coef[k]);
         cout << endl << endl;
     }
 };
@@ -111,6 +114,43 @@ vecteur operator*(matricecreuseun M, vecteur v) {
     return w;
 }
 
+matricecreuseun pleineversun(matricepleine A) {
+    matricecreuseun B;
+    B.m = A.m;
+    B.n = A.n;
+    B.o = 0;
+    for(int i=0;i<A.m;i++) {
+        for(int j=0;j<A.n;j++) {
+            if (A.coef[i][j] != 0) {
+                B.i[B.o] = i;
+                B.j[B.o] = j;
+                B.coef[B.o] = A.coef[i][j];
+                B.o++;
+            }
+        }
+    }
+    return B;
+}
+
+
 int main() {
     cout << "Mini Projet" << endl;
+    matricepleine A;
+    A.m = 5;
+    A.n = 5;
+    for(int i=0;i<5;i++) A.coef[i][i] = i;
+    A.afficher();
+
+    vecteur v;
+    v.n = 5;
+    for(int i=0;i<5;i++) v.coef[i] = i;
+    v.afficher();
+
+    vecteur w;
+    w = A*v;
+    w.afficher();
+
+    matricecreuseun B;
+    B = pleineversun(A);
+    B.afficher();
 }

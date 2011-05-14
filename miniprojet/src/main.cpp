@@ -111,3 +111,6 @@ vecteur operator*(matricecreuseun M, vecteur v) {
     return w;
 }
 
+int main() {
+    cout << "Mini Projet" << endl;
+}

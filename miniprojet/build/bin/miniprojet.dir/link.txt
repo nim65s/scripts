@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -Wall -pedantic -Wextra   CMakeFiles/../bin/miniprojet.dir/home/saurelg/scripts/miniprojet/src/main.cpp.o  -o ../bin/miniprojet -rdynamic 

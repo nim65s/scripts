@@ -30,24 +30,15 @@ class matricepleine {
     float coef[100][100]; // TODO dynamic
     void afficher() {
         cout << "⎡";
-        for(int j=0;j<m;j++) {
-            printf("%5.2g",coef[0][j]);
-            cout << " ";
-        }
+        for(int j=0;j<m;j++) printf("%5.4g ",coef[0][j]);
         cout << "  ⎤" << endl;
         for(int i=1;i<n-1;i++) {
             cout << "⎢";
-            for(int j=0;j<m;j++) {
-                printf("%5.2g",coef[i][j]);
-                cout << " ";
-            }
+            for(int j=0;j<m;j++) printf("%5.4g ",coef[i][j]);
             cout << "  ⎥" << endl;
         }
         cout << "⎣";
-        for(int j=0;j<m;j++) {
-            printf("%5.2g",coef[n-1][j]);
-            cout << " ";
-        }
+        for(int j=0;j<m;j++) printf("%5.4g ",coef[n-1][j]);
         cout << "  ⎦" << endl;
     }
 };
@@ -83,11 +74,11 @@ class matricecreuseun {
     float coef[100]; 
     void afficher() {
         cout << "  i  | ";
-        for(int k=0;k<o;k++) printf("%5d",i[k]);
+        for(int k=0;k<o;k++) printf("%5d ",i[k]+1);
         cout << endl << "  j  | ";
-        for(int k=0;k<o;k++) printf("%5d",j[k]);
+        for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
         cout << endl << "coef | ";
-        for(int k=0;k<o;k++) printf("%5.2g",coef[k]);
+        for(int k=0;k<o;k++) printf("%5.4g ",coef[k]);
         cout << endl << endl;
     }
 };
@@ -132,6 +123,64 @@ matricecreuseun pleineversun(matricepleine A) {
     return B;
 }
 
+class matricecreusedeux {
+    public:
+    int m;
+    int n;
+    int o; // peut se déduire vu que la matrice est crueuse...
+    int p; // nombre de valeurs dans le tableau II
+    float vals[100]; 
+    int j[100]; // TODO dynamic
+    int II[100];
+    void afficher() {
+        cout << "vals | ";
+        for(int k=0;k<o;k++) printf("%5.4g ",vals[k]);
+        cout << endl << "  j  | ";
+        for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
+        cout << endl << " II  | ";
+        for(int k=0;k<p;k++) printf("%5d ",II[k]);
+        cout << endl << endl;
+    }
+};
+
+bool operator==(matricecreusedeux A, matricecreusedeux B) {
+    if (A.m != B.m || A.n != B.n || A.o != B.o || A.p != B.p) return false;
+    else {
+        for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return false;
+        for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return false;
+    }
+    return true;
+}
+
+vecteur operator*(matricecreusedeux A, vecteur v) {
+    return v;// TODO
+}
+
+matricecreusedeux pleineversdeux(matricepleine A) {
+    matricecreusedeux B;
+    B.m = A.m;
+    B.n = A.n;
+    B.o = 0;
+    B.p = 0;
+    int cmpt = 0;
+    for (int i=0;i<A.m;i++) {
+        bool yadejaqqchsurlaligne = false;
+        for(int j=0;j<A.n;j++) {
+            if(A.coef[i][j] != 0) {
+                B.vals[B.o] = A.coef[i][j];
+                B.j[B.o++] = j;
+                cmpt++; // TODO décalage vu qu'un tableau commence à 0 ?
+                if (!yadejaqqchsurlaligne) {
+                    yadejaqqchsurlaligne = true;
+                    B.II[B.p++] = cmpt;
+                }
+            }
+        }
+        if (!yadejaqqchsurlaligne) B.II[B.p++] = 0; // TODO si la ligne est vide ?
+    }
+    B.II[B.p++] = B.II[0]+B.o;// TODO faudra qu'on m'explique à quoi il sert lui... 
+    return B;
+}
 
 int main() {
     cout << "Mini Projet" << endl;
@@ -150,7 +199,28 @@ int main() {
     w = A*v;
     w.afficher();
 
-    matricecreuseun B;
-    B = pleineversun(A);
+    matricepleine B;
+    B.m = 5;
+    B.n = 5;
+    B.coef[0][0] = 1.1;
+    B.coef[0][3] = 4;
+    B.coef[1][0] = 5;
+    B.coef[1][1] = 2.2;
+    B.coef[1][3] = 7;
+    B.coef[2][0] = 6;
+    B.coef[2][2] = 3.3;
+    B.coef[2][3] = 8;
+    B.coef[2][4] = 9;
+    B.coef[3][2] = 11;
+    B.coef[3][3] = 10.1;
+    B.coef[4][4] = 12.7;
     B.afficher();
+
+    matricecreuseun C;
+    C = pleineversun(B);
+    C.afficher();
+
+    matricecreusedeux D;
+    D = pleineversdeux(B);
+    D.afficher();
 }

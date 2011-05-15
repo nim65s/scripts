@@ -19,7 +19,7 @@ class vecteur {
 
 bool operator==(vecteur a, vecteur b) {
     if (a.n != b.n) return false;
-    else for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return false; // TODO ça marche ça ? x)
+    for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return false; // TODO ça marche ça ? x)
     return true;
 }
 
@@ -45,7 +45,7 @@ class matricepleine {
 
 bool operator==(matricepleine A, matricepleine B) {
     if( A.n != B.n || A.m != B.m) return false;
-    else for(int i=0;i<A.n;i++) for(int j=0;j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return false;
+    for(int i=0;i<A.n;i++) for(int j=0;j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return false;
     return true;
 }
 
@@ -85,7 +85,7 @@ class matricecreuseun {
 
 bool operator==(matricecreuseun A, matricecreuseun B) {
     if (A.m != B.m || A.n != B.n || A.o != B.o) return false;
-    else for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false; // TODO Faux positifs monstrueux T-T
+    for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false; // TODO Faux positifs monstrueux T-T
     /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
      * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
      */
@@ -145,10 +145,8 @@ class matricecreusedeux {
 
 bool operator==(matricecreusedeux A, matricecreusedeux B) {
     if (A.m != B.m || A.n != B.n || A.o != B.o || A.p != B.p) return false;
-    else {
-        for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return false;
-        for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return false;
-    }
+    for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return false;
+    for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return false;
     return true;
 }
 

@@ -19,8 +19,14 @@ class vecteur {
 
 bool operator==(vecteur a, vecteur b) {
     if (a.n != b.n) return false;
-    for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return false; // TODO ça marche ça ? x)
+    for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return false;
     return true;
+}
+
+bool operator!=(vecteur a, vecteur b) {
+    if (a.n != b.n) return true;
+    for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return true;
+    return false;
 }
 
 class matricepleine {
@@ -47,6 +53,12 @@ bool operator==(matricepleine A, matricepleine B) {
     if( A.n != B.n || A.m != B.m) return false;
     for(int i=0;i<A.n;i++) for(int j=0;j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return false;
     return true;
+}
+
+bool operator!=(matricepleine A, matricepleine B) {
+    if( A.n != B.n || A.m != B.m) return true;
+    for(int i=0;i<A.n;i++) for(int j=0;j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return true;
+    return false;
 }
 
 vecteur operator*(matricepleine M, vecteur v) {
@@ -79,7 +91,7 @@ class matricecreuseun {
         for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
         cout << endl << "coef | ";
         for(int k=0;k<o;k++) printf("%5.4g ",coef[k]);
-        cout << endl << endl;
+        cout << endl;
     }
 };
 
@@ -90,6 +102,15 @@ bool operator==(matricecreuseun A, matricecreuseun B) {
      * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
      */
     return true;
+}
+
+bool operator!=(matricecreuseun A, matricecreuseun B) {
+    if (A.m != B.m || A.n != B.n || A.o != B.o) return true;
+    for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return true; // TODO Faux positifs monstrueux T-T
+    /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
+     * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
+     */
+    return false;
 }
 
 vecteur operator*(matricecreuseun M, vecteur v) {
@@ -139,7 +160,7 @@ class matricecreusedeux {
         for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
         cout << endl << " II  | ";
         for(int k=0;k<p;k++) printf("%5d ",II[k]);
-        cout << endl << endl;
+        cout << endl;
     }
 };
 
@@ -150,8 +171,25 @@ bool operator==(matricecreusedeux A, matricecreusedeux B) {
     return true;
 }
 
-vecteur operator*(matricecreusedeux A, vecteur v) {
-    return v;// TODO
+bool operator!=(matricecreusedeux A, matricecreusedeux B) {
+    if (A.m != B.m || A.n != B.n || A.o != B.o || A.p != B.p) return true;
+    for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return true;
+    for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return true;
+    return false;
+}
+
+vecteur operator*(matricecreusedeux M, vecteur v) {
+    if (M.m != v.n) {
+        cout << "On ne peut pas multiplier cette matrice et ce vecteur pour des raisons de dimension." << endl;
+        cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
+        return v;
+    }
+    vecteur w;
+    w.n = M.n;
+    for(int i=0;i<w.n;i++) w.coef[i] = 0;
+    int a=0;
+    for(int b=0;b<M.n;b++) while(a<M.II[b]) w.coef[b] += M.vals[a]*v.coef[M.j[a++]];
+    return w;
 }
 
 matricecreusedeux pleineversdeux(matricepleine A) {
@@ -174,29 +212,15 @@ matricecreusedeux pleineversdeux(matricepleine A) {
                 }
             }
         }
-        if (!yadejaqqchsurlaligne) B.II[B.p++] = 0; // TODO si la ligne est vide ?
+        if (!yadejaqqchsurlaligne) B.II[B.p++] = 0;
     }
     B.II[B.p++] = B.II[0]+B.o;// TODO faudra qu'on m'explique à quoi il sert lui... 
     return B;
 }
 
 int main() {
-    cout << "Mini Projet" << endl;
-    matricepleine A;
-    A.m = 5;
-    A.n = 5;
-    for(int i=0;i<5;i++) A.coef[i][i] = i;
-    A.afficher();
-
-    vecteur v;
-    v.n = 5;
-    for(int i=0;i<5;i++) v.coef[i] = i;
-    v.afficher();
-
-    vecteur w;
-    w = A*v;
-    w.afficher();
-
+    cout << "\t\tMini Projet" << endl;
+    cout << "\tTest conversions pleine => creuse 1 & 2" << endl;
     matricepleine B;
     B.m = 5;
     B.n = 5;
@@ -213,12 +237,54 @@ int main() {
     B.coef[3][3] = 10.1;
     B.coef[4][4] = 12.7;
     B.afficher();
+    cout << endl;
 
     matricecreuseun C;
     C = pleineversun(B);
     C.afficher();
+    cout << endl;
 
     matricecreusedeux D;
     D = pleineversdeux(B);
     D.afficher();
+
+    cout << "\tTest produit pleine*vecteur" << endl;
+    matricepleine A;
+    A.m = 5;
+    A.n = 5;
+    for(int i=0;i<5;i++) A.coef[i][i] = i;
+    A.afficher();
+    cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    vecteur v;
+    v.n = 5;
+    for(int i=0;i<5;i++) v.coef[i] = i;
+    v.afficher();
+    cout << "==================================" << endl;
+    vecteur x;
+    x = A*v;
+    x.afficher();
+
+    cout << "\tTest produit creuseun*vecteur" << endl;
+    matricecreuseun E;
+    E = pleineversun(A);
+    E.afficher();
+    cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    v.afficher();
+    cout << "==================================" << endl;
+    vecteur y;
+    y = E*v;
+    y.afficher();
+
+    cout << "\tTest produit creusedeux*vecteur" << endl;
+    matricecreusedeux F;
+    F = pleineversdeux(A);
+    F.afficher();
+    cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    v.afficher();
+    cout << "==================================" << endl;
+    vecteur z;
+    z = F*v;
+    z.afficher();
+
+    if(x==y && x==z && !(y!=z)) cout << "X==Y && X==Z && !(Y!=Z)" << endl;
 }

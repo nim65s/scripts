@@ -1,8 +1,5 @@
 #!/bin/bash
 
-eval `ssh-agent`
-ssh-add ~/.ssh/id_rsa
-
 cd ~/dotfiles
 echo -e "\t\t == pull dotfiles =="
 git pull origin master

@@ -5,7 +5,7 @@
 using namespace std;
 
 int test_conversions(bool afficher) {
-    cout << "\tTest conversions pleine => creuse 1 & 2" << endl;
+    cout << "\tTest conversions entre matrices" << endl;
     matricepleine B;
     B.m = 5;
     B.n = 5;
@@ -32,8 +32,14 @@ int test_conversions(bool afficher) {
     matricecreusedeux D;
     D = pleineversdeux(B);
     if(afficher) D.afficher();
+    if(afficher) cout << endl;
 
-    return 0; // Tu parles d'un test XD
+    matricecreusedeux E;
+    E = unversdeux(C);
+    if(afficher) E.afficher();
+
+    if (D==E) return 0;
+    return 1; 
 }
 
 int test_produits(bool afficher) {

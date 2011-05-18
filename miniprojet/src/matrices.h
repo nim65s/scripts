@@ -53,5 +53,6 @@ bool operator==(matricecreusedeux A, matricecreusedeux B);
 bool operator!=(matricecreusedeux A, matricecreusedeux B);
 vecteur operator*(matricecreusedeux M, vecteur v);
 matricecreusedeux pleineversdeux(matricepleine A);
+matricecreusedeux unversdeux(matricecreuseun A);
 
 #endif

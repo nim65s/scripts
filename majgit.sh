@@ -13,3 +13,5 @@ git pull origin master
 git commit -a
 echo -e "\t\t == push scripts =="
 git push origin master
+
+[[ `hostname` != 'totoro' ]] && ssh -A /home/nim/scripts/majgit.sh

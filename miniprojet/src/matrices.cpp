@@ -207,11 +207,11 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
         B.vals[i] = A.coef[i];
         B.j[i] = A.j[i];
         if (A.i[i] != B.m) {
-            if (A.i[i] == B.m+1) B.II[B.m++ +1] = i+1;
-            else B.II[B.m++] = 0; // TODO il faut aussi rajouter la suite ...
+            if (A.i[i] == B.m+1) B.II[++B.m] = i+1;
+            else B.II[++B.m] = 0; // TODO il faut aussi rajouter la suite ...
         }
     }
-    B.II[B.m++ +1] = B.II[0]+B.nz;
+    B.II[++B.m] = B.II[0]+B.nz;
     return B;
 }}}
 

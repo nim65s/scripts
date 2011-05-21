@@ -220,9 +220,36 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
  *                       Ordonage de matrices                   *
  ****************************************************************/
 
-//matricecreuseun ordonne(matricecreuseun A) {{{
+matricecreuseun ordonne(matricecreuseun A) {{{
+    matricecreuseun B;
+    B.m = A.m;
+    B.n = A.n;
+    B.nz = 0;
+    for(int i=0;i<A.m;i++) {
+        for(int j=0;j<A.n;j++) {
+            for(int k=0;k<A.nz;k++) {
+                if (A.i[k] == i && A.j[k] == j) {
+                    B.i[B.nz] = A.i[k];
+                    B.j[B.nz] = A.j[k];
+                    B.coef[B.nz++] = A.coef[k];
+                }
+            }
+        }
+    } // TODO euh... y'a pas moyen de faire ça mieux ? XD
+    return B;
+}}}
 
-//bool estenbordel(matricecreuseun A) {{{
-
+bool estenbordel(matricecreuseun A) {{{
+    int i=-1;
+    int j=-1;
+    for(int a=0;a<A.nz;a++) {
+        if (i < A.i[a] || ( i == A.i[a] && j < A.j[a] )) {
+            i = A.i[a];
+            j = A.j[a];
+        }
+        else return true;
+    }
+    return false;
+}}}
 
 // vim: set foldmethod=marker:

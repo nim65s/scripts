@@ -37,6 +37,8 @@ bool operator==(matricecreuseun A, matricecreuseun B);
 bool operator!=(matricecreuseun A, matricecreuseun B);
 vecteur operator*(matricecreuseun M, vecteur v);
 matricecreuseun pleineversun(matricepleine A);
+matricecreuseun ordonne(matricecreuseun A);
+bool estenbordel(matricecreuseun A);
 
 class matricecreusedeux {
     public:

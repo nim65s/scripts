@@ -4,11 +4,12 @@
 
 using namespace std;
 
-int test_conversions(bool afficher) {
+int test_conversions(bool afficher) {{{
     cout << "\tTest conversions entre matrices" << endl;
     matricepleine B;
     B.m = 5;
     B.n = 5;
+    for(int i=0;i<B.m;i++) for(int j=0;j<B.n;j++) B.coef[i][j] = 0;
     B.coef[0][0] = 1.1;
     B.coef[0][3] = 4;
     B.coef[1][0] = 5;
@@ -40,15 +41,14 @@ int test_conversions(bool afficher) {
 
     if (D==E) return 0;
     return 1; 
-}
+}}}
 
-int test_produits(bool afficher) {
+int test_produits(bool afficher) {{{
     cout << "\tTest produit pleine*vecteur" << endl;
     matricepleine A;
     A.m = 5;
     A.n = 5;
-    for(int i=0;i<5;i++) for(int j=0;j<5;j++) A.coef[i][j] = 0;
-    for(int i=0;i<5;i++) A.coef[i][i] = i;
+    for(int i=0;i<A.m;i++) for(int j=0;j<A.n;j++) if (i==j) A.coef[i][j] = i; else A.coef[i][j] = 0;
     if(afficher) A.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     vecteur v;
@@ -84,4 +84,52 @@ int test_produits(bool afficher) {
 
     if(x==y && x==z && !(y!=z)) return 0;
     return 1;
-}
+}}}
+
+int test_ordonnage(bool afficher) {{{
+    cout << "\tTest ordonnage" << endl;
+    matricecreuseun A;
+    A.m = 5;
+    A.n = 5;
+    A.nz = 4;
+    for(int i=0;i<5;i++) {
+        A.i[i] = i;
+        A.j[i] = i;
+        A.coef[i] = i;
+    }
+    if (afficher) A.afficher();
+    if (estenbordel(A)) {
+        if (afficher) cout << "A est en bordel..." << endl;
+        return 1;
+    }
+    else if (afficher) cout << "A est en ordre" << endl;
+
+    matricecreuseun B;
+    B.m = 5;
+    B.n = 5;
+    B.nz = 2;
+    B.i[0] = 4;
+    B.j[0] = 2;
+    B.coef[0] = 42;
+    B.i[1] = 2;
+    B.j[1] = 4;
+    B.coef[1] = 24;
+    if (afficher) B.afficher();
+    if (!estenbordel(B)) {
+        if (afficher) cout << "B est en ordre..." << endl;
+        return 1;
+    }
+    else if (afficher) cout << "B est en bordel" << endl;
+
+    B = ordonne(B);
+    if (afficher) B.afficher();
+    if (estenbordel(B)) {
+        if (afficher) cout << "B est en bordel..." << endl;
+        return 1;
+    }
+    else if (afficher) cout << "B est en ordre" << endl;
+
+    return 0;
+}}}
+
+// vim: set foldmethod=marker:

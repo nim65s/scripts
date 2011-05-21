@@ -3,5 +3,6 @@
 
 int test_conversions(bool afficher);
 int test_produits(bool afficher);
+int test_ordonnage(bool afficher);
 
 #endif

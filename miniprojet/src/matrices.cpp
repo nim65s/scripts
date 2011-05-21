@@ -29,21 +29,21 @@ void matricepleine::afficher() {{{
 
 void matricecreuseun::afficher() {{{
     cout << "  i  | ";
-    for(int k=0;k<o;k++) printf("%5d ",i[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",i[k]+1);
     cout << endl << "  j  | ";
-    for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",j[k]+1);
     cout << endl << "coef | ";
-    for(int k=0;k<o;k++) printf("%5.4g ",coef[k]);
+    for(int k=0;k<nz;k++) printf("%5.4g ",coef[k]);
     cout << endl;
 }}}
 
 void matricecreusedeux::afficher() {{{
     cout << "vals | ";
-    for(int k=0;k<o;k++) printf("%5.4g ",vals[k]);
+    for(int k=0;k<nz;k++) printf("%5.4g ",vals[k]);
     cout << endl << "  j  | ";
-    for(int k=0;k<o;k++) printf("%5d ",j[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",j[k]+1);
     cout << endl << " II  | ";
-    for(int k=0;k<p;k++) printf("%5d ",II[k]);
+    for(int k=0;k<=m;k++) printf("%5d ",II[k]);
     cout << endl;
 }}}
 
@@ -76,7 +76,7 @@ bool operator!=(matricepleine A, matricepleine B) {{{
 }}}
 
 bool operator==(matricecreuseun A, matricecreuseun B) {{{
-    if (A.m != B.m || A.n != B.n || A.o != B.o) return false;
+    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return false;
     for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false; // TODO Faux positifs monstrueux T-T
     /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
      * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
@@ -85,7 +85,7 @@ bool operator==(matricecreuseun A, matricecreuseun B) {{{
 }}}
 
 bool operator!=(matricecreuseun A, matricecreuseun B) {{{
-    if (A.m != B.m || A.n != B.n || A.o != B.o) return true;
+    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return true;
     for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return true; // TODO Faux positifs monstrueux T-T
     /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
      * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
@@ -94,16 +94,16 @@ bool operator!=(matricecreuseun A, matricecreuseun B) {{{
 }}}
 
 bool operator==(matricecreusedeux A, matricecreusedeux B) {{{
-    if (A.m != B.m || A.n != B.n || A.o != B.o || A.p != B.p) return false;
-    for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return false;
-    for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return false;
+    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return false;
+    for (int k=0;k<A.nz;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return false;
+    for (int k=0;k<=A.m;k++) if (A.II[k] != B.II[k]) return false;
     return true;
 }}}
 
 bool operator!=(matricecreusedeux A, matricecreusedeux B) {{{
-    if (A.m != B.m || A.n != B.n || A.o != B.o || A.p != B.p) return true;
-    for (int k=0;k<A.o;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return true;
-    for (int k=0;k<=A.p;k++) if (A.II[k] != B.II[k]) return true;
+    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return true;
+    for (int k=0;k<A.nz;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return true;
+    for (int k=0;k<=A.m;k++) if (A.II[k] != B.II[k]) return true;
     return false;
 }}}
 
@@ -135,7 +135,7 @@ vecteur operator*(matricecreuseun M, vecteur v) {{{
     vecteur w;
     w.n = M.n;
     for(int i=0;i<w.n;i++) w.coef[i] = 0;
-    for(int k=0;k<M.o;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
+    for(int k=0;k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
     return w;
 }}}
 
@@ -161,14 +161,14 @@ matricecreuseun pleineversun(matricepleine A) {{{
     matricecreuseun B;
     B.m = A.m;
     B.n = A.n;
-    B.o = 0;
+    B.nz = 0;
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             if (A.coef[i][j] != 0) {
-                B.i[B.o] = i;
-                B.j[B.o] = j;
-                B.coef[B.o] = A.coef[i][j];
-                B.o++;
+                B.i[B.nz] = i;
+                B.j[B.nz] = j;
+                B.coef[B.nz] = A.coef[i][j];
+                B.nz++;
             }
         }
     }
@@ -177,46 +177,52 @@ matricecreuseun pleineversun(matricepleine A) {{{
 
 matricecreusedeux pleineversdeux(matricepleine A) {{{
     matricecreusedeux B;
-    B.m = A.m;
     B.n = A.n;
-    B.o = 0;
-    B.p = 0;
-    int cmpt = 0;
+    B.m = 0;
+    B.nz = 0;
     for (int i=0;i<A.m;i++) {
         bool yadejaqqchsurlaligne = false;
         for(int j=0;j<A.n;j++) {
             if(A.coef[i][j] != 0) {
-                B.vals[B.o] = A.coef[i][j];
-                B.j[B.o++] = j;
-                cmpt++; // TODO décalage vu qu'un tableau commence à 0 ?
+                B.vals[B.nz] = A.coef[i][j];
+                B.j[B.nz++] = j;
                 if (!yadejaqqchsurlaligne) {
                     yadejaqqchsurlaligne = true;
-                    B.II[B.p++] = cmpt;
+                    B.II[B.m++] = B.nz;
                 }
             }
         }
-        if (!yadejaqqchsurlaligne) B.II[B.p++] = 0;
+        if (!yadejaqqchsurlaligne) B.II[B.m++] = 0;
     }
-    B.II[B.p++] = B.II[0]+B.o;// TODO faudra qu'on m'explique à quoi il sert lui... 
+    B.II[B.m] = B.II[0]+B.nz;
     return B;
 }}}
 
 matricecreusedeux unversdeux(matricecreuseun A) {{{
     matricecreusedeux B;
-    B.m = A.m;
     B.n = A.n;
-    B.o = A.o;
-    B.p = 0;
-    for(int i=0;i<B.o;i++) {
+    B.nz = A.nz;
+    B.m = -1;
+    for(int i=0;i<B.nz;i++) {
         B.vals[i] = A.coef[i];
         B.j[i] = A.j[i];
-        if (A.i[i] != B.p-1) {
-            if (A.i[i] == B.p) B.II[B.p++] = i+1;
-            else B.II[B.p++] = 0;
+        if (A.i[i] != B.m) {
+            if (A.i[i] == B.m+1) B.II[B.m++ +1] = i+1;
+            else B.II[B.m++] = 0; // TODO il faut aussi rajouter la suite ...
         }
     }
-    B.II[B.p++] = B.II[0]+B.o;
+    B.II[B.m++ +1] = B.II[0]+B.nz;
     return B;
 }}}
+
+
+/****************************************************************
+ *                       Ordonage de matrices                   *
+ ****************************************************************/
+
+//matricecreuseun ordonne(matricecreuseun A) {{{
+
+//bool estenbordel(matricecreuseun A) {{{
+
 
 // vim: set foldmethod=marker:

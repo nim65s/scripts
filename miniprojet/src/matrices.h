@@ -27,7 +27,7 @@ class matricecreuseun {
     public:
         int m;
         int n;
-        int o;
+        int nz;
         int i[100];
         int j[100];
         float coef[100];
@@ -42,8 +42,7 @@ class matricecreusedeux {
     public:
         int m;
         int n;
-        int o;
-        int p;
+        int nz;
         float vals[100];
         int j[100];
         int II[100];

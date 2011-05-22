@@ -12,14 +12,14 @@ echo >> Makefile
 
 echo '%.pdf: %.tex' >> Makefile
 echo -en "\t" >> Makefile
-echo '( ( pdflatex $< || ( rm $@ && false ) ) && pdflatex $< || ( rm $@ && false ) ) && pdflatex $<' >> Makefile
+echo '( ( pdflatex -shell-escape $< || ( rm $@ && false ) ) && pdflatex -shell-escape $< || ( rm $@ && false ) ) && pdflatex -shell-escape $<' >> Makefile
 echo >> Makefile
 echo 'clean:' >> Makefile
 echo -en "\t" >> Makefile
 echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *~ 2> /dev/null' >> Makefile
 
 
-sed 's/( ( pdflatex $< || ( rm $@ && false ) ) && pdflatex $< || ( rm $@ && false ) ) && pdflatex $</pdflatex $</' Makefile >> Makefile.quick
+sed 's/( ( pdflatex -shell-escape $< || ( rm $@ && false ) ) && pdflatex -shell-escape $< || ( rm $@ && false ) ) && pdflatex -shell-escape $</pdflatex -shell-escape $</' Makefile > Makefile.quick
 
 chmod +x Makefile Makefile.quick
 

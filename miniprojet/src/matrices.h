@@ -27,7 +27,7 @@ class matricecreuseun {
     public:
         int m;
         int n;
-        int o;
+        int nz;
         int i[100];
         int j[100];
         float coef[100];
@@ -37,13 +37,14 @@ bool operator==(matricecreuseun A, matricecreuseun B);
 bool operator!=(matricecreuseun A, matricecreuseun B);
 vecteur operator*(matricecreuseun M, vecteur v);
 matricecreuseun pleineversun(matricepleine A);
+matricecreuseun ordonne(matricecreuseun A);
+bool estenbordel(matricecreuseun A);
 
 class matricecreusedeux {
     public:
         int m;
         int n;
-        int o;
-        int p;
+        int nz;
         float vals[100];
         int j[100];
         int II[100];

@@ -53,6 +53,7 @@ int test_produits(bool afficher) {{{
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     vecteur v;
     v.n = 5;
+    v.coef = new float[v.n];
     for(int i=0;i<5;i++) v.coef[i] = i;
     if(afficher) v.afficher();
     if(afficher) cout << "==================================" << endl;

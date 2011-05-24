@@ -2,11 +2,12 @@
 #define MATRICES_H_INCLUDED
 
 // TODO mettre des petites & partout :)
+// TODO les templates caybonmangezen
 
 class vecteur {
     public:
         int n;
-        float coef[100];
+        float * coef;
         void afficher();
 };
 bool operator==(vecteur a, vecteur b);

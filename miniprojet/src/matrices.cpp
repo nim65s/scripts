@@ -58,9 +58,7 @@ bool operator==(vecteur a, vecteur b) {{{
 }}}
 
 bool operator!=(vecteur a, vecteur b) {{{
-    if (a.n != b.n) return true;
-    for(int i=0;i<a.n;i++) if (a.coef[i] != b.coef[i]) return true;
-    return false;
+    return !(a==b);
 }}}
 
 bool operator==(matricepleine A, matricepleine B) {{{
@@ -70,27 +68,19 @@ bool operator==(matricepleine A, matricepleine B) {{{
 }}}
 
 bool operator!=(matricepleine A, matricepleine B) {{{
-    if( A.n != B.n || A.m != B.m) return true;
-    for(int i=0;i<A.n;i++) for(int j=0;j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return true;
-    return false;
+    return !(A==B);
 }}}
 
 bool operator==(matricecreuseun A, matricecreuseun B) {{{
     if (A.m != B.m || A.n != B.n || A.nz != B.nz) return false;
-    for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false; // TODO Faux positifs monstrueux T-T
-    /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
-     * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
-     */
+    if (estenbordel(A)) ordonne(A);
+    if (estenbordel(B)) ordonne(B);
+    for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false;
     return true;
 }}}
 
 bool operator!=(matricecreuseun A, matricecreuseun B) {{{
-    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return true;
-    for(int k=0;k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return true; // TODO Faux positifs monstrueux T-T
-    /* L'idée serait de faire ce test là, et s'il ne passe pas, mettre les données de B de coté, et réessayer avec les suivantes
-     * Mais c'est un poil tendu et peut être pas si pertinent que ça à coder...
-     */
-    return false;
+    return !(A==B);
 }}}
 
 bool operator==(matricecreusedeux A, matricecreusedeux B) {{{
@@ -101,10 +91,7 @@ bool operator==(matricecreusedeux A, matricecreusedeux B) {{{
 }}}
 
 bool operator!=(matricecreusedeux A, matricecreusedeux B) {{{
-    if (A.m != B.m || A.n != B.n || A.nz != B.nz) return true;
-    for (int k=0;k<A.nz;k++) if (A.vals[k] != B.vals[k] || A.j[k] != B.j[k]) return true;
-    for (int k=0;k<=A.m;k++) if (A.II[k] != B.II[k]) return true;
-    return false;
+    return !(A==B);
 }}}
 
 /****************************************************************
@@ -119,6 +106,7 @@ vecteur operator*(matricepleine M, vecteur v) {{{
     }
     vecteur w;
     w.n = M.n;
+    w.coef = new float[w.n];
     for(int i=0;i<M.n;i++) {
         w.coef[i] = 0;
         for(int j=0;j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
@@ -134,6 +122,7 @@ vecteur operator*(matricecreuseun M, vecteur v) {{{
     }
     vecteur w;
     w.n = M.n;
+    w.coef = new float[w.n];
     for(int i=0;i<w.n;i++) w.coef[i] = 0;
     for(int k=0;k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
     return w;
@@ -147,9 +136,10 @@ vecteur operator*(matricecreusedeux M, vecteur v) {{{
     }
     vecteur w;
     w.n = M.n;
+    w.coef = new float[w.n];
     for(int i=0;i<w.n;i++) w.coef[i] = 0;
     int a=0;
-    for(int b=0;b<M.n;b++) while(a<M.II[b]) w.coef[b] += M.vals[a]*v.coef[M.j[a++]]; // TODO Le compilateur me fait remarquer qu'il incrémentera mon a quand bon lui semblera...
+    for(int b=0;b<M.n;b++) while(a<M.II[b]) w.coef[b] += M.vals[a]*v.coef[M.j[a++]];
     return w;
 }}}
 

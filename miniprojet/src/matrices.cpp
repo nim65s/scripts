@@ -152,13 +152,15 @@ matricecreuseun pleineversun(matricepleine A) {{{
     B.m = A.m;
     B.n = A.n;
     B.nz = 0;
+    B.i = new int[A.nz];
+    B.j = new int[A.nz];
+    B.coef = new float[A.nz];
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             if (A.coef[i][j] != 0) {
                 B.i[B.nz] = i;
                 B.j[B.nz] = j;
-                B.coef[B.nz] = A.coef[i][j];
-                B.nz++;
+                B.coef[B.nz++] = A.coef[i][j];
             }
         }
     }
@@ -170,6 +172,9 @@ matricecreusedeux pleineversdeux(matricepleine A) {{{
     B.n = A.n;
     B.m = 0;
     B.nz = 0;
+    B.j = new int[A.nz];
+    B.II = new int[A.m+1];
+    B.vals = new float[A.nz];
     for (int i=0;i<A.m;i++) {
         bool yadejaqqchsurlaligne = false;
         for(int j=0;j<A.n;j++) {
@@ -193,6 +198,9 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
     B.n = A.n;
     B.nz = A.nz;
     B.m = -1;
+    B.j = new int[A.nz];
+    B.II = new int[A.m+1];
+    B.vals = new float[A.nz];
     for(int i=0;i<B.nz;i++) {
         B.vals[i] = A.coef[i];
         B.j[i] = A.j[i];
@@ -215,6 +223,9 @@ matricecreuseun ordonne(matricecreuseun A) {{{
     B.m = A.m;
     B.n = A.n;
     B.nz = 0;
+    B.i = new int[A.nz];
+    B.j = new int[A.nz];
+    B.coef = new float[A.nz];
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             for(int k=0;k<A.nz;k++) {

@@ -9,6 +9,7 @@ int test_conversions(bool afficher) {{{
     matricepleine B;
     B.m = 5;
     B.n = 5;
+    B.nz = 12;
     for(int i=0;i<B.m;i++) for(int j=0;j<B.n;j++) B.coef[i][j] = 0;
     B.coef[0][0] = 1.1;
     B.coef[0][3] = 4;
@@ -92,8 +93,11 @@ int test_ordonnage(bool afficher) {{{
     matricecreuseun A;
     A.m = 5;
     A.n = 5;
-    A.nz = 4;
-    for(int i=0;i<5;i++) {
+    A.nz = 3;
+    A.i = new int[A.nz];
+    A.j = new int[A.nz];
+    A.coef = new float[A.nz];
+    for(int i=1;i<5;i++) {
         A.i[i] = i;
         A.j[i] = i;
         A.coef[i] = i;
@@ -109,6 +113,9 @@ int test_ordonnage(bool afficher) {{{
     B.m = 5;
     B.n = 5;
     B.nz = 2;
+    B.i = new int[B.nz];
+    B.j = new int[B.nz];
+    B.coef = new float[B.nz];
     B.i[0] = 4;
     B.j[0] = 2;
     B.coef[0] = 42;

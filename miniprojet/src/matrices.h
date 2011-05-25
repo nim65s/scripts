@@ -3,6 +3,8 @@
 
 // TODO mettre des petites & partout :)
 // TODO les templates caybonmangezen
+// ASK faut vraiment dynamiser les pleines ?
+// ASK ça vaut le coup de passer par des références ?
 
 class vecteur {
     public:
@@ -17,6 +19,7 @@ class matricepleine {
     public:
        int n;
        int m;
+       int nz;
        float coef[100][100];
        void afficher();
 };
@@ -29,9 +32,9 @@ class matricecreuseun {
         int m;
         int n;
         int nz;
-        int i[100];
-        int j[100];
-        float coef[100];
+        int * i;
+        int * j;
+        float * coef;
         void afficher();
 };
 bool operator==(matricecreuseun A, matricecreuseun B);
@@ -46,9 +49,9 @@ class matricecreusedeux {
         int m;
         int n;
         int nz;
-        float vals[100];
-        int j[100];
-        int II[100];
+        float * vals;
+        int * j;
+        int * II;
         void afficher();
 };
 bool operator==(matricecreusedeux A, matricecreusedeux B);

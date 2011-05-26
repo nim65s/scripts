@@ -70,7 +70,7 @@ int test_produits(bool afficher) {{{
     if(afficher) z.afficher();
 
     if(x==y && x==z && !(y!=z)) return 0;
-    return 0;
+    return 1;
 }}}
 
 int test_ordonnage(bool afficher) {{{

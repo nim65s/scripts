@@ -256,20 +256,15 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
  ****************************************************************/
 
 matricecreuseun ordonne(matricecreuseun A) {{{
-    //cout << A.nz << endl;
     matricecreuseun B(A.m, A.n, A.nz);
     int cmpt = 0;
     for(int i=0;i<A.m;i++) {
-        //cout << i;
         for(int j=0;j<A.n;j++) {
-            //cout << "\t" << j;
             for(int k=0;k<A.nz;k++) {
-                //cout << "\t" << k << endl;
                 if (A.i[k] == i && A.j[k] == j) {
                     B.i[cmpt] = A.i[k];
                     B.j[cmpt] = A.j[k];
                     B.coef[cmpt++] = A.coef[k];
-                    //cout << cmpt << endl;
                 }
             }
         }

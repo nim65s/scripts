@@ -4,7 +4,6 @@
 #include <string>
 
 // TODO un bool estenbordel dans matricecreuseun et manipuler que des ordonnées
-// TODO les matrices seront toujours carrées en fait
 // TODO mettre des assert(bool) ou des exit(int) partout
 
 class vecteur {

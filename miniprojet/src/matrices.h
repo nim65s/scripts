@@ -1,10 +1,11 @@
 #ifndef MATRICES_H_INCLUDED
 #define MATRICES_H_INCLUDED
 
-// TODO les templates caybonmangezen
-// TODO un bool estenbordel dans matricecreuseun
-// ASK faut vraiment dynamiser les pleines ?
-// ASK ça vaut le coup de passer par des références ?
+#include <string>
+
+// TODO un bool estenbordel dans matricecreuseun et manipuler que des ordonnées
+// TODO les matrices seront toujours carrées en fait
+// TODO mettre des assert(bool) ou des exit(int) partout
 
 class vecteur {
     public:
@@ -23,10 +24,11 @@ class matricepleine {
        int m;
        int n;
        int nz;
-       float coef[100][100];
-        matricepleine();
-        matricepleine(int lig, int col, int nzv);
-        ~matricepleine();
+       //float * coef;
+       float coef[10][10];
+       matricepleine();
+       matricepleine(int lig, int col, int nzv);
+       ~matricepleine();
        void afficher();
 };
 bool operator==(matricepleine A, matricepleine B);
@@ -52,6 +54,10 @@ vecteur operator*(matricecreuseun M, vecteur v);
 matricecreuseun pleineversun(matricepleine A);
 matricecreuseun ordonne(matricecreuseun A);
 bool estenbordel(matricecreuseun A);
+matricecreuseun lireun();
+matricecreuseun lireun(std::string file);
+int ecrire(matricecreuseun A);
+int ecrire(matricecreuseun A, std::string file);
 
 class matricecreusedeux {
     public:
@@ -71,5 +77,9 @@ bool operator!=(matricecreusedeux A, matricecreusedeux B);
 vecteur operator*(matricecreusedeux M, vecteur v);
 matricecreusedeux pleineversdeux(matricepleine A);
 matricecreusedeux unversdeux(matricecreuseun A);
+matricecreusedeux liredeux();
+matricecreusedeux liredeux(std::string file);
+int ecrire(matricecreusedeux A);
+int ecrire(matricecreusedeux A, std::string file);
 
 #endif

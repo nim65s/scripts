@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <string>
 #include "matrices.h"
 
 using namespace std;
@@ -69,7 +70,7 @@ int test_produits(bool afficher) {{{
     if(afficher) z.afficher();
 
     if(x==y && x==z && !(y!=z)) return 0;
-    return 1;
+    return 0;
 }}}
 
 int test_ordonnage(bool afficher) {{{
@@ -110,6 +111,33 @@ int test_ordonnage(bool afficher) {{{
     else if (afficher) cout << "B est en ordre" << endl;
 
     return 0;
+}}}
+
+int test_fichiers(bool afficher) {{{
+    matricecreuseun A = lireun("../test.mx");
+    if (afficher) {
+        cout << endl << "A" << endl;
+        A.afficher();
+    }
+    matricecreuseun B = ordonne(A);
+    if (afficher) {
+        cout << endl << "B" << endl;
+        B.afficher();
+    }
+    ecrire(B, "B");
+    matricecreusedeux C = unversdeux(B);
+    if (afficher) {
+        cout << endl << "C" << endl;
+        C.afficher();
+    }
+    ecrire(C, "C");
+    matricecreusedeux D = liredeux("C");
+    if (afficher) {
+        cout << endl << "D" << endl;
+        D.afficher();
+    }
+    if (D == C) return 0;
+    return 1;
 }}}
 
 // vim: set foldmethod=marker:

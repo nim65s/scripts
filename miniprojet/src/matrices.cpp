@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <string>
 #include "matrices.h"
 
 using namespace std;
@@ -21,7 +22,8 @@ matricepleine::matricepleine(int lig, int col, int nzv) {{{
     m = lig;
     n = col;
     nz = nzv;
-    for(int i=0;m<lig;m++) for(int j=0;j<lig;j++) coef[i][j] = 0;
+    //TODO coef = new float[nzv][nzv];
+    for(int i=0;i<lig;i++) for(int j=0;j<col;j++) coef[i][j] = 0;
 }}}
 
 matricepleine::~matricepleine() {{{
@@ -39,12 +41,10 @@ matricecreuseun::matricecreuseun(int lig, int col, int nzv) {{{
 
 matricecreuseun::~matricecreuseun() {{{
     /*
-    delete[] i;
-    i = 0;
-    delete[] j;
-    j = 0;
-    delete[] coef;
-    coef = 0;
+    cout << "destruc" << endl;
+    delete i;
+    delete j;
+    delete coef;
     */
 }}}
 
@@ -256,15 +256,20 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
  ****************************************************************/
 
 matricecreuseun ordonne(matricecreuseun A) {{{
+    //cout << A.nz << endl;
     matricecreuseun B(A.m, A.n, A.nz);
     int cmpt = 0;
     for(int i=0;i<A.m;i++) {
+        //cout << i;
         for(int j=0;j<A.n;j++) {
+            //cout << "\t" << j;
             for(int k=0;k<A.nz;k++) {
+                //cout << "\t" << k << endl;
                 if (A.i[k] == i && A.j[k] == j) {
                     B.i[cmpt] = A.i[k];
                     B.j[cmpt] = A.j[k];
                     B.coef[cmpt++] = A.coef[k];
+                    //cout << cmpt << endl;
                 }
             }
         }
@@ -283,6 +288,208 @@ bool estenbordel(matricecreuseun A) {{{
         else return true;
     }
     return false;
+}}}
+
+/****************************************************************
+ *                       Lecture ecriture                       *
+ ****************************************************************/
+
+matricecreuseun lireun() {{{
+    FILE * t;
+    string a, b, c, d, e;
+    char rep;
+    a = "../test.mx";
+    b = "../A62.mx";
+    c = "../B398.mx";
+    d = "../B62.mx";
+    e = "La réponse e";
+    cout << "Quel fichier voulez vous lire ?" << endl;
+    cout << "a) " << a << endl;
+    cout << "b) " << b << endl;
+    cout << "c) " << c << endl;
+    cout << "d) " << d << endl;
+    cout << "e) " << "En entrer un autre" << endl;
+    cout << "==> ";
+    cin >> rep;
+    string choix; // TODO l'idée était de faire un * choix...
+    switch (rep) {
+        case 'a':
+            choix = a;
+            break;
+        case 'b':
+            choix = b;
+            break;
+        case 'c':
+            choix = c;
+            break;
+        case 'd':
+            choix = d;
+            break;
+        case 'e':
+            cin >> choix;
+            break;
+        default :
+            //exit(1); // TODO 
+            break;
+    }
+
+    t = fopen(choix.c_str(),"r");
+    //if(t==NULL) { // TODO dans la doc y'a "the file must exit"
+    int m, n, nz, i, j;
+    float coef;
+    fscanf(t, "%d %d %d", &m, &n, &nz);
+    matricecreuseun M(m, n, nz);
+    for(int k=0; k<nz; k++) {
+        fscanf(t, "%d %d %f", &i, &j, &coef);
+        M.i[k] = i;
+        M.j[k] = j;
+        M.coef[k] = coef;
+    }
+    fclose(t);
+    return M;
+}}}
+
+int ecrire(matricecreuseun A) {{{
+    FILE * t;
+    string nom;
+    cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
+    cin >> nom;
+    t = fopen(nom.c_str(),"w"); // TODO On risque d'écraser des trucs ça craint
+    fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
+    for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
+    fclose(t);
+    return 0;
+}}}
+
+matricecreusedeux liredeux() {{{
+    FILE * f;
+    string a, b, c, d, e;
+    char rep;
+    a = "../test.mxb";
+    b = "../A62.mxb";
+    c = "../B398.mxb";
+    d = "../B62.mxb";
+    e = "La réponse e"; // TODO : entrez un autre fichier
+    cout << "Quel fichier voulez vous lire ?" << endl;
+    cout << "a) " << a << endl;
+    cout << "b) " << b << endl;
+    cout << "c) " << c << endl;
+    cout << "d) " << d << endl;
+    cout << "e) " << "En entrer un autre" << endl;
+    cout << "==> ";
+    cin >> rep;
+    string choix; // TODO l'idée était de faire un * choix...
+    switch (rep) {
+        case 'a':
+            choix = a;
+            break;
+        case 'b':
+            choix = b;
+            break;
+        case 'c':
+            choix = c;
+            break;
+        case 'd':
+            choix = d;
+            break;
+        case 'e':
+            cin >> choix;
+            break;
+        default :
+            //exit(1); // TODO 
+            break;
+    }
+
+    f = fopen(choix.c_str(),"rb");
+    //if(t!=NULL) { // TODO dans la doc y'a "the file must exit"
+    int m, n, nz, j, II;
+    float vals;
+    fscanf(f, "%d %d %d", &m, &n, &nz);
+    matricecreusedeux M(m, n, nz);
+    for(int k=0; k<=m; k++) {
+        fscanf(f, "%d", &II);
+        M.II[k] = II;
+    }
+    for(int k=0; k<nz; k++) {
+        fscanf(f, "%d %f", &j, &vals);
+        M.j[k] = j;
+        M.vals[k] = vals;
+    }
+    fclose(f);
+    return M;
+}}}
+
+int ecrire(matricecreusedeux A) {{{
+    FILE * b;
+    string nom;
+    cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
+    cin >> nom;
+    b = fopen(nom.c_str(),"wb"); // TODO On risque d'écraser des trucs ça craint
+    fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
+    for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
+    for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
+    fclose(b);
+    return 0;
+}}}
+
+// Les même avec le nom en paramètre
+
+matricecreuseun lireun(string file) {{{
+    FILE * t;
+    t = fopen(file.c_str(),"r");
+    //if(t==NULL) { // TODO dans la doc y'a "the file must exit"
+    int m, n, nz, i, j;
+    float coef;
+    fscanf(t, "%d %d %d", &m, &n, &nz);
+    matricecreuseun M(m, n, nz);
+    for(int k=0; k<nz; k++) {
+        fscanf(t, "%d %d %f", &i, &j, &coef);
+        M.i[k] = i;
+        M.j[k] = j;
+        M.coef[k] = coef;
+    }
+    fclose(t);
+    return M;
+}}}
+
+int ecrire(matricecreuseun A, string file) {{{
+    FILE * t;
+    t = fopen(file.c_str(),"w"); // TODO On risque d'écraser des trucs ça craint
+    fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
+    for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
+    fclose(t);
+    return 0;
+}}}
+
+matricecreusedeux liredeux(string file) {{{
+    FILE * f;
+    f = fopen(file.c_str(),"rb");
+    //if(t!=NULL) { // TODO dans la doc y'a "the file must exit"
+    int m, n, nz, j, II;
+    float vals;
+    fscanf(f, "%d %d %d", &m, &n, &nz);
+    matricecreusedeux M(m, n, nz);
+    for(int k=0; k<=m; k++) {
+        fscanf(f, "%d", &II);
+        M.II[k] = II;
+    }
+    for(int k=0; k<nz; k++) {
+        fscanf(f, "%d %f", &j, &vals);
+        M.j[k] = j;
+        M.vals[k] = vals;
+    }
+    fclose(f);
+    return M;
+}}}
+
+int ecrire(matricecreusedeux A, string file) {{{
+    FILE * b;
+    b = fopen(file.c_str(),"wb"); // TODO On risque d'écraser des trucs ça craint
+    fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
+    for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
+    for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
+    fclose(b);
+    return 0;
 }}}
 
 // vim: set foldmethod=marker:

@@ -4,6 +4,66 @@
 
 using namespace std;
 
+/****************************************************************
+ *                  Construteurs et destructeurs                *
+ ****************************************************************/
+
+vecteur::vecteur(int dim) {{{
+    n = dim;
+    coef = new float[dim];
+    for(int i=0;i<dim;i++) coef[i] = 0;
+}}}
+
+vecteur::~vecteur() {{{
+}}}
+
+matricepleine::matricepleine(int lig, int col, int nzv) {{{
+    m = lig;
+    n = col;
+    nz = nzv;
+    for(int i=0;m<lig;m++) for(int j=0;j<lig;j++) coef[i][j] = 0;
+}}}
+
+matricepleine::~matricepleine() {{{
+}}}
+
+matricecreuseun::matricecreuseun(int lig, int col, int nzv) {{{
+    // TODO là on pourrait vérifier que c'est pas nul...
+    m = lig;
+    n = col;
+    nz = nzv;
+    i = new int[nzv];
+    j = new int[nzv];
+    coef = new float[nzv];
+}}}
+
+matricecreuseun::~matricecreuseun() {{{
+    /*
+    delete[] i;
+    i = 0;
+    delete[] j;
+    j = 0;
+    delete[] coef;
+    coef = 0;
+    */
+}}}
+
+matricecreusedeux::matricecreusedeux(int lig, int col, int nzv) {{{
+    m = lig;
+    n = col;
+    nz = nzv;
+    vals = new float[nzv];
+    j = new int[nzv];
+    II = new int[lig+1];
+}}}
+
+matricecreusedeux::~matricecreusedeux() {{{
+}}}
+
+/****************************************************************
+ *                       Affichage de matrices                  *
+ ****************************************************************/
+
 void vecteur::afficher() {{{
     cout << "[";
     for(int i=0;i<n;i++) {
@@ -29,9 +89,9 @@ void matricepleine::afficher() {{{
 
 void matricecreuseun::afficher() {{{
     cout << "  i  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",i[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",i[k]);
     cout << endl << "  j  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",j[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",j[k]);
     cout << endl << "coef | ";
     for(int k=0;k<nz;k++) printf("%5.4g ",coef[k]);
     cout << endl;
@@ -41,7 +101,7 @@ void matricecreusedeux::afficher() {{{
     cout << "vals | ";
     for(int k=0;k<nz;k++) printf("%5.4g ",vals[k]);
     cout << endl << "  j  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",j[k]+1);
+    for(int k=0;k<nz;k++) printf("%5d ",j[k]);
     cout << endl << " II  | ";
     for(int k=0;k<=m;k++) printf("%5d ",II[k]);
     cout << endl;
@@ -104,13 +164,8 @@ vecteur operator*(matricepleine M, vecteur v) {{{
         cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
         return v;
     }
-    vecteur w;
-    w.n = M.n;
-    w.coef = new float[w.n];
-    for(int i=0;i<M.n;i++) {
-        w.coef[i] = 0;
-        for(int j=0;j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
-    }
+    vecteur w(M.n);
+    for(int i=0;i<M.n;i++) for(int j=0;j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
     return w;
 }}}
 
@@ -120,10 +175,7 @@ vecteur operator*(matricecreuseun M, vecteur v) {{{
         cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
         return v;
     }
-    vecteur w;
-    w.n = M.n;
-    w.coef = new float[w.n];
-    for(int i=0;i<w.n;i++) w.coef[i] = 0;
+    vecteur w(M.n);
     for(int k=0;k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
     return w;
 }}}
@@ -134,12 +186,12 @@ vecteur operator*(matricecreusedeux M, vecteur v) {{{
         cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
         return v;
     }
-    vecteur w;
-    w.n = M.n;
-    w.coef = new float[w.n];
-    for(int i=0;i<w.n;i++) w.coef[i] = 0;
+    vecteur w(M.n);
     int a=0;
-    for(int b=0;b<M.n;b++) while(a<M.II[b]) w.coef[b] += M.vals[a]*v.coef[M.j[a++]];
+    for(int b=0;b<M.n;b++) while(a<M.II[b]) {
+        w.coef[b] += M.vals[a]*v.coef[M.j[a]];
+        a++;
+    }
     return w;
 }}}
 
@@ -148,19 +200,14 @@ vecteur operator*(matricecreusedeux M, vecteur v) {{{
  ****************************************************************/
 
 matricecreuseun pleineversun(matricepleine A) {{{
-    matricecreuseun B;
-    B.m = A.m;
-    B.n = A.n;
-    B.nz = 0;
-    B.i = new int[A.nz];
-    B.j = new int[A.nz];
-    B.coef = new float[A.nz];
+    matricecreuseun B(A.m, A.n, A.nz);
+    int cmpt = 0;
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             if (A.coef[i][j] != 0) {
-                B.i[B.nz] = i;
-                B.j[B.nz] = j;
-                B.coef[B.nz++] = A.coef[i][j];
+                B.i[cmpt] = i;
+                B.j[cmpt] = j;
+                B.coef[cmpt++] = A.coef[i][j];
             }
         }
     }
@@ -168,71 +215,56 @@ matricecreuseun pleineversun(matricepleine A) {{{
 }}}
 
 matricecreusedeux pleineversdeux(matricepleine A) {{{
-    matricecreusedeux B;
-    B.n = A.n;
-    B.m = 0;
-    B.nz = 0;
-    B.j = new int[A.nz];
-    B.II = new int[A.m+1];
-    B.vals = new float[A.nz];
+    matricecreusedeux B(A.m, A.n, A.nz);
+    int cmptm = 0;
+    int cmptnz = 0;
     for (int i=0;i<A.m;i++) {
         bool yadejaqqchsurlaligne = false;
         for(int j=0;j<A.n;j++) {
             if(A.coef[i][j] != 0) {
-                B.vals[B.nz] = A.coef[i][j];
-                B.j[B.nz++] = j;
+                B.vals[cmptnz] = A.coef[i][j];
+                B.j[cmptnz++] = j;
                 if (!yadejaqqchsurlaligne) {
                     yadejaqqchsurlaligne = true;
-                    B.II[B.m++] = B.nz;
+                    B.II[cmptm++] = cmptnz;
                 }
             }
         }
-        if (!yadejaqqchsurlaligne) B.II[B.m++] = 0;
+        if (!yadejaqqchsurlaligne) B.II[cmptm++] = 0;
     }
-    B.II[B.m] = B.II[0]+B.nz;
+    B.II[cmptm] = B.II[0]+cmptnz;
     return B;
 }}}
 
 matricecreusedeux unversdeux(matricecreuseun A) {{{
-    matricecreusedeux B;
-    B.n = A.n;
-    B.nz = A.nz;
-    B.m = -1;
-    B.j = new int[A.nz];
-    B.II = new int[A.m+1];
-    B.vals = new float[A.nz];
+    matricecreusedeux B(A.m, A.n, A.nz);
+    int cmpt = -1;
     for(int i=0;i<B.nz;i++) {
         B.vals[i] = A.coef[i];
         B.j[i] = A.j[i];
-        if (A.i[i] != B.m) {
-            if (A.i[i] == B.m+1) B.II[++B.m] = i+1;
-            else B.II[++B.m] = 0; // TODO il faut aussi rajouter la suite ...
+        if (A.i[i] != cmpt) {
+            if (A.i[i] == cmpt+1) B.II[++cmpt] = i+1;
+            else B.II[++cmpt] = 0; // TODO il faut aussi rajouter la suite ...
         }
     }
-    B.II[++B.m] = B.II[0]+B.nz;
+    B.II[++cmpt] = B.II[0]+B.nz;
     return B;
 }}}
-
 
 /****************************************************************
  *                       Ordonage de matrices                   *
  ****************************************************************/
 
 matricecreuseun ordonne(matricecreuseun A) {{{
-    matricecreuseun B;
-    B.m = A.m;
-    B.n = A.n;
-    B.nz = 0;
-    B.i = new int[A.nz];
-    B.j = new int[A.nz];
-    B.coef = new float[A.nz];
+    matricecreuseun B(A.m, A.n, A.nz);
+    int cmpt = 0;
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             for(int k=0;k<A.nz;k++) {
                 if (A.i[k] == i && A.j[k] == j) {
-                    B.i[B.nz] = A.i[k];
-                    B.j[B.nz] = A.j[k];
-                    B.coef[B.nz++] = A.coef[k];
+                    B.i[cmpt] = A.i[k];
+                    B.j[cmpt] = A.j[k];
+                    B.coef[cmpt++] = A.coef[k];
                 }
             }
         }

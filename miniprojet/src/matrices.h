@@ -81,4 +81,9 @@ matricecreusedeux liredeux(std::string file);
 int ecrire(matricecreusedeux A);
 int ecrire(matricecreusedeux A, std::string file);
 
+float abs(float x);
+vecteur operator*(vecteur v, float x);
+vecteur operator/(vecteur v, float x);
+float norme(vecteur v);
+
 #endif

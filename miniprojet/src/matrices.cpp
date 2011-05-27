@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <assert.h>
+#include <math.h>
 #include "matrices.h"
 
 using namespace std;
@@ -10,6 +12,7 @@ using namespace std;
  ****************************************************************/
 
 vecteur::vecteur(int dim) {{{
+    assert(dim != 0);
     n = dim;
     coef = new float[dim];
     for(int i=0;i<dim;i++) coef[i] = 0;
@@ -19,6 +22,7 @@ vecteur::~vecteur() {{{
 }}}
 
 matricepleine::matricepleine(int lig, int col, int nzv) {{{
+    assert(lig != 0 && col != 0 && nzv != 0);
     m = lig;
     n = col;
     nz = nzv;
@@ -30,7 +34,7 @@ matricepleine::~matricepleine() {{{
 }}}
 
 matricecreuseun::matricecreuseun(int lig, int col, int nzv) {{{
-    // TODO là on pourrait vérifier que c'est pas nul...
+    assert(lig != 0 && col != 0 && nzv != 0);
     m = lig;
     n = col;
     nz = nzv;
@@ -49,6 +53,7 @@ matricecreuseun::~matricecreuseun() {{{
 }}}
 
 matricecreusedeux::matricecreusedeux(int lig, int col, int nzv) {{{
+    assert(lig != 0 && col != 0 && nzv != 0);
     m = lig;
     n = col;
     nz = nzv;
@@ -159,33 +164,21 @@ bool operator!=(matricecreusedeux A, matricecreusedeux B) {{{
  ****************************************************************/
 
 vecteur operator*(matricepleine M, vecteur v) {{{
-    if (M.m != v.n) {
-        cout << "On ne peut pas multiplier cette matrice et ce vecteur pour des raisons de dimension." << endl;
-        cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
-        return v;
-    }
+    assert(M.m == v.n);
     vecteur w(M.n);
     for(int i=0;i<M.n;i++) for(int j=0;j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
     return w;
 }}}
 
 vecteur operator*(matricecreuseun M, vecteur v) {{{
-    if (M.m != v.n) {
-        cout << "On ne peut pas multiplier cette matrice et ce vecteur pour des raisons de dimension." << endl;
-        cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
-        return v;
-    }
+    assert(M.m == v.n);
     vecteur w(M.n);
     for(int k=0;k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
     return w;
 }}}
 
 vecteur operator*(matricecreusedeux M, vecteur v) {{{
-    if (M.m != v.n) {
-        cout << "On ne peut pas multiplier cette matrice et ce vecteur pour des raisons de dimension." << endl;
-        cout << "Le vecteur retourné par cette multiplication est le vecteur initial !" << endl;
-        return v;
-    }
+    assert(M.m == v.n);
     vecteur w(M.n);
     int a=0;
     for(int b=0;b<M.n;b++) while(a<M.II[b]) {
@@ -252,7 +245,7 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
 }}}
 
 /****************************************************************
- *                       Ordonage de matrices                   *
+ *                       Ordonnage de matrices                  *
  ****************************************************************/
 
 matricecreuseun ordonne(matricecreuseun A) {{{
@@ -261,6 +254,7 @@ matricecreuseun ordonne(matricecreuseun A) {{{
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             for(int k=0;k<A.nz;k++) {
+                // TODO on pourrait optimiser un peu en ne regardant pas un numéro déja passé.... En fait, faudrait supprimer le truc de la liste
                 if (A.i[k] == i && A.j[k] == j) {
                     B.i[cmpt] = A.i[k];
                     B.j[cmpt] = A.j[k];
@@ -268,7 +262,7 @@ matricecreuseun ordonne(matricecreuseun A) {{{
                 }
             }
         }
-    } // TODO euh... y'a pas moyen de faire ça mieux ? XD
+    } // TODO euh... y'a pas moyen de faire ça mieux ? N*N*nz opérations :s
     return B;
 }}}
 
@@ -324,12 +318,12 @@ matricecreuseun lireun() {{{
             cin >> choix;
             break;
         default :
-            //exit(1); // TODO 
+            assert(false);
             break;
     }
 
     t = fopen(choix.c_str(),"r");
-    //if(t==NULL) { // TODO dans la doc y'a "the file must exit"
+    assert(t!=NULL);
     int m, n, nz, i, j;
     float coef;
     fscanf(t, "%d %d %d", &m, &n, &nz);
@@ -347,9 +341,19 @@ matricecreuseun lireun() {{{
 int ecrire(matricecreuseun A) {{{
     FILE * t;
     string nom;
-    cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
-    cin >> nom;
-    t = fopen(nom.c_str(),"w"); // TODO On risque d'écraser des trucs ça craint
+    /*
+    bool test=true;
+    while(test){
+    */
+        cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
+        cin >> nom;
+        /*
+        t = fopen(nom.c_str(),"r");
+        if (t==NULL) test=false;
+    }
+    fclose(t);
+    */
+    t = fopen(nom.c_str(),"w");
     fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
     for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
     fclose(t);
@@ -364,13 +368,13 @@ matricecreusedeux liredeux() {{{
     b = "../A62.mxb";
     c = "../B398.mxb";
     d = "../B62.mxb";
-    e = "La réponse e"; // TODO : entrez un autre fichier
+    e = "En entrer un autre";
     cout << "Quel fichier voulez vous lire ?" << endl;
     cout << "a) " << a << endl;
     cout << "b) " << b << endl;
     cout << "c) " << c << endl;
     cout << "d) " << d << endl;
-    cout << "e) " << "En entrer un autre" << endl;
+    cout << "e) " << e << endl;
     cout << "==> ";
     cin >> rep;
     string choix; // TODO l'idée était de faire un * choix...
@@ -391,12 +395,12 @@ matricecreusedeux liredeux() {{{
             cin >> choix;
             break;
         default :
-            //exit(1); // TODO 
+            assert(false);
             break;
     }
 
     f = fopen(choix.c_str(),"rb");
-    //if(t!=NULL) { // TODO dans la doc y'a "the file must exit"
+    assert(f!=NULL);
     int m, n, nz, j, II;
     float vals;
     fscanf(f, "%d %d %d", &m, &n, &nz);
@@ -417,9 +421,19 @@ matricecreusedeux liredeux() {{{
 int ecrire(matricecreusedeux A) {{{
     FILE * b;
     string nom;
-    cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
-    cin >> nom;
-    b = fopen(nom.c_str(),"wb"); // TODO On risque d'écraser des trucs ça craint
+    /*
+    bool test=true;
+    while(test){
+    */
+        cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
+        cin >> nom;
+        /*
+        b = fopen(nom.c_str(),"r");
+        if (b==NULL) test=false;
+    }
+    fclose(b);
+    */
+    b = fopen(nom.c_str(),"wb");
     fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
     for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
     for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
@@ -432,7 +446,7 @@ int ecrire(matricecreusedeux A) {{{
 matricecreuseun lireun(string file) {{{
     FILE * t;
     t = fopen(file.c_str(),"r");
-    //if(t==NULL) { // TODO dans la doc y'a "the file must exit"
+    assert(t!=NULL);
     int m, n, nz, i, j;
     float coef;
     fscanf(t, "%d %d %d", &m, &n, &nz);
@@ -449,7 +463,13 @@ matricecreuseun lireun(string file) {{{
 
 int ecrire(matricecreuseun A, string file) {{{
     FILE * t;
-    t = fopen(file.c_str(),"w"); // TODO On risque d'écraser des trucs ça craint
+    /*
+    t = fopen(file.c_str(),"r");
+    //if (!(f = fopen("lol.txt", "r"))) perror("mdr");
+    assert(t==NULL);
+    fclose(t);
+    */
+    t = fopen(file.c_str(),"w");
     fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
     for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
     fclose(t);
@@ -459,7 +479,7 @@ int ecrire(matricecreuseun A, string file) {{{
 matricecreusedeux liredeux(string file) {{{
     FILE * f;
     f = fopen(file.c_str(),"rb");
-    //if(t!=NULL) { // TODO dans la doc y'a "the file must exit"
+    assert(f!=NULL);
     int m, n, nz, j, II;
     float vals;
     fscanf(f, "%d %d %d", &m, &n, &nz);
@@ -479,12 +499,50 @@ matricecreusedeux liredeux(string file) {{{
 
 int ecrire(matricecreusedeux A, string file) {{{
     FILE * b;
-    b = fopen(file.c_str(),"wb"); // TODO On risque d'écraser des trucs ça craint
+    /*
+    b = fopen(file.c_str(),"rb");
+    assert(b==NULL);
+    fclose(b);
+    */
+    b = fopen(file.c_str(),"wb");
     fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
     for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
     for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
     fclose(b);
     return 0;
+}}}
+
+/****************************************************************
+ *                   Opérations vecteur-nombre                  *
+ ****************************************************************/
+
+float norme(vecteur v) {{{
+    float n,m=0;
+	int i;
+	for (i=0; i<v.n; i++) {
+		m += pow(v.coef[i],2);
+	}
+	n=sqrt(m);
+    return n;
+}}}
+
+float abs(float x) {{{
+    float y ;
+    if ( x > 0 ) y = x ;
+    else y = -x ;
+    return y ;
+}}}
+
+vecteur operator/(vecteur v, float x) {{{
+    vecteur w(v.n);
+	for (int i=0; i<v.n; i++) w.coef[i] = v.coef[i]/x;
+    return w;
+}}}
+
+vecteur operator*(vecteur v, float x) {{{
+    vecteur w(v.n);
+	for (int i=0; i<v.n; i++) w.coef[i] = v.coef[i]*x;
+    return w;
 }}}
 
 // vim: set foldmethod=marker:

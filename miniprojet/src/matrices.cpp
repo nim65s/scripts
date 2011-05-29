@@ -136,7 +136,6 @@ matricecreuseun::matricecreuseun(int lig, int col, int nzv) {{{
 
 matricecreuseun::~matricecreuseun() {{{
     /*
-    cout << "destruc" << endl;
     delete i;
     delete j;
     delete coef;
@@ -173,17 +172,14 @@ void vecteur::afficher() {{{
 
 void matricepleine::afficher() {{{
     cout << "⎡ ";
-    //for(int j=0;j<m;j++) printf("%5.4g ",coef[0][j]);
     for(int j=0;j<m;j++) coef[0][j].afficher();
     cout << "⎤" << endl;
     for(int i=1;i<n-1;i++) {
         cout << "⎢ ";
-        //for(int j=0;j<m;j++) printf("%5.4g ",coef[i][j]);
         for(int j=0;j<m;j++) coef[i][j].afficher();
         cout << "⎥" << endl;
     }
     cout << "⎣ ";
-    //for(int j=0;j<m;j++) printf("%5.4g ",coef[n-1][j]);
     for(int j=0;j<m;j++) coef[n-1][j].afficher();
     cout << "⎦" << endl;
 }}}
@@ -194,14 +190,12 @@ void matricecreuseun::afficher() {{{
     cout << endl << "  j  | ";
     for(int k=0;k<nz;k++) printf("%12d ",j[k]);
     cout << endl << "coef | ";
-    //for(int k=0;k<nz;k++) printf("%5.4g ",coef[k]);
     for(int k=0;k<nz;k++) coef[k].afficher();
     cout << endl;
 }}}
 
 void matricecreusedeux::afficher() {{{
     cout << "vals | ";
-    //for(int k=0;k<nz;k++) printf("%5.4g ",vals[k]);
     for(int k=0;k<nz;k++) vals[k].afficher();
     cout << endl << "  j  | ";
     for(int k=0;k<nz;k++) printf("%12d ",j[k]);
@@ -386,16 +380,13 @@ matricecreuseun lireun(string file, bool comp) {{{
     FILE * t;
     t = fopen(file.c_str(),"r");
     assert(t!=NULL);
-    int m, n, nz, i, j;
+    int m, n, nz;
     complexe coef;
     fscanf(t, "%d %d %d", &m, &n, &nz);
     matricecreuseun M(m, n, nz);
     for(int k=0; k<nz; k++) {
-        if(comp) fscanf(t, "%d %d %lf %lf", &i, &j, &coef.re, &coef.im);
-        else fscanf(t, "%d %d %lf", &i, &j, &coef.re);
-        M.i[k] = i;
-        M.j[k] = j;
-        M.coef[k] = coef; // TODO on peut pas mettre ça dans le fscanf directos ?
+        if(comp) fscanf(t, "%d %d %lf %lf", &M.i[k], &M.j[k], &M.coef[k].re, &M.coef[k].im);
+        else fscanf(t, "%d %d %lf", &M.i[k], &M.j[k], &M.coef[k].re);
     }
     fclose(t);
     return M;
@@ -414,19 +405,14 @@ matricecreusedeux liredeux(string file, bool comp) {{{
     FILE * t;
     t = fopen(file.c_str(),"r");
     assert(t!=NULL);
-    int m, n, nz, j, II;
+    int m, n, nz;
     complexe vals;
     fscanf(t, "%d %d %d", &m, &n, &nz);
     matricecreusedeux M(m, n, nz);
-    for(int k=0; k<=m; k++) {
-        fscanf(t, "%d", &II);
-        M.II[k] = II;
-    }
+    for(int k=0; k<=m; k++) fscanf(t, "%d", &M.II[k]);
     for(int k=0; k<nz; k++) {
-        if(comp) fscanf(t, "%d %lf %lf", &j, &vals.re, &vals.im);
-        else fscanf(t, "%d %lf", &j, &vals.re);
-        M.j[k] = j;
-        M.vals[k] = vals; // TODO on peut pas mettre ça dans le fscanf directos ?
+        if(comp) fscanf(t, "%d %lf %lf", &M.j[k], &M.vals[k].re, &M.vals[k].im);
+        else fscanf(t, "%d %lf", &M.j[k], &M.vals[k].re);
     }
     fclose(t);
     return M;

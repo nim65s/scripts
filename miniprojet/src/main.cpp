@@ -24,23 +24,28 @@ void entrer_matrice(matricecreuseun A) {{{
 
 int main() {
     cout << "\t\tMini Projet" << endl;
-    int a = test_conversions(false);
-    int b = test_produits(false);
-    int c = test_ordonnage(false);
-    int d = test_fichiers(false);
+    int a = test_conversions(true);
+    int b = test_produits(true);
+    int c = test_ordonnage(true);
+    int d = test_fichiers(true);
     if ( a == 0 && b==0 && c==0 && d == 0) cout << " OK " << endl;
     else cout << " KO : a=" << a << " | b=" << b << " | c=" << c << " | d=" << d << endl;
 
 	// Début du programme 
+    /*
 
 	int i,k=0;
-	float norme_x ;
     complexe lambda1, temp;
-	vecteur q(2),x(2),u1(2) ;
-	matricepleine B(2, 2, 4);;
-	matricecreuseun A(2, 2, 4);
-	q.coef[0].re = sqrt(2);
-	q.coef[1].re = sqrt(2);
+    double norme_x;
+    matricecreuseun A = lireun("../test.mx", false);
+    matricecreuseun B = ordonne(A);
+    matricecreusedeux C = unversdeux(B);
+    vecteur q(A.m), x(A.m), u1(A.m);
+    double val = sqrt(sqrt(1/A.m)/2);
+    for(int i=0; i<A.m; i++) {
+        q.coef[i].re = val; 
+        q.coef[i].im = val;
+    }
 
 	//---------------------- Algorithme de calcul ----------------------------//
 
@@ -56,12 +61,7 @@ int main() {
             x = A*q;
             i = 0 ;
             temp = lambda1;
-            while ( i == 0 && i!=q.n ) {
-                if (!isnull(q.coef[i])) {
-                    lambda1=x.coef[i]/q.coef[i];
-                    i++ ;
-                }
-            }
+            for(i=0;i<q.n;i++) if (!isnull(q.coef[i])) lambda1=x.coef[i]/q.coef[i];
             u1=q*pow(lambda1/norme(lambda1),k);
         }
         else {
@@ -78,5 +78,6 @@ int main() {
     else {
         printf("Il n'y a pas de valeur propre");
     }
+    */
     return 0 ;
 }

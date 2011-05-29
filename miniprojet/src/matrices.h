@@ -10,53 +10,58 @@ class complexe {
         double re;
         double im;
         complexe();
-        void afficher();
+        void afficher() const;
+        complexe & operator+=(complexe const & a);
+        complexe & operator-=(complexe const & a);
+        complexe & operator*=(complexe const & a);
+        complexe & operator/=(complexe const & a);
+        complexe & operator *=(double const & x);
+        complexe & operator /=(double const & x);
 };
-bool operator==(complexe a, complexe b);
-bool operator!=(complexe a, complexe b);
-bool isnull(complexe a);
-complexe operator*(complexe a, complexe b);
-complexe operator*(complexe a, float b);
-complexe operator*(complexe a, double b);
-complexe operator/(complexe a, complexe b);
-complexe operator/(complexe a, float b);
-complexe operator/(complexe a, double b);
-complexe operator+(complexe a, complexe b);
-complexe operator-(complexe a, complexe b);
-double norme(complexe a);
-complexe pow(complexe a, int b);
+bool operator==(complexe const & a, complexe const & b);
+bool operator!=(complexe const & a, complexe const & b);
+bool isnull(complexe const & a);
+complexe operator*(complexe const & a, complexe const & b);
+complexe operator*(complexe a, double const & b);
+complexe operator/(complexe const & a, complexe const & b);
+complexe operator/(complexe a, double const & b);
+complexe operator+(complexe a, complexe const & b);
+complexe operator-(complexe a, complexe const & b);
+double norme(complexe const & a);
+complexe pow(complexe const & a, int const & b);
+complexe conjugue(complexe & a);
 
 class vecteur {
     public:
         int n;
         complexe * coef;
         vecteur();
-        vecteur(int dim);
+        vecteur(int const & dim);
         ~vecteur();
-        void afficher();
+        void afficher() const;
 };
-bool operator==(vecteur a, vecteur b);
-bool operator!=(vecteur a, vecteur b);
-vecteur operator*(vecteur v, float x);
-vecteur operator*(vecteur v, complexe a);
-vecteur operator/(vecteur v, float x);
-float norme(vecteur v);
+bool operator==(vecteur const & a, vecteur const & b);
+bool operator!=(vecteur const & a, vecteur const & b);
+vecteur operator*(vecteur const & v, double const & x);
+vecteur operator*(vecteur const & v, complexe const & a);
+vecteur operator/(vecteur const & v, double const & x);
+double norme(vecteur const & v);
 
 class matricepleine {
     public:
        int m;
        int n;
        int nz;
-       //complexe * coef;
+       //complexe * coef; TODO : coef[m] ? coef[m][n] ?
        complexe coef[10][10];
        matricepleine();
-       matricepleine(int lig, int col, int nzv);
+       matricepleine(int const & lig, int const & col, int const & nzv);
        ~matricepleine();
-       void afficher();
+       void afficher() const;
 };
-bool operator==(matricepleine A, matricepleine B);
-bool operator!=(matricepleine A, matricepleine B);
-vecteur operator*(matricepleine A, vecteur v);
+bool operator==(matricepleine const & A, matricepleine const & B);
+bool operator!=(matricepleine const & A, matricepleine const & B);
+vecteur operator*(matricepleine const & A, vecteur const & v);
 
 class matricecreuseun {
     public:
@@ -67,20 +72,20 @@ class matricecreuseun {
         int * j;
         complexe * coef;
         matricecreuseun();
-        matricecreuseun(int lig, int col, int nzv);
+        matricecreuseun(int const & lig, int const & col, int const & nzv);
         ~matricecreuseun();
-        void afficher();
+        void afficher() const;
 };
-bool operator==(matricecreuseun A, matricecreuseun B);
-bool operator!=(matricecreuseun A, matricecreuseun B);
-vecteur operator*(matricecreuseun M, vecteur v);
-matricecreuseun pleineversun(matricepleine A);
-matricecreuseun ordonne(matricecreuseun A);
-bool estenbordel(matricecreuseun A);
-matricecreuseun lireun(bool comp);
-matricecreuseun lireun(std::string file, bool comp);
-int ecrire(matricecreuseun A);
-int ecrire(matricecreuseun A, std::string file);
+bool operator==(matricecreuseun const & A, matricecreuseun const & B);
+bool operator!=(matricecreuseun const & A, matricecreuseun const & B);
+vecteur operator*(matricecreuseun const & M, vecteur const & v);
+matricecreuseun pleineversun(matricepleine const & A);
+matricecreuseun ordonne(matricecreuseun const & A);
+bool estenbordel(matricecreuseun const & A);
+matricecreuseun lireun(bool const & comp);
+matricecreuseun lireun(std::string const & file, bool const & comp);
+int ecrire(matricecreuseun const & A);
+int ecrire(matricecreuseun const & A, std::string const & file);
 
 class matricecreusedeux {
     public:
@@ -91,22 +96,20 @@ class matricecreusedeux {
         int * j;
         int * II;
         matricecreusedeux();
-        matricecreusedeux(int lig, int col, int nzv);
+        matricecreusedeux(int const & lig, int const & col, int const & nzv);
         ~matricecreusedeux();
-        void afficher();
+        void afficher() const;
 };
-bool operator==(matricecreusedeux A, matricecreusedeux B);
-bool operator!=(matricecreusedeux A, matricecreusedeux B);
-vecteur operator*(matricecreusedeux M, vecteur v);
-matricecreusedeux pleineversdeux(matricepleine A);
-matricecreusedeux unversdeux(matricecreuseun A);
-matricecreusedeux liredeux(bool comp);
-matricecreusedeux liredeux(std::string file, bool comp);
-int ecrire(matricecreusedeux A);
-int ecrire(matricecreusedeux A, std::string file);
+bool operator==(matricecreusedeux const & A, matricecreusedeux const & B);
+bool operator!=(matricecreusedeux const & A, matricecreusedeux const & B);
+vecteur operator*(matricecreusedeux const & M, vecteur const & v);
+matricecreusedeux pleineversdeux(matricepleine const & A);
+matricecreusedeux unversdeux(matricecreuseun const & A);
+matricecreusedeux liredeux(bool const & comp);
+matricecreusedeux liredeux(std::string const & file, bool const & comp);
+int ecrire(matricecreusedeux const & A);
+int ecrire(matricecreusedeux const & A, std::string const & file);
 
 std::string demandernomdufichier();
-
-float abs(float x);
 
 #endif

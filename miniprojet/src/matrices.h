@@ -4,12 +4,32 @@
 #include <string>
 
 // TODO un bool estenbordel dans matricecreuseun et manipuler que des ordonnées
-// TODO mettre des assert(bool) ou des exit(int) partout
+
+class complexe {
+    public:
+        double re;
+        double im;
+        complexe();
+        void afficher();
+};
+bool operator==(complexe a, complexe b);
+bool operator!=(complexe a, complexe b);
+bool isnull(complexe a);
+complexe operator*(complexe a, complexe b);
+complexe operator*(complexe a, float b);
+complexe operator*(complexe a, double b);
+complexe operator/(complexe a, complexe b);
+complexe operator/(complexe a, float b);
+complexe operator/(complexe a, double b);
+complexe operator+(complexe a, complexe b);
+complexe operator-(complexe a, complexe b);
+double norme(complexe a);
+complexe pow(complexe a, int b);
 
 class vecteur {
     public:
         int n;
-        float * coef;
+        complexe * coef;
         vecteur();
         vecteur(int dim);
         ~vecteur();
@@ -17,14 +37,18 @@ class vecteur {
 };
 bool operator==(vecteur a, vecteur b);
 bool operator!=(vecteur a, vecteur b);
+vecteur operator*(vecteur v, float x);
+vecteur operator*(vecteur v, complexe a);
+vecteur operator/(vecteur v, float x);
+float norme(vecteur v);
 
 class matricepleine {
     public:
        int m;
        int n;
        int nz;
-       //float * coef;
-       float coef[10][10];
+       //complexe * coef;
+       complexe coef[10][10];
        matricepleine();
        matricepleine(int lig, int col, int nzv);
        ~matricepleine();
@@ -41,7 +65,7 @@ class matricecreuseun {
         int nz;
         int * i;
         int * j;
-        float * coef;
+        complexe * coef;
         matricecreuseun();
         matricecreuseun(int lig, int col, int nzv);
         ~matricecreuseun();
@@ -53,8 +77,8 @@ vecteur operator*(matricecreuseun M, vecteur v);
 matricecreuseun pleineversun(matricepleine A);
 matricecreuseun ordonne(matricecreuseun A);
 bool estenbordel(matricecreuseun A);
-matricecreuseun lireun();
-matricecreuseun lireun(std::string file);
+matricecreuseun lireun(bool comp);
+matricecreuseun lireun(std::string file, bool comp);
 int ecrire(matricecreuseun A);
 int ecrire(matricecreuseun A, std::string file);
 
@@ -63,7 +87,7 @@ class matricecreusedeux {
         int m;
         int n;
         int nz;
-        float * vals;
+        complexe * vals;
         int * j;
         int * II;
         matricecreusedeux();
@@ -76,14 +100,13 @@ bool operator!=(matricecreusedeux A, matricecreusedeux B);
 vecteur operator*(matricecreusedeux M, vecteur v);
 matricecreusedeux pleineversdeux(matricepleine A);
 matricecreusedeux unversdeux(matricecreuseun A);
-matricecreusedeux liredeux();
-matricecreusedeux liredeux(std::string file);
+matricecreusedeux liredeux(bool comp);
+matricecreusedeux liredeux(std::string file, bool comp);
 int ecrire(matricecreusedeux A);
 int ecrire(matricecreusedeux A, std::string file);
 
+std::string demandernomdufichier();
+
 float abs(float x);
-vecteur operator*(vecteur v, float x);
-vecteur operator/(vecteur v, float x);
-float norme(vecteur v);
 
 #endif

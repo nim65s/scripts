@@ -8,6 +8,7 @@
 
 using namespace std;
 
+/*
 void entrer_matrice(matricecreuseun A) {{{
 	printf("Entrez les coefficients de la matrice");
 	for (int k=0; k<A.nz; k++) {
@@ -19,6 +20,7 @@ void entrer_matrice(matricecreuseun A) {{{
         cin >> A.coef[k];
 	}
 }}}
+*/
 
 int main() {
     cout << "\t\tMini Projet" << endl;
@@ -32,34 +34,35 @@ int main() {
 	// Début du programme 
 
 	int i,k=0;
-	float lambda1=0, temp=1, norme_x ;
+	float norme_x ;
+    complexe lambda1, temp;
 	vecteur q(2),x(2),u1(2) ;
 	matricepleine B(2, 2, 4);;
 	matricecreuseun A(2, 2, 4);
-	q.coef[0] = sqrt(2);
-	q.coef[1] = sqrt(2);
+	q.coef[0].re = sqrt(2);
+	q.coef[1].re = sqrt(2);
 
 	//---------------------- Algorithme de calcul ----------------------------//
 
-    while(abs(temp-lambda1) > 0.001 && k<2000 ) {
-        for (i=1;i<20;i++) {
+    while(norme(temp-lambda1) > 0.001 && k<2000 ) {
+        for (i=0;i<20;i++) {
             x = A*q;
-            q = x/norme(x);
             norme_x = norme(x) ;
-            k++; // TODO
+            q = x/norme_x;
         }
+        k += 20;
 
         if(abs(norme_x)>0.000001) {
             x = A*q;
             i = 0 ;
             temp = lambda1;
             while ( i == 0 && i!=q.n ) {
-                if (q.coef[i]!=0) {
+                if (!isnull(q.coef[i])) {
                     lambda1=x.coef[i]/q.coef[i];
                     i++ ;
                 }
             }
-            u1=q*pow(lambda1/abs(lambda1),k);
+            u1=q*pow(lambda1/norme(lambda1),k);
         }
         else {
             printf("Il n'y a pas de valeur propre");
@@ -67,8 +70,9 @@ int main() {
         }
     }
     if (k < 2000) {
-        printf("La plus grande valeur propre est %5.2g \n",lambda1);
-        printf("Un vecteur propre associe est\n");
+        printf("La plus grande valeur propre est ");
+        lambda1.afficher();
+        printf("\nUn vecteur propre associe est\n");
         u1.afficher();
     }
     else {

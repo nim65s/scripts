@@ -8,14 +8,106 @@
 using namespace std;
 
 /****************************************************************
+ *                           Complexes                          *
+ ****************************************************************/
+
+bool operator==(complexe a, complexe b) {{{
+    if(a.re == b.re && a.im == a.im) return true;
+    return false;
+}}}
+
+bool operator!=(complexe a, complexe b) {{{
+    return !(a==b);
+}}}
+
+complexe operator+(complexe a, complexe b) {{{
+    a.re += b.re;
+    a.im += b.im;
+    return a;
+}}}
+
+complexe operator-(complexe a, complexe b) {{{
+    a.re -= b.re;
+    a.im -= b.im;
+    return a;
+}}}
+
+complexe conjugue(complexe a) {{{
+    a.im = -a.im;
+    return a;
+}}}
+
+complexe operator*(complexe a, complexe b) {{{
+    // (v+iw)(x+iy) = vx - wy + i(vy +wx)
+    complexe c;
+    c.re = a.re*b.re-a.im*b.im;
+    c.im = a.re*b.im+a.im*b.re;
+    return c;
+}}}
+
+complexe operator*(complexe a, float b) {{{
+    a.re *= b;
+    a.im *= b;
+    return a;
+}}}
+
+complexe operator*(complexe a, double b) {{{
+    a.re *= b;
+    a.im *= b;
+    return a;
+}}}
+
+complexe operator/(complexe a, complexe b) {{{
+    // (v+iw)/(x+iy) = ((v+iw)(x-iy))/(x²+y²)
+    return a*conjugue(b)/(pow(b.re,2)+pow(b.im,2));
+}}}
+
+complexe operator/(complexe a, float b) {{{
+    a.re /= b;
+    a.im /= b;
+    return a;
+}}}
+
+complexe operator/(complexe a, double b) {{{
+    a.re /= b;
+    a.im /= b;
+    return a;
+}}}
+
+complexe operator+=(complexe a, complexe b) {{{ // TODO : ne marche visiblement pas oO
+    a.re += b.re;
+    a.im += b.im;
+    return a;
+}}}
+
+double norme(complexe a) {{{
+    return sqrt(pow(a.re,2)+pow(a.im,2));
+}}}
+
+bool isnull(complexe a) {{{
+    if(a.re == 0 && a.im == 0) return true;
+    return false;
+}}}
+
+complexe pow(complexe a, int k) {{{
+    complexe b = a;
+    for(int i=1; i<k; i++) b = b * a;
+    return b;
+}}}
+        
+/****************************************************************
  *                  Construteurs et destructeurs                *
  ****************************************************************/
+
+complexe::complexe() {{{
+    re = 0;
+    im = 0;
+}}}
 
 vecteur::vecteur(int dim) {{{
     assert(dim != 0);
     n = dim;
-    coef = new float[dim];
-    for(int i=0;i<dim;i++) coef[i] = 0;
+    coef = new complexe[dim];
 }}}
 
 vecteur::~vecteur() {{{
@@ -26,8 +118,7 @@ matricepleine::matricepleine(int lig, int col, int nzv) {{{
     m = lig;
     n = col;
     nz = nzv;
-    //TODO coef = new float[nzv][nzv];
-    for(int i=0;i<lig;i++) for(int j=0;j<col;j++) coef[i][j] = 0;
+    //TODO coef = new complexe[nzv][nzv];
 }}}
 
 matricepleine::~matricepleine() {{{
@@ -40,7 +131,7 @@ matricecreuseun::matricecreuseun(int lig, int col, int nzv) {{{
     nz = nzv;
     i = new int[nzv];
     j = new int[nzv];
-    coef = new float[nzv];
+    coef = new complexe[nzv];
 }}}
 
 matricecreuseun::~matricecreuseun() {{{
@@ -57,7 +148,7 @@ matricecreusedeux::matricecreusedeux(int lig, int col, int nzv) {{{
     m = lig;
     n = col;
     nz = nzv;
-    vals = new float[nzv];
+    vals = new complexe[nzv];
     j = new int[nzv];
     II = new int[lig+1];
 }}}
@@ -69,46 +160,53 @@ matricecreusedeux::~matricecreusedeux() {{{
  *                       Affichage de matrices                  *
  ****************************************************************/
 
+void complexe::afficher() {{{
+    if(im!=0) printf("%5.4g+i%-5.4g ", re, im);
+    else printf("%12.11g ", re);
+}}}
+
 void vecteur::afficher() {{{
-    cout << "[";
-    for(int i=0;i<n;i++) {
-        printf("%5.2g",coef[i]);
-        cout << " ";
-    }
-    cout << "  ]" << endl;
+    cout << "[ ";
+    for(int i=0;i<n;i++) coef[i].afficher();
+    cout << "]" << endl;
 }}}
 
 void matricepleine::afficher() {{{
-    cout << "⎡";
-    for(int j=0;j<m;j++) printf("%5.4g ",coef[0][j]);
-    cout << "  ⎤" << endl;
+    cout << "⎡ ";
+    //for(int j=0;j<m;j++) printf("%5.4g ",coef[0][j]);
+    for(int j=0;j<m;j++) coef[0][j].afficher();
+    cout << "⎤" << endl;
     for(int i=1;i<n-1;i++) {
-        cout << "⎢";
-        for(int j=0;j<m;j++) printf("%5.4g ",coef[i][j]);
-        cout << "  ⎥" << endl;
+        cout << "⎢ ";
+        //for(int j=0;j<m;j++) printf("%5.4g ",coef[i][j]);
+        for(int j=0;j<m;j++) coef[i][j].afficher();
+        cout << "⎥" << endl;
     }
-    cout << "⎣";
-    for(int j=0;j<m;j++) printf("%5.4g ",coef[n-1][j]);
-    cout << "  ⎦" << endl;
+    cout << "⎣ ";
+    //for(int j=0;j<m;j++) printf("%5.4g ",coef[n-1][j]);
+    for(int j=0;j<m;j++) coef[n-1][j].afficher();
+    cout << "⎦" << endl;
 }}}
 
 void matricecreuseun::afficher() {{{
     cout << "  i  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",i[k]);
+    for(int k=0;k<nz;k++) printf("%12d ",i[k]);
     cout << endl << "  j  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",j[k]);
+    for(int k=0;k<nz;k++) printf("%12d ",j[k]);
     cout << endl << "coef | ";
-    for(int k=0;k<nz;k++) printf("%5.4g ",coef[k]);
+    //for(int k=0;k<nz;k++) printf("%5.4g ",coef[k]);
+    for(int k=0;k<nz;k++) coef[k].afficher();
     cout << endl;
 }}}
 
 void matricecreusedeux::afficher() {{{
     cout << "vals | ";
-    for(int k=0;k<nz;k++) printf("%5.4g ",vals[k]);
+    //for(int k=0;k<nz;k++) printf("%5.4g ",vals[k]);
+    for(int k=0;k<nz;k++) vals[k].afficher();
     cout << endl << "  j  | ";
-    for(int k=0;k<nz;k++) printf("%5d ",j[k]);
+    for(int k=0;k<nz;k++) printf("%12d ",j[k]);
     cout << endl << " II  | ";
-    for(int k=0;k<=m;k++) printf("%5d ",II[k]);
+    for(int k=0;k<=m;k++) printf("%12d ",II[k]);
     cout << endl;
 }}}
 
@@ -166,14 +264,14 @@ bool operator!=(matricecreusedeux A, matricecreusedeux B) {{{
 vecteur operator*(matricepleine M, vecteur v) {{{
     assert(M.m == v.n);
     vecteur w(M.n);
-    for(int i=0;i<M.n;i++) for(int j=0;j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
+    for(int i=0;i<M.n;i++) for(int j=0;j<M.m;j++) w.coef[i] = w.coef[i] + v.coef[j]*M.coef[i][j];
     return w;
 }}}
 
 vecteur operator*(matricecreuseun M, vecteur v) {{{
     assert(M.m == v.n);
     vecteur w(M.n);
-    for(int k=0;k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
+    for(int k=0;k<M.nz;k++) w.coef[M.i[k]] = w.coef[M.i[k]] + M.coef[k]*v.coef[M.j[k]];
     return w;
 }}}
 
@@ -182,7 +280,7 @@ vecteur operator*(matricecreusedeux M, vecteur v) {{{
     vecteur w(M.n);
     int a=0;
     for(int b=0;b<M.n;b++) while(a<M.II[b]) {
-        w.coef[b] += M.vals[a]*v.coef[M.j[a]];
+        w.coef[b] = w.coef[b] + M.vals[a]*v.coef[M.j[a]];
         a++;
     }
     return w;
@@ -197,7 +295,7 @@ matricecreuseun pleineversun(matricepleine A) {{{
     int cmpt = 0;
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
-            if (A.coef[i][j] != 0) {
+            if (!isnull(A.coef[i][j])) {
                 B.i[cmpt] = i;
                 B.j[cmpt] = j;
                 B.coef[cmpt++] = A.coef[i][j];
@@ -214,7 +312,7 @@ matricecreusedeux pleineversdeux(matricepleine A) {{{
     for (int i=0;i<A.m;i++) {
         bool yadejaqqchsurlaligne = false;
         for(int j=0;j<A.n;j++) {
-            if(A.coef[i][j] != 0) {
+            if(!isnull(A.coef[i][j])) {
                 B.vals[cmptnz] = A.coef[i][j];
                 B.j[cmptnz++] = j;
                 if (!yadejaqqchsurlaligne) {
@@ -237,7 +335,7 @@ matricecreusedeux unversdeux(matricecreuseun A) {{{
         B.j[i] = A.j[i];
         if (A.i[i] != cmpt) {
             if (A.i[i] == cmpt+1) B.II[++cmpt] = i+1;
-            else B.II[++cmpt] = 0; // TODO il faut aussi rajouter la suite ...
+            else B.II[++cmpt] = 0; 
         }
     }
     B.II[++cmpt] = B.II[0]+B.nz;
@@ -254,11 +352,12 @@ matricecreuseun ordonne(matricecreuseun A) {{{
     for(int i=0;i<A.m;i++) {
         for(int j=0;j<A.n;j++) {
             for(int k=0;k<A.nz;k++) {
-                // TODO on pourrait optimiser un peu en ne regardant pas un numéro déja passé.... En fait, faudrait supprimer le truc de la liste
                 if (A.i[k] == i && A.j[k] == j) {
                     B.i[cmpt] = A.i[k];
                     B.j[cmpt] = A.j[k];
-                    B.coef[cmpt++] = A.coef[k];
+                    B.coef[cmpt].re = A.coef[k].re;
+                    B.coef[cmpt].im = A.coef[k].im;
+                    cmpt++;
                 }
             }
         }
@@ -280,236 +379,136 @@ bool estenbordel(matricecreuseun A) {{{
 }}}
 
 /****************************************************************
- *                       Lecture ecriture                       *
+ *                 Lecture/ecriture de matrices                 *
  ****************************************************************/
 
-matricecreuseun lireun() {{{
-    FILE * t;
-    string a, b, c, d, e;
-    char rep;
-    a = "../test.mx";
-    b = "../A62.mx";
-    c = "../B398.mx";
-    d = "../B62.mx";
-    e = "La réponse e";
-    cout << "Quel fichier voulez vous lire ?" << endl;
-    cout << "a) " << a << endl;
-    cout << "b) " << b << endl;
-    cout << "c) " << c << endl;
-    cout << "d) " << d << endl;
-    cout << "e) " << "En entrer un autre" << endl;
-    cout << "==> ";
-    cin >> rep;
-    string choix; // TODO l'idée était de faire un * choix...
-    switch (rep) {
-        case 'a':
-            choix = a;
-            break;
-        case 'b':
-            choix = b;
-            break;
-        case 'c':
-            choix = c;
-            break;
-        case 'd':
-            choix = d;
-            break;
-        case 'e':
-            cin >> choix;
-            break;
-        default :
-            assert(false);
-            break;
-    }
-
-    t = fopen(choix.c_str(),"r");
-    assert(t!=NULL);
-    int m, n, nz, i, j;
-    float coef;
-    fscanf(t, "%d %d %d", &m, &n, &nz);
-    matricecreuseun M(m, n, nz);
-    for(int k=0; k<nz; k++) {
-        fscanf(t, "%d %d %f", &i, &j, &coef);
-        M.i[k] = i;
-        M.j[k] = j;
-        M.coef[k] = coef;
-    }
-    fclose(t);
-    return M;
-}}}
-
-int ecrire(matricecreuseun A) {{{
-    FILE * t;
-    string nom;
-    /*
-    bool test=true;
-    while(test){
-    */
-        cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
-        cin >> nom;
-        /*
-        t = fopen(nom.c_str(),"r");
-        if (t==NULL) test=false;
-    }
-    fclose(t);
-    */
-    t = fopen(nom.c_str(),"w");
-    fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
-    for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
-    fclose(t);
-    return 0;
-}}}
-
-matricecreusedeux liredeux() {{{
-    FILE * f;
-    string a, b, c, d, e;
-    char rep;
-    a = "../test.mxb";
-    b = "../A62.mxb";
-    c = "../B398.mxb";
-    d = "../B62.mxb";
-    e = "En entrer un autre";
-    cout << "Quel fichier voulez vous lire ?" << endl;
-    cout << "a) " << a << endl;
-    cout << "b) " << b << endl;
-    cout << "c) " << c << endl;
-    cout << "d) " << d << endl;
-    cout << "e) " << e << endl;
-    cout << "==> ";
-    cin >> rep;
-    string choix; // TODO l'idée était de faire un * choix...
-    switch (rep) {
-        case 'a':
-            choix = a;
-            break;
-        case 'b':
-            choix = b;
-            break;
-        case 'c':
-            choix = c;
-            break;
-        case 'd':
-            choix = d;
-            break;
-        case 'e':
-            cin >> choix;
-            break;
-        default :
-            assert(false);
-            break;
-    }
-
-    f = fopen(choix.c_str(),"rb");
-    assert(f!=NULL);
-    int m, n, nz, j, II;
-    float vals;
-    fscanf(f, "%d %d %d", &m, &n, &nz);
-    matricecreusedeux M(m, n, nz);
-    for(int k=0; k<=m; k++) {
-        fscanf(f, "%d", &II);
-        M.II[k] = II;
-    }
-    for(int k=0; k<nz; k++) {
-        fscanf(f, "%d %f", &j, &vals);
-        M.j[k] = j;
-        M.vals[k] = vals;
-    }
-    fclose(f);
-    return M;
-}}}
-
-int ecrire(matricecreusedeux A) {{{
-    FILE * b;
-    string nom;
-    /*
-    bool test=true;
-    while(test){
-    */
-        cout << "Comment voulez-vous appeller le ficher ?" << endl << "==> " ;
-        cin >> nom;
-        /*
-        b = fopen(nom.c_str(),"r");
-        if (b==NULL) test=false;
-    }
-    fclose(b);
-    */
-    b = fopen(nom.c_str(),"wb");
-    fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
-    for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
-    for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
-    fclose(b);
-    return 0;
-}}}
-
-// Les même avec le nom en paramètre
-
-matricecreuseun lireun(string file) {{{
+matricecreuseun lireun(string file, bool comp) {{{
     FILE * t;
     t = fopen(file.c_str(),"r");
     assert(t!=NULL);
     int m, n, nz, i, j;
-    float coef;
+    complexe coef;
     fscanf(t, "%d %d %d", &m, &n, &nz);
     matricecreuseun M(m, n, nz);
     for(int k=0; k<nz; k++) {
-        fscanf(t, "%d %d %f", &i, &j, &coef);
+        if(comp) fscanf(t, "%d %d %lf %lf", &i, &j, &coef.re, &coef.im);
+        else fscanf(t, "%d %d %lf", &i, &j, &coef.re);
         M.i[k] = i;
         M.j[k] = j;
-        M.coef[k] = coef;
+        M.coef[k] = coef; // TODO on peut pas mettre ça dans le fscanf directos ?
     }
     fclose(t);
     return M;
 }}}
 
 int ecrire(matricecreuseun A, string file) {{{
-    FILE * t;
-    /*
-    t = fopen(file.c_str(),"r");
-    //if (!(f = fopen("lol.txt", "r"))) perror("mdr");
-    assert(t==NULL);
-    fclose(t);
-    */
+    FILE * t; // Faudrait sécuriser ça
     t = fopen(file.c_str(),"w");
     fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
-    for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %f\n", A.i[k], A.j[k], A.coef[k]);
+    for(int k=0; k<A.nz; k++) fprintf(t, "%d %d %lf %lf\n", A.i[k], A.j[k], A.coef[k].re, A.coef[k].im);
     fclose(t);
     return 0;
 }}}
 
-matricecreusedeux liredeux(string file) {{{
-    FILE * f;
-    f = fopen(file.c_str(),"rb");
-    assert(f!=NULL);
+matricecreusedeux liredeux(string file, bool comp) {{{
+    FILE * t;
+    t = fopen(file.c_str(),"r");
+    assert(t!=NULL);
     int m, n, nz, j, II;
-    float vals;
-    fscanf(f, "%d %d %d", &m, &n, &nz);
+    complexe vals;
+    fscanf(t, "%d %d %d", &m, &n, &nz);
     matricecreusedeux M(m, n, nz);
     for(int k=0; k<=m; k++) {
-        fscanf(f, "%d", &II);
+        fscanf(t, "%d", &II);
         M.II[k] = II;
     }
     for(int k=0; k<nz; k++) {
-        fscanf(f, "%d %f", &j, &vals);
+        if(comp) fscanf(t, "%d %lf %lf", &j, &vals.re, &vals.im);
+        else fscanf(t, "%d %lf", &j, &vals.re);
         M.j[k] = j;
-        M.vals[k] = vals;
+        M.vals[k] = vals; // TODO on peut pas mettre ça dans le fscanf directos ?
     }
-    fclose(f);
+    fclose(t);
     return M;
 }}}
 
 int ecrire(matricecreusedeux A, string file) {{{
-    FILE * b;
-    /*
-    b = fopen(file.c_str(),"rb");
-    assert(b==NULL);
-    fclose(b);
-    */
-    b = fopen(file.c_str(),"wb");
-    fprintf(b, "%d %d %d\n", A.m, A.n, A.nz);
-    for(int k=0; k<=A.m; k++) fprintf(b, "%d\n", A.II[k]);
-    for(int k=0; k<A.nz; k++) fprintf(b, "%d %f\n", A.j[k], A.vals[k]);
-    fclose(b);
+    FILE * t; // Faudrait sécuriser ça
+    t = fopen(file.c_str(),"w");
+    fprintf(t, "%d %d %d\n", A.m, A.n, A.nz);
+    for(int k=0; k<=A.m; k++) fprintf(t, "%d\n", A.II[k]);
+    for(int k=0; k<A.nz; k++) fprintf(t, "%d %lf %lf\n", A.j[k], A.vals[k].re, A.vals[k].im);
+    fclose(t);
     return 0;
+}}}
+
+string demandernomdufichier() {{{
+    string a, b, c, d, e, f;
+    char rep;
+    a = "../test.mx";
+    b = "../A398.mx";
+    c = "../A62.mx";
+    d = "../B398.mx";
+    e = "../B62.mx";
+    f = "En entrer un autre";
+    cout << "Quel fichier voulez vous lire ?" << endl;
+    cout << "a) " << a << endl;
+    cout << "b) " << b << endl;
+    cout << "c) " << c << endl;
+    cout << "d) " << d << endl;
+    cout << "e) " << e << endl;
+    cout << "f) " << e << endl;
+    cout << "==> ";
+    cin >> rep;
+    string choix; // TODO l'idée était de faire un * choix...
+    switch (rep) {
+        case 'a':
+            choix = a;
+            break;
+        case 'b':
+            choix = b;
+            break;
+        case 'c':
+            choix = c;
+            break;
+        case 'd':
+            choix = d;
+            break;
+        case 'e':
+            choix = d;
+            break;
+        case 'f':
+            cin >> choix;
+            break;
+        default :
+            assert(false);
+            break;
+    }
+    return choix;
+}}}
+
+matricecreuseun lireun(bool comp) {{{
+    string nom = demandernomdufichier();
+    return lireun(nom, comp);
+}}}
+
+int ecrire(matricecreuseun A) {{{
+    string nom;
+    cout << "Comment voulez-vous appeler le fichier ?" << endl << "==> " ;
+    cin >> nom;
+    return ecrire(A, nom);
+}}}
+
+matricecreusedeux liredeux(bool comp) {{{
+    string nom = demandernomdufichier();
+    return liredeux(nom, comp);
+}}}
+
+int ecrire(matricecreusedeux A) {{{
+    string nom;
+    cout << "Comment voulez-vous appeler le fichier ?" << endl << "==> " ;
+    cin >> nom;
+    return ecrire(A, nom);
 }}}
 
 /****************************************************************
@@ -520,7 +519,7 @@ float norme(vecteur v) {{{
     float n,m=0;
 	int i;
 	for (i=0; i<v.n; i++) {
-		m += pow(v.coef[i],2);
+		m += pow(norme(v.coef[i]),2);
 	}
 	n=sqrt(m);
     return n;
@@ -534,15 +533,18 @@ float abs(float x) {{{
 }}}
 
 vecteur operator/(vecteur v, float x) {{{
-    vecteur w(v.n);
-	for (int i=0; i<v.n; i++) w.coef[i] = v.coef[i]/x;
-    return w;
+	for (int i=0; i<v.n; i++) v.coef[i] = v.coef[i]/x; // TODO /=
+    return v;
 }}}
 
 vecteur operator*(vecteur v, float x) {{{
-    vecteur w(v.n);
-	for (int i=0; i<v.n; i++) w.coef[i] = v.coef[i]*x;
-    return w;
+	for (int i=0; i<v.n; i++) v.coef[i] = v.coef[i]*x; // TODO /=
+    return v;
+}}}
+
+vecteur operator *(vecteur v, complexe a){{{
+    for(int i=0; i<v.n; i++) v.coef[i] = a*v.coef[i]; // TODO /=
+    return v;
 }}}
 
 // vim: set foldmethod=marker:

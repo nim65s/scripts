@@ -100,12 +100,12 @@ complexe & complexe::operator/=(double const & x) {{{
     return *this;
 }}}
 
-double norme(complexe const & a) {{{
-    return sqrt(pow(a.re,2)+pow(a.im,2));
+double complexe::norme() const {{{
+    return sqrt(pow(re,2)+pow(im,2));
 }}}
 
-bool isnull(complexe const & a) {{{
-    if(a.re == 0 && a.im == 0) return true;
+bool complexe::isnull() const {{{
+    if(re == 0 && im == 0) return true;
     return false;
 }}}
 
@@ -250,10 +250,10 @@ bool operator!=(matricepleine const & A, matricepleine const & B) {{{
     return !(A==B);
 }}}
 
-bool operator==(matricecreuseun const & A, matricecreuseun const & B) {{{
+bool operator==(matricecreuseun A, matricecreuseun B) {{{
     if (A.m != B.m || A.n != B.n || A.nz != B.nz) return false;
-    if (estenbordel(A)) ordonne(A);
-    if (estenbordel(B)) ordonne(B);
+    if (A.estenbordel()) A = A.ordonne();
+    if (B.estenbordel()) B = B.ordonne();
     for(int k(0);k<A.n;k++) if(A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false;
     return true;
 }}}
@@ -306,88 +306,88 @@ vecteur operator*(matricecreusedeux const & M, vecteur const & v) {{{
  *                       Conversion de matrices                 *
  ****************************************************************/
 
-matricecreuseun pleineversun(matricepleine const & A) {{{
-    matricecreuseun B(A.m, A.n, A.nz);
+matricecreuseun matricepleine::versun() const {{{
+    matricecreuseun A(m, n, nz);
     int cmpt(0);
-    for(int i(0);i<A.m;i++) {
-        for(int j(0);j<A.n;j++) {
-            if (!isnull(A.coef[i][j])) {
-                B.i[cmpt] = i;
-                B.j[cmpt] = j;
-                B.coef[cmpt++] = A.coef[i][j];
+    for(int i(0);i<m;i++) {
+        for(int j(0);j<n;j++) {
+            if (!coef[i][j].isnull()) {
+                A.i[cmpt] = i;
+                A.j[cmpt] = j;
+                A.coef[cmpt++] = coef[i][j];
             }
         }
     }
-    return B;
+    return A;
 }}}
 
-matricecreusedeux pleineversdeux(matricepleine const & A) {{{
-    matricecreusedeux B(A.m, A.n, A.nz);
+matricecreusedeux matricepleine::versdeux() const {{{
+    matricecreusedeux A(m, n, nz);
     int cmptm(0);
     int cmptnz(0);
     bool yadejaqqchsurlaligne;
-    for (int i(0);i<A.m;i++) {
+    for (int i(0);i<m;i++) {
         yadejaqqchsurlaligne = false;
-        for(int j(0);j<A.n;j++) {
-            if(!isnull(A.coef[i][j])) {
-                B.vals[cmptnz] = A.coef[i][j];
-                B.j[cmptnz++] = j;
+        for(int j(0);j<n;j++) {
+            if(!coef[i][j].isnull()) {
+                A.vals[cmptnz] = coef[i][j];
+                A.j[cmptnz++] = j;
                 if (!yadejaqqchsurlaligne) {
                     yadejaqqchsurlaligne = true;
-                    B.II[cmptm++] = cmptnz;
+                    A.II[cmptm++] = cmptnz;
                 }
             }
         }
-        if (!yadejaqqchsurlaligne) B.II[cmptm++] = 0;
+        if (!yadejaqqchsurlaligne) A.II[cmptm++] = 0;
     }
-    B.II[cmptm] = B.II[0]+cmptnz;
-    return B;
+    A.II[cmptm] = A.II[0]+cmptnz;
+    return A;
 }}}
 
-matricecreusedeux unversdeux(matricecreuseun const & A) {{{
-    matricecreusedeux B(A.m, A.n, A.nz);
+matricecreusedeux matricecreuseun::versdeux() const {{{
+    matricecreusedeux A(m, n, nz);
     int cmpt(-1);
-    for(int i(0);i<B.nz;i++) {
-        B.vals[i] = A.coef[i];
-        B.j[i] = A.j[i];
-        if (A.i[i] != cmpt) {
-            if (A.i[i] == cmpt+1) B.II[++cmpt] = i+1;
-            else B.II[++cmpt] = 0; 
+    for(int a(0);a<nz;a++) {
+        A.vals[a] = coef[a];
+        A.j[a] = j[a];
+        if (i[a] != cmpt) {
+            if (i[a] == cmpt+1) A.II[++cmpt] = a+1;
+            else A.II[++cmpt] = 0; 
         }
     }
-    B.II[++cmpt] = B.II[0]+B.nz;
-    return B;
+    A.II[++cmpt] = A.II[0]+A.nz;
+    return A;
 }}}
 
 /****************************************************************
  *                       Ordonnage de matrices                  *
  ****************************************************************/
 
-matricecreuseun ordonne(matricecreuseun const & A) {{{
-    matricecreuseun B(A.m, A.n, A.nz);
+matricecreuseun matricecreuseun::ordonne() const {{{
+    matricecreuseun A(m, n, nz);
     int cmpt(0);
-    for(int i(0);i<A.m;i++) {
-        for(int j(0);j<A.n;j++) {
-            for(int k(0);k<A.nz;k++) {
-                if (A.i[k] == i && A.j[k] == j) {
-                    B.i[cmpt] = A.i[k];
-                    B.j[cmpt] = A.j[k];
-                    B.coef[cmpt] = A.coef[k];
+    for(int a(0);a<m;a++) {
+        for(int b(0);b<n;b++) {
+            for(int c(0);c<nz;c++) {
+                if(i[c] == a && j[c] == b) {
+                    A.i[cmpt] = i[c];
+                    A.j[cmpt] = j[c];
+                    A.coef[cmpt] = coef[c];
                     cmpt++;
                 }
             }
         }
     } // TODO euh... y'a pas moyen de faire ça mieux ? N*N*nz opérations :s
-    return B;
+    return A;
 }}}
 
-bool estenbordel(matricecreuseun const & A) {{{
-    int i(-1);
-    int j(-1);
-    for(int a(0);a<A.nz;a++) {
-        if (i < A.i[a] || ( i == A.i[a] && j < A.j[a] )) {
-            i = A.i[a];
-            j = A.j[a];
+bool matricecreuseun::estenbordel() const{{{
+    int a(-1);
+    int b(-1);
+    for(int c(0);c<nz;c++) {
+        if (a < i[c] || ( a == i[c] && b < j[c] )) {
+            a = i[c];
+            b = j[c];
         }
         else return true;
     }
@@ -521,9 +521,9 @@ int matricecreusedeux::ecrire() const {{{
  *                   Opérations vecteur-nombre                  *
  ****************************************************************/
 
-double norme(vecteur const & v) {{{
+double vecteur::norme() const {{{
     double m(0);
-	for (int i(0); i<v.n; i++) m += pow(norme(v.coef[i]),2);
+	for (int i(0); i<n; i++) m += pow(coef[i].norme(),2);
     return sqrt(m);
 }}}
 

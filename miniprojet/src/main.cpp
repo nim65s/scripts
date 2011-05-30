@@ -27,8 +27,8 @@ int main() {
     temp.re = 2;
     double norme_x;
     matricecreuseun A = lireun("../test.mx", false);
-    matricecreuseun B = ordonne(A);
-    matricecreusedeux C = unversdeux(B);
+    matricecreuseun B = A.ordonne();
+    matricecreusedeux C = B.versdeux();
     vecteur q(A.m), x(A.m), u1(A.m);
     double m(A.m);
     double val = sqrt(sqrt(1/m)/2);
@@ -39,10 +39,10 @@ int main() {
 
 	//---------------------- Algorithme de calcul ----------------------------//
 
-    while(norme(temp-lambda1) > 0.001 && k<2000 ) {
+    while((temp-lambda1).norme() > 0.001 && k<2000 ) {
         for (i=0;i<20;i++) {
             x = A*q;
-            norme_x = norme(x) ;
+            norme_x = x.norme() ;
             q = x/norme_x;
         }
         k += 20;
@@ -51,8 +51,8 @@ int main() {
             x = A*q;
             i = 0 ;
             temp = lambda1;
-            for(i=0;i<q.n;i++) if (!isnull(q.coef[i])) lambda1=x.coef[i]/q.coef[i];
-            u1=q*pow(lambda1/norme(lambda1),k);
+            for(i=0;i<q.n;i++) if (!q.coef[i].isnull()) lambda1=x.coef[i]/q.coef[i];
+            u1=q*pow(lambda1/lambda1.norme(),k);
         }
         else {
             printf("Il n'y a pas de valeur propre");
@@ -68,6 +68,5 @@ int main() {
     else {
         printf("Il n'y a pas de valeur propre");
     }
-    //*/
     return 0 ;
 }

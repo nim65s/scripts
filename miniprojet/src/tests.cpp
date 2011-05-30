@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int test_conversions(bool afficher) {{{
+int test_conversions(bool const & afficher) {{{
     cout << "\tTest conversions entre matrices" << endl;
     matricepleine B(5, 5, 12);
     B.coef[0][0].re = 1.1;
@@ -24,36 +24,36 @@ int test_conversions(bool afficher) {{{
     if(afficher) B.afficher();
     if(afficher) cout << endl;
 
-    matricecreuseun C = pleineversun(B);
+    matricecreuseun C = B.versun();
     if(afficher) C.afficher();
     if(afficher) cout << endl;
 
-    matricecreusedeux D = pleineversdeux(B);
+    matricecreusedeux D = B.versdeux();
     if(afficher) D.afficher();
     if(afficher) cout << endl;
 
-    matricecreusedeux E = unversdeux(C);
+    matricecreusedeux E = C.versdeux();
     if(afficher) E.afficher();
 
     if (D==E) return 0;
     return 1; 
 }}}
 
-int test_produits(bool afficher) {{{
+int test_produits(bool const & afficher) {{{
     cout << "\tTest produit pleine*vecteur" << endl;
     matricepleine A(5, 5, 4);
-    for(int i=0;i<A.m;i++) A.coef[i][i].re = i; 
+    for(int i(0);i<A.m;i++) A.coef[i][i].re = i; 
     if(afficher) A.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     vecteur v(5);
-    for(int i=0;i<5;i++) v.coef[i].re = i;
+    for(int i(0);i<5;i++) v.coef[i].re = i;
     if(afficher) v.afficher();
     if(afficher) cout << "====================================================================" << endl;
     vecteur x = A*v;
     if(afficher) x.afficher();
 
     cout << "\tTest produit creuseun*vecteur" << endl;
-    matricecreuseun E = pleineversun(A);
+    matricecreuseun E = A.versun();
     if(afficher) E.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     if(afficher) v.afficher();
@@ -62,7 +62,7 @@ int test_produits(bool afficher) {{{
     if(afficher) y.afficher();
 
     cout << "\tTest produit creusedeux*vecteur" << endl;
-    matricecreusedeux F = pleineversdeux(A);
+    matricecreusedeux F = A.versdeux();
     if(afficher) F.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     if(afficher) v.afficher();
@@ -74,16 +74,16 @@ int test_produits(bool afficher) {{{
     return 1;
 }}}
 
-int test_ordonnage(bool afficher) {{{
+int test_ordonnage(bool const & afficher) {{{
     cout << "\tTest ordonnage" << endl;
     matricecreuseun A(5, 5, 4);
-    for(int i=0;i<4;i++) {
+    for(int i(0);i<4;i++) {
         A.i[i] = i+1;
         A.j[i] = i+1;
         A.coef[i].re = i+1;
     }
     if (afficher) A.afficher();
-    if (estenbordel(A)) {
+    if (A.estenbordel()) {
         if (afficher) cout << "A est en bordel..." << endl;
         return 1;
     }
@@ -97,15 +97,15 @@ int test_ordonnage(bool afficher) {{{
     B.j[1] = 4;
     B.coef[1].re = 24;
     if (afficher) B.afficher();
-    if (!estenbordel(B)) {
+    if (!B.estenbordel()) {
         if (afficher) cout << "B est en ordre..." << endl;
         return 1;
     }
     else if (afficher) cout << "B est en bordel" << endl;
 
-    B = ordonne(B);
+    B = B.ordonne();
     if (afficher) B.afficher();
-    if (estenbordel(B)) {
+    if (B.estenbordel()) {
         if (afficher) cout << "B est en bordel..." << endl;
         return 1;
     }
@@ -114,19 +114,19 @@ int test_ordonnage(bool afficher) {{{
     return 0;
 }}}
 
-int test_fichiers(bool afficher) {{{
+int test_fichiers(bool const & afficher) {{{
     matricecreuseun A = lireun("../test.mx", false);
     if (afficher) {
         cout << endl << "\tA" << endl;
         A.afficher();
     }
-    matricecreuseun B = ordonne(A);
+    matricecreuseun B = A.ordonne();
     if (afficher) {
         cout << endl << "\tB" << endl;
         B.afficher();
     }
     B.ecrire("B");
-    matricecreusedeux C = unversdeux(B);
+    matricecreusedeux C = B.versdeux();
     if (afficher) {
         cout << endl << "\tC" << endl;
         C.afficher();
@@ -141,7 +141,7 @@ int test_fichiers(bool afficher) {{{
     return 1;
 }}}
 
-int test_historique(bool afficher) {{{
+int test_historique(bool const & afficher) {{{
     if(afficher) cout << "TODO" << endl;
     return 0;
 }}}

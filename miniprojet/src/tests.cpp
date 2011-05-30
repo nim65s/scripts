@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <string>
 #include "matrices.h"
-#include "fichiers.h"
 #include "historique.h"
 
 using namespace std;
@@ -126,13 +125,13 @@ int test_fichiers(bool afficher) {{{
         cout << endl << "\tB" << endl;
         B.afficher();
     }
-    ecrire(B, "B");
+    B.ecrire("B");
     matricecreusedeux C = unversdeux(B);
     if (afficher) {
         cout << endl << "\tC" << endl;
         C.afficher();
     }
-    ecrire(C, "C");
+    C.ecrire("C");
     matricecreusedeux D = liredeux("C", true);
     if (afficher) {
         cout << endl << "\tD" << endl;

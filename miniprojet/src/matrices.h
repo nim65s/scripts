@@ -76,6 +76,8 @@ class matricecreuseun {
         matricecreuseun(int const & lig, int const & col, int const & nzv);
         ~matricecreuseun();
         void afficher() const;
+        int ecrire() const;
+        int ecrire(std::string const & file) const;
 };
 bool operator==(matricecreuseun const & A, matricecreuseun const & B);
 bool operator!=(matricecreuseun const & A, matricecreuseun const & B);
@@ -83,6 +85,8 @@ vecteur operator*(matricecreuseun const & M, vecteur const & v);
 matricecreuseun pleineversun(matricepleine const & A);
 matricecreuseun ordonne(matricecreuseun const & A);
 bool estenbordel(matricecreuseun const & A);
+matricecreuseun lireun(bool const & comp);
+matricecreuseun lireun(std::string const & file, bool const & comp);
 
 class matricecreusedeux {
     public:
@@ -96,12 +100,16 @@ class matricecreusedeux {
         matricecreusedeux(int const & lig, int const & col, int const & nzv);
         ~matricecreusedeux();
         void afficher() const;
+        int ecrire() const;
+        int ecrire(std::string const & file) const;
 };
 bool operator==(matricecreusedeux const & A, matricecreusedeux const & B);
 bool operator!=(matricecreusedeux const & A, matricecreusedeux const & B);
 vecteur operator*(matricecreusedeux const & M, vecteur const & v);
 matricecreusedeux pleineversdeux(matricepleine const & A);
 matricecreusedeux unversdeux(matricecreuseun const & A);
+matricecreusedeux liredeux(bool const & comp);
+matricecreusedeux liredeux(std::string const & file, bool const & comp);
 
 
 #endif

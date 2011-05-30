@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <math.h>
 #include "matrices.h"
-#include "fichiers.h"
 #include "historique.h"
 #include "tests.h"
 

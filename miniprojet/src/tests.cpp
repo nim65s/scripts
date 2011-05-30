@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <string>
 #include "matrices.h"
+#include "fichiers.h"
+#include "historique.h"
 
 using namespace std;
 
@@ -138,6 +140,11 @@ int test_fichiers(bool afficher) {{{
     }
     if (D == C) return 0;
     return 1;
+}}}
+
+int test_historique(bool afficher) {{{
+    if(afficher) cout << "TODO" << endl;
+    return 0;
 }}}
 
 // vim: set foldmethod=marker:

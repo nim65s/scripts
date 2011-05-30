@@ -43,8 +43,8 @@ class vecteur {
 bool operator==(vecteur const & a, vecteur const & b);
 bool operator!=(vecteur const & a, vecteur const & b);
 vecteur operator*(vecteur const & v, double const & x);
-vecteur operator*(vecteur const & v, complexe const & a);
-vecteur operator/(vecteur const & v, double const & x);
+vecteur operator*(vecteur v, complexe const & a);
+vecteur operator/(vecteur v, double const & x);
 double norme(vecteur const & v);
 
 class matricepleine {
@@ -72,6 +72,7 @@ class matricecreuseun {
         int * j;
         complexe * coef;
         matricecreuseun();
+        //matricecreuseun(const matricecreuseun & other);
         matricecreuseun(int const & lig, int const & col, int const & nzv);
         ~matricecreuseun();
         void afficher() const;
@@ -82,10 +83,6 @@ vecteur operator*(matricecreuseun const & M, vecteur const & v);
 matricecreuseun pleineversun(matricepleine const & A);
 matricecreuseun ordonne(matricecreuseun const & A);
 bool estenbordel(matricecreuseun const & A);
-matricecreuseun lireun(bool const & comp);
-matricecreuseun lireun(std::string const & file, bool const & comp);
-int ecrire(matricecreuseun const & A);
-int ecrire(matricecreuseun const & A, std::string const & file);
 
 class matricecreusedeux {
     public:
@@ -105,11 +102,6 @@ bool operator!=(matricecreusedeux const & A, matricecreusedeux const & B);
 vecteur operator*(matricecreusedeux const & M, vecteur const & v);
 matricecreusedeux pleineversdeux(matricepleine const & A);
 matricecreusedeux unversdeux(matricecreuseun const & A);
-matricecreusedeux liredeux(bool const & comp);
-matricecreusedeux liredeux(std::string const & file, bool const & comp);
-int ecrire(matricecreusedeux const & A);
-int ecrire(matricecreusedeux const & A, std::string const & file);
 
-std::string demandernomdufichier();
 
 #endif

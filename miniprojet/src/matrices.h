@@ -3,8 +3,6 @@
 
 #include <string>
 
-// TODO un bool estenbordel dans matricecreuseun et manipuler que des ordonnées
-
 class complexe {
     public:
         double re;
@@ -85,7 +83,7 @@ class matricecreuseun {
         complexe * coef;
 
         matricecreuseun();
-        //matricecreuseun(const matricecreuseun & other);
+        //matricecreuseun(const matricecreuseun & A);
         matricecreuseun(int const & lig, int const & col, int const & nzv);
         ~matricecreuseun();
 

@@ -111,7 +111,7 @@ bool isnull(complexe const & a) {{{
 
 complexe pow(complexe const & a, int const & k) {{{
     complexe b = a;
-    for(int i(1); i<k; i++) b = b * a;
+    for(int i(1); i<k; i++) b *= a;
     return b;
 }}}
         
@@ -123,11 +123,12 @@ complexe::complexe() : re(0), im(0) {{{
 }}}
 
 vecteur::vecteur(int const & dim) : n(dim) {{{
-    assert(dim != 0);
-    coef = new complexe[dim];
+    assert(n != 0);
+    coef = new complexe[n];
 }}}
 
 vecteur::~vecteur() {{{
+    //delete [] coef;
 }}}
 
 matricepleine::matricepleine(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{
@@ -358,10 +359,6 @@ matricecreuseun ordonne(matricecreuseun const & A) {{{
                 if (A.i[k] == i && A.j[k] == j) {
                     B.i[cmpt] = A.i[k];
                     B.j[cmpt] = A.j[k];
-                    /* TODO
-                    B.coef[cmpt].re = A.coef[k].re;
-                    B.coef[cmpt].im = A.coef[k].im;
-                    */
                     B.coef[cmpt] = A.coef[k];
                     cmpt++;
                 }
@@ -486,8 +483,6 @@ string demandernomdufichier() {{{
 }}}
 
 matricecreuseun lireun(bool const & comp) {{{
-    //string nom = demandernomdufichier();
-    //return lireun(nom, comp);
     return lireun(demandernomdufichier(), comp);
 }}}
 
@@ -499,8 +494,6 @@ int ecrire(matricecreuseun const & A) {{{
 }}}
 
 matricecreusedeux liredeux(bool const & comp) {{{
-    //string nom = demandernomdufichier();
-    //return liredeux(nom, comp);
     return liredeux(demandernomdufichier(), comp);
 }}}
 

@@ -24,15 +24,15 @@ int test_conversions(bool const & afficher) {{{
     if(afficher) B.afficher();
     if(afficher) cout << endl;
 
-    matricecreuseun C = B.versun();
+    matricecreuseun C(B.versun());
     if(afficher) C.afficher();
     if(afficher) cout << endl;
 
-    matricecreusedeux D = B.versdeux();
+    matricecreusedeux D(B.versdeux());
     if(afficher) D.afficher();
     if(afficher) cout << endl;
 
-    matricecreusedeux E = C.versdeux();
+    matricecreusedeux E(C.versdeux());
     if(afficher) E.afficher();
 
     if (D==E) return 0;
@@ -49,25 +49,25 @@ int test_produits(bool const & afficher) {{{
     for(int i(0);i<5;i++) v.coef[i].re = i;
     if(afficher) v.afficher();
     if(afficher) cout << "====================================================================" << endl;
-    vecteur x = A*v;
+    vecteur x(A*v);
     if(afficher) x.afficher();
 
     cout << "\tTest produit creuseun*vecteur" << endl;
-    matricecreuseun E = A.versun();
+    matricecreuseun E(A.versun());
     if(afficher) E.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     if(afficher) v.afficher();
     if(afficher) cout << "====================================================================" << endl;
-    vecteur y = E*v;
+    vecteur y(E*v);
     if(afficher) y.afficher();
 
     cout << "\tTest produit creusedeux*vecteur" << endl;
-    matricecreusedeux F = A.versdeux();
+    matricecreusedeux F(A.versdeux());
     if(afficher) F.afficher();
     if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     if(afficher) v.afficher();
     if(afficher) cout << "====================================================================" << endl;
-    vecteur z = F*v;
+    vecteur z(F*v);
     if(afficher) z.afficher();
 
     if(x==y && x==z && !(y!=z)) return 0;
@@ -103,9 +103,9 @@ int test_ordonnage(bool const & afficher) {{{
     }
     else if (afficher) cout << "B est en bordel" << endl;
 
-    B = B.ordonne();
-    if (afficher) B.afficher();
-    if (B.estenbordel()) {
+    matricecreuseun C(B.ordonne());
+    if (afficher) C.afficher();
+    if (C.estenbordel()) {
         if (afficher) cout << "B est en bordel..." << endl;
         return 1;
     }
@@ -115,24 +115,24 @@ int test_ordonnage(bool const & afficher) {{{
 }}}
 
 int test_fichiers(bool const & afficher) {{{
-    matricecreuseun A = lireun("../test.mx", false);
+    matricecreuseun A(lireun("../test.mx", false));
     if (afficher) {
         cout << endl << "\tA" << endl;
         A.afficher();
     }
-    matricecreuseun B = A.ordonne();
+    matricecreuseun B(A.ordonne());
     if (afficher) {
         cout << endl << "\tB" << endl;
         B.afficher();
     }
     B.ecrire("B");
-    matricecreusedeux C = B.versdeux();
+    matricecreusedeux C(B.versdeux());
     if (afficher) {
         cout << endl << "\tC" << endl;
         C.afficher();
     }
     C.ecrire("C");
-    matricecreusedeux D = liredeux("C", true);
+    matricecreusedeux D(liredeux("C", true));
     if (afficher) {
         cout << endl << "\tD" << endl;
         D.afficher();

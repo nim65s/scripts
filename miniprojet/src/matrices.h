@@ -9,6 +9,9 @@ class complexe {
         double im;
 
         complexe();
+        complexe(double const & a);
+        complexe(double const & a, double const & b);
+        complexe(complexe const & a);
 
         complexe & operator+=(complexe const & a);
         complexe & operator-=(complexe const & a);
@@ -37,8 +40,9 @@ class vecteur {
         int n;
         complexe * coef;
 
-        vecteur();
         vecteur(int const & dim);
+        vecteur(vecteur const & v);
+        vecteur & operator=(vecteur const & a);
         ~vecteur();
 
         void afficher() const;
@@ -59,8 +63,9 @@ class matricecreusedeux {
         int * j;
         int * II;
 
-        matricecreusedeux();
         matricecreusedeux(int const & lig, int const & col, int const & nzv);
+        matricecreusedeux(matricecreusedeux const & A);
+        matricecreusedeux & operator=(matricecreusedeux const & A);
         ~matricecreusedeux();
 
         void afficher() const;
@@ -82,9 +87,9 @@ class matricecreuseun {
         int * j;
         complexe * coef;
 
-        matricecreuseun();
-        //matricecreuseun(const matricecreuseun & A);
         matricecreuseun(int const & lig, int const & col, int const & nzv);
+        matricecreuseun(matricecreuseun const & A);
+        matricecreuseun & operator=(matricecreuseun const & A);
         ~matricecreuseun();
 
         void afficher() const;
@@ -110,6 +115,8 @@ class matricepleine {
 
        matricepleine();
        matricepleine(int const & lig, int const & col, int const & nzv);
+       matricepleine(matricepleine const & A);
+       matricepleine & operator=(matricepleine const & A);
        ~matricepleine();
 
        void afficher() const;

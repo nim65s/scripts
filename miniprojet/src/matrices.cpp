@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <cmath>
 #include <assert.h>
-#include <math.h>
 #include "matrices.h"
 
 using namespace std;
@@ -122,13 +122,37 @@ complexe pow(complexe const & a, int const & k) {{{
 complexe::complexe() : re(0), im(0) {{{
 }}}
 
+complexe::complexe(double const & a) : re(a), im(0) {{{
+}}}
+
+complexe::complexe(double const & a, double const & b) : re(a), im(b) {{{
+}}}
+
+complexe::complexe(complexe const & a) : re(a.re), im(a.im) {{{
+}}}
+
 vecteur::vecteur(int const & dim) : n(dim) {{{
     assert(n != 0);
     coef = new complexe[n];
 }}}
 
+vecteur::vecteur(vecteur const & v) : n(v.n) {{{
+    assert(n != 0);
+    coef = new complexe[n];
+    for(int i(0); i<n; i++) coef[i] = v.coef[i];
+}}}
+
+vecteur & vecteur::operator=(vecteur const & v) {{{
+    if(this != &v) {
+        n = v.n;
+        delete [] coef;
+        coef = new complexe(*(v.coef));
+    }
+    return *this;
+}}}
+
 vecteur::~vecteur() {{{
-    //delete [] coef;
+    delete [] coef;
 }}}
 
 matricepleine::matricepleine(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{
@@ -136,21 +160,24 @@ matricepleine::matricepleine(int const & lig, int const & col, int const & nzv) 
     //TODO coef = new complexe[nzv][nzv];
 }}}
 
-matricepleine::~matricepleine() {{{
+matricepleine::matricepleine(matricepleine const & A) : m(A.m), n(A.n), nz(A.nz) {{{
+    assert(n != 0 && m != 0 && nz != 0);
+    for(int i(0); i<m; i++) for(int j(0); j<n; j++) coef[m][n] = A.coef[m][n];
+    //TODO coef = new complexe[nzv][nzv];
 }}}
 
-/*
-matricecreuseun::matricecreuseun(const matricecreuseun & A) : m(A.m), n(A.n), nz(A.nz) {{{
-    i = new int[A.nz];
-    j = new int[A.nz];
-    coef = new complexe[A.nz];
-    for (int p(0);p<A.nz;p++) {
-        i[p] = A.i[p];
-        j[p] = A.j[p];
-        coef[p] = A.coef[p];
+matricepleine & matricepleine::operator=(matricepleine const & A) {{{
+    if(this != &A) {
+        m = A.m;
+        n = A.n;
+        nz = A.nz;
+        for(int i(0); i<m; i++) for(int j(0); j<n; j++) coef[m][n] = A.coef[m][n];
     }
+    return *this;
 }}}
-*/
+
+matricepleine::~matricepleine() {{{
+}}}
 
 matricecreuseun::matricecreuseun(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{
     assert(m != 0 && n != 0 && nz != 0);
@@ -159,12 +186,37 @@ matricecreuseun::matricecreuseun(int const & lig, int const & col, int const & n
     coef = new complexe[nzv];
 }}}
 
+matricecreuseun::matricecreuseun(matricecreuseun const & A) : m(A.m), n(A.n), nz(A.nz) {{{
+    assert(m != 0 && n != 0 && nz != 0);
+    i = new int[nz];
+    j = new int[nz];
+    coef = new complexe[nz];
+    for (int k(0);k<A.nz;k++) {
+        i[k] = A.i[k];
+        j[k] = A.j[k];
+        coef[k] = A.coef[k];
+    }
+}}}
+
+matricecreuseun & matricecreuseun::operator=(matricecreuseun const & A) {{{
+    if(this != &A) {
+        m = A.m;
+        n = A.n;
+        nz = A.nz;
+        delete [] i;
+        delete [] j;
+        delete [] coef;
+        i = new int(*(A.i));
+        j = new int(*(A.j));
+        coef = new complexe(*(A.coef));
+    }
+    return *this;
+}}}
+
 matricecreuseun::~matricecreuseun() {{{
-    /*
     delete [] i;
     delete [] j;
     delete [] coef;
-    */
 }}}
 
 matricecreusedeux::matricecreusedeux(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{
@@ -174,7 +226,37 @@ matricecreusedeux::matricecreusedeux(int const & lig, int const & col, int const
     II = new int[lig+1];
 }}}
 
+matricecreusedeux::matricecreusedeux(matricecreusedeux const & A) : m(A.m), n(A.n), nz(A.nz) {{{
+    assert(m != 0 && n != 0 && nz != 0);
+    vals = new complexe[nz];
+    j = new int[nz];
+    II = new int[m+1];
+    for(int i(0); i<nz; i++) {
+        vals[i] = A.vals[i];
+        j[i] = A.j[i];
+    }
+    for(int i(0); i<=m; i++) II[i] = A.II[i];
+}}}
+
+matricecreusedeux & matricecreusedeux::operator=(matricecreusedeux const & A) {{{
+    if(this != &A) {
+        m = A.m;
+        n = A.n;
+        nz = A.nz;
+        delete [] vals;
+        delete [] j;
+        delete [] II;
+        vals = new complexe(*(A.vals));
+        j = new int(*(A.j));
+        II = new int(*(A.II));
+    }
+    return *this;
+}}}
+
 matricecreusedeux::~matricecreusedeux() {{{
+    delete [] vals;
+    delete [] j;
+    delete [] II;
 }}}
 
 /****************************************************************

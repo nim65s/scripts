@@ -21,19 +21,19 @@ int test_conversions(bool const & afficher) {{{
     B.coef[3][2].re = 11;
     B.coef[3][3].re = 10.1;
     B.coef[4][4].re = 12.7;
-    if(afficher) B.afficher();
-    if(afficher) cout << endl;
+    if (afficher) B.afficher();
+    if (afficher) cout << endl;
 
     matricecreuseun C(B.versun());
-    if(afficher) C.afficher();
-    if(afficher) cout << endl;
+    if (afficher) C.afficher();
+    if (afficher) cout << endl;
 
     matricecreusedeux D(B.versdeux());
-    if(afficher) D.afficher();
-    if(afficher) cout << endl;
+    if (afficher) D.afficher();
+    if (afficher) cout << endl;
 
     matricecreusedeux E(C.versdeux());
-    if(afficher) E.afficher();
+    if (afficher) E.afficher();
 
     if (D==E) return 0;
     return 1; 
@@ -42,42 +42,42 @@ int test_conversions(bool const & afficher) {{{
 int test_produits(bool const & afficher) {{{
     cout << "\tTest produit pleine*vecteur" << endl;
     matricepleine A(5, 5, 4);
-    for(int i(0);i<A.m;i++) A.coef[i][i].re = i; 
-    if(afficher) A.afficher();
-    if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    for (int i(0);i<A.m;i++) A.coef[i][i].re = i; 
+    if (afficher) A.afficher();
+    if (afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
     vecteur v(5);
-    for(int i(0);i<5;i++) v.coef[i].re = i;
-    if(afficher) v.afficher();
-    if(afficher) cout << "====================================================================" << endl;
+    for (int i(0);i<5;i++) v.coef[i].re = i;
+    if (afficher) v.afficher();
+    if (afficher) cout << "====================================================================" << endl;
     vecteur x(A*v);
-    if(afficher) x.afficher();
+    if (afficher) x.afficher();
 
     cout << "\tTest produit creuseun*vecteur" << endl;
     matricecreuseun E(A.versun());
-    if(afficher) E.afficher();
-    if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
-    if(afficher) v.afficher();
-    if(afficher) cout << "====================================================================" << endl;
+    if (afficher) E.afficher();
+    if (afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    if (afficher) v.afficher();
+    if (afficher) cout << "====================================================================" << endl;
     vecteur y(E*v);
-    if(afficher) y.afficher();
+    if (afficher) y.afficher();
 
     cout << "\tTest produit creusedeux*vecteur" << endl;
     matricecreusedeux F(A.versdeux());
-    if(afficher) F.afficher();
-    if(afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
-    if(afficher) v.afficher();
-    if(afficher) cout << "====================================================================" << endl;
+    if (afficher) F.afficher();
+    if (afficher) cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+    if (afficher) v.afficher();
+    if (afficher) cout << "====================================================================" << endl;
     vecteur z(F*v);
-    if(afficher) z.afficher();
+    if (afficher) z.afficher();
 
-    if(x==y && x==z && !(y!=z)) return 0;
+    if (x==y && x==z && !(y!=z)) return 0;
     return 1;
 }}}
 
 int test_ordonnage(bool const & afficher) {{{
     cout << "\tTest ordonnage" << endl;
     matricecreuseun A(5, 5, 4);
-    for(int i(0);i<4;i++) {
+    for (int i(0);i<4;i++) {
         A.i[i] = i+1;
         A.j[i] = i+1;
         A.coef[i].re = i+1;
@@ -142,7 +142,7 @@ int test_fichiers(bool const & afficher) {{{
 }}}
 
 int test_historique(bool const & afficher) {{{
-    if(afficher) cout << "TODO" << endl;
+    if (afficher) cout << "TODO" << endl;
     return 0;
 }}}
 

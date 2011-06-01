@@ -17,8 +17,8 @@ class complexe {
         complexe & operator-=(complexe const & a);
         complexe & operator*=(complexe const & a);
         complexe & operator/=(complexe const & a);
-        complexe & operator *=(double const & x);
-        complexe & operator /=(double const & x);
+        complexe & operator*=(double const & x);
+        complexe & operator/=(double const & x);
 
         void afficher() const;
         bool isnull() const ;

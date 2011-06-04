@@ -12,14 +12,15 @@ using namespace std;
 
 int main() {
     cout << "\t\tMini Projet" << endl;
-    bool afficher = true;
+    bool afficher = false;
     int a(test_conversions(afficher));
     int b(test_produits(afficher));
     int c(test_ordonnage(afficher));
     int d(test_fichiers(afficher));
     int e(test_historique(afficher));
+    cout << endl << a << endl;
 
-    int f(algo(lireun("../test.mx", false).versdeux(), afficher));
+    int f(algo(lireun("../test.mx", false).ordonne(), true));
     
     if ( a == 0 && b==0 && c==0 && d == 0 && e == 0 && f == 0 ) {
         cout << " OK " << endl;
@@ -29,4 +30,5 @@ int main() {
         cout << " KO : a=" << a << " | b=" << b << " | c=" << c << " | d=" << d << " | e=" << e << " | f=" << f << endl; 
         return 1;
     }
+    return 0;
 }

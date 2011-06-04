@@ -104,24 +104,25 @@ bool operator!=(matricecreuseun const & A, matricecreuseun const & B);
 vecteur operator*(matricecreuseun const & M, vecteur const & v);
 matricecreuseun lireun(bool const & comp);
 matricecreuseun lireun(std::string const & file, bool const & comp);
+matricecreuseun versun(matricecreusedeux const & A);
 
 class matricepleine {
     public:
-       int m;
-       int n;
-       int nz;
-       //complexe * coef; TODO : coef[m] ? coef[m][n] ?
-       complexe coef[10][10];
-
-       matricepleine();
-       matricepleine(int const & lig, int const & col, int const & nzv);
-       matricepleine(matricepleine const & A);
-       matricepleine & operator=(matricepleine const & A);
-       ~matricepleine();
-
-       void afficher() const;
-       matricecreuseun versun() const;
-       matricecreusedeux versdeux() const;
+        int m;
+        int n;
+        int nz;
+        //complexe * coef; TODO : coef[m] ? coef[m][n] ?
+        complexe coef[10][10];
+        
+        matricepleine();
+        matricepleine(int const & lig, int const & col, int const & nzv);
+        matricepleine(matricepleine const & A);
+        matricepleine & operator=(matricepleine const & A);
+        ~matricepleine();
+        
+        void afficher() const;
+        matricecreuseun versun() const;
+        matricecreusedeux versdeux() const;
 };
 bool operator==(matricepleine const & A, matricepleine const & B);
 bool operator!=(matricepleine const & A, matricepleine const & B);

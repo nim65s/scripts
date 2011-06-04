@@ -146,8 +146,10 @@ vecteur & vecteur::operator=(vecteur const & v) {{{ // -------------------------
     if (this != &v) {
         n = v.n;
         delete [] coef;
-        coef = new complexe(*(v.coef));
+        coef = new complexe[n];
+        for (int i(0); i<n; i++) coef[i] = v.coef[i];
     }
+    else cout << "Soucis d'opérateur d'affectation de vecteur !" << endl;
     return *this;
 }}}
 
@@ -162,7 +164,7 @@ matricepleine::matricepleine(int const & lig, int const & col, int const & nzv) 
 
 matricepleine::matricepleine(matricepleine const & A) : m(A.m), n(A.n), nz(A.nz) {{{ // -------------------------------- Constructeur de matrice pleine de copie
     assert(n != 0 && m != 0 && nz != 0);
-    for (int i(0); i<m; i++) for (int j(0); j<n; j++) coef[m][n] = A.coef[m][n];
+    for (int i(0); i<m; i++) for (int j(0); j<n; j++) coef[i][j] = A.coef[i][j];
     //TODO coef = new complexe[nzv][nzv];
 }}}
 
@@ -171,8 +173,9 @@ matricepleine & matricepleine::operator=(matricepleine const & A) {{{ // -------
         m = A.m;
         n = A.n;
         nz = A.nz;
-        for (int i(0); i<m; i++) for (int j(0); j<n; j++) coef[m][n] = A.coef[m][n];
+        for (int i(0); i<m; i++) for (int j(0); j<n; j++) coef[i][j] = A.coef[i][j];
     }
+    else cout << "Soucis d'opérateur d'affectation de matrice pleine" << endl;
     return *this;
 }}}
 
@@ -181,9 +184,9 @@ matricepleine::~matricepleine() {{{ // -----------------------------------------
 
 matricecreuseun::matricecreuseun(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{ // --- Constructeur de matrice creuse un
     assert(m != 0 && n != 0 && nz != 0);
-    i = new int[nzv];
-    j = new int[nzv];
-    coef = new complexe[nzv];
+    i = new int[nz];
+    j = new int[nz];
+    coef = new complexe[nz];
 }}}
 
 matricecreuseun::matricecreuseun(matricecreuseun const & A) : m(A.m), n(A.n), nz(A.nz) {{{ // -------------------------- Constructeur de matrice creuse un de copie
@@ -206,10 +209,16 @@ matricecreuseun & matricecreuseun::operator=(matricecreuseun const & A) {{{ // -
         delete [] i;
         delete [] j;
         delete [] coef;
-        i = new int(*(A.i));
-        j = new int(*(A.j));
-        coef = new complexe(*(A.coef));
+        i = new int[nz];
+        j = new int[nz];
+        coef = new complexe[nz];
+        for (int k(0);k<A.nz;k++) {
+            i[k] = A.i[k];
+            j[k] = A.j[k];
+            coef[k] = A.coef[k];
+        }
     }
+    else cout << "soucis d'opérateur d'affectation de matrice creuse un" << endl;
     return *this;
 }}}
 
@@ -221,9 +230,9 @@ matricecreuseun::~matricecreuseun() {{{ // -------------------------------------
 
 matricecreusedeux::matricecreusedeux(int const & lig, int const & col, int const & nzv) : m(lig), n(col), nz(nzv) {{{ // constructeur de matrice creuse deux
     assert(m != 0 && n != 0 && nz != 0);
-    vals = new complexe[nzv];
-    j = new int[nzv];
-    II = new int[lig+1];
+    vals = new complexe[nz];
+    j = new int[nz];
+    II = new int[m+1];
 }}}
 
 matricecreusedeux::matricecreusedeux(matricecreusedeux const & A) : m(A.m), n(A.n), nz(A.nz) {{{ // -------------------- Constructeur de matrice creuse deux de copie
@@ -231,11 +240,11 @@ matricecreusedeux::matricecreusedeux(matricecreusedeux const & A) : m(A.m), n(A.
     vals = new complexe[nz];
     j = new int[nz];
     II = new int[m+1];
-    for (int i(0); i<nz; i++) {
-        vals[i] = A.vals[i];
-        j[i] = A.j[i];
+    for (int k(0); k<nz; k++) {
+        vals[k] = A.vals[k];
+        j[k] = A.j[k];
     }
-    for (int i(0); i<=m; i++) II[i] = A.II[i];
+    for (int k(0); k<=m; k++) II[k] = A.II[k];
 }}}
 
 matricecreusedeux & matricecreusedeux::operator=(matricecreusedeux const & A) {{{ // ----------------------------------- Opérateur d'affectation de matrice creuse deux
@@ -246,10 +255,16 @@ matricecreusedeux & matricecreusedeux::operator=(matricecreusedeux const & A) {{
         delete [] vals;
         delete [] j;
         delete [] II;
-        vals = new complexe(*(A.vals));
-        j = new int(*(A.j));
-        II = new int(*(A.II));
+        vals = new complexe[nz];
+        j = new int[nz];
+        II = new int[m+1];
+        for (int k(0); k<nz; k++) {
+            vals[k] = A.vals[k];
+            j[k] = A.j[k];
+        }
+        for (int k(0); k<=m; k++) II[k] = A.II[k];
     }
+    else cout << "Soucis d'opérateur d'affectation de matrice creuse deux" << endl;
     return *this;
 }}}
 
@@ -260,7 +275,7 @@ matricecreusedeux::~matricecreusedeux() {{{ // ---------------------------------
 }}}
 
 /****************************************************************
- *                       Affichage de matrices                  *
+ *                       Affichage                              *
  ****************************************************************/
 
 void complexe::afficher() const {{{ // --------------------------------------------------------------------------------- Affichage de complexe
@@ -324,7 +339,7 @@ bool operator!=(vecteur const & a, vecteur const & b) {{{ // -------------------
 
 bool operator==(matricepleine const & A, matricepleine const & B) {{{ // ----------------------------------------------- Égalité de matrices pleines
     if ( A.n != B.n || A.m != B.m) return false;
-    for (int i(0);i<A.n;i++) for (int j(0);j<A.m;j++) if (A.coef[i][j] != B.coef[i][j]) return false;
+    for (int i(0);i<A.m;i++) for (int j(0);j<A.n;j++) if (A.coef[i][j] != B.coef[i][j]) return false;
     return true;
 }}}
 
@@ -336,7 +351,7 @@ bool operator==(matricecreuseun A, matricecreuseun B) {{{ // -------------------
     if (A.m != B.m || A.n != B.n || A.nz != B.nz) return false;
     if (A.estenbordel()) A = A.ordonne();
     if (B.estenbordel()) B = B.ordonne();
-    for (int k(0);k<A.n;k++) if (A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false;
+    for (int k(0);k<A.nz;k++) if (A.i[k] != B.i[k] || A.j[k] != B.j[k] || A.coef[k] != B.coef[k]) return false;
     return true;
 }}}
 
@@ -360,24 +375,24 @@ bool operator!=(matricecreusedeux const & A, matricecreusedeux const & B) {{{ //
  ****************************************************************/
 
 vecteur operator*(matricepleine const & M, vecteur const & v) {{{ // --------------------------------------------------- Multiplication de matrice pleine et de vecteur
-    assert(M.m == v.n);
-    vecteur w(M.n);
-    for (int i(0);i<M.n;i++) for (int j(0);j<M.m;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
-    return w;
+    assert(M.n == v.n);
+    vecteur w(M.m);
+    for (int i(0);i<M.m;i++) for (int j(0);j<M.n;j++) w.coef[i] += v.coef[j]*M.coef[i][j];
+    return w; // TODO marche pas
 }}}
 
 vecteur operator*(matricecreuseun const & M, vecteur const & v) {{{ // ------------------------------------------------- Multiplication de matrice creuse un et de vecteur
-    assert(M.m == v.n);
-    vecteur w(M.n);
+    assert(M.n == v.n);
+    vecteur w(M.m);
     for (int k(0);k<M.nz;k++) w.coef[M.i[k]] += M.coef[k]*v.coef[M.j[k]];
     return w;
 }}}
 
 vecteur operator*(matricecreusedeux const & M, vecteur const & v) {{{ // ----------------------------------------------- Multiplication de matricecreuse deux et de vecteur
-    assert(M.m == v.n);
-    vecteur w(M.n);
+    assert(M.n == v.n);
+    vecteur w(M.m);
     int a(0);
-    for (int b(0);b<M.n;b++) while (a<M.II[b]) {
+    for (int b(0);b<M.m;b++) while (a<M.II[b]) {
         w.coef[b] += M.vals[a]*v.coef[M.j[a]];
         a++;
     }
@@ -440,6 +455,19 @@ matricecreusedeux matricecreuseun::versdeux() const {{{ // ---------------------
     A.II[++cmpt] = A.II[0]+A.nz;
     return A;
 }}}
+
+matricecreuseun versun(matricecreusedeux const & B) {{{ // --------------------------------------------------------------- Conversion de matrice creuse deux vers creuse un
+    matricecreuseun A(B.m, B.n, B.nz);
+    int cmpt(0);
+    for (int a(0);a<B.nz;a++) {
+        if (a == B.II[cmpt]-1 ) cmpt++;
+        A.coef[a] = B.vals[a];
+        A.j[a] = B.j[a];
+        A.i[a] = cmpt-1;
+    }
+    return A;
+}}}
+
 
 /****************************************************************
  *                          Ordonnage                           *

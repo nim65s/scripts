@@ -11,6 +11,27 @@
 using namespace std;
 
 int main() {
+
+    int i;
+    i=0;
+
+    int *j,*p;
+    j=new int;
+    p=new int;
+
+
+    j=&i;
+    *p=*j;
+
+
+    cout << i << "  " << &i <<endl; 
+    cout << j << "  " << *j << endl; 
+    cout << p << "  " << *p << endl; 
+
+
+    return 0;
+
+
     cout << "\t\tMini Projet" << endl;
     bool afficher = false;
     int a(test_conversions(afficher));

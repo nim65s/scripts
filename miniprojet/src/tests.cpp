@@ -95,7 +95,7 @@ int test_produits(bool const & afficher) {{{
     V.coef[0].re = 1;
     if (afficher) V.afficher();
     if (afficher) cout << "====================================================================" << endl;
-    x = A*V;
+    x = G*V;
     if (afficher) x.afficher();
 
     if (afficher) cout << "\tTest produit creuseun*vecteur" << endl;

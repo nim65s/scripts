@@ -23,7 +23,7 @@ echo -en "\t" >> Makefile
 echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *~ 2> /dev/null' >> Makefile
 
 
-sed "s/( ( $TEX -shell-escape $< || ( rm \$@ && false ) ) && $TEX -shell-escape $< || ( rm \$@ && false ) ) && $TEX -shell-escape $</$TEX-shell-escape $</" Makefile > Makefile.quick
+sed "s/( ( $TEX -shell-escape $< || ( rm \$@ && false ) ) && $TEX -shell-escape $< || ( rm \$@ && false ) ) && $TEX -shell-escape $</$TEX -shell-escape $</" Makefile > Makefile.quick
 
 chmod +x Makefile Makefile.quick
 

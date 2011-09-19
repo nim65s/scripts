@@ -2,7 +2,7 @@
 
 if [[ "$1" == "hostname" ]]
 then
-    if [[ -e "$HOME/images/hostname/`hostname`.jpg"]]
+    if [[ -e "$HOME/images/hostname/`hostname`.jpg" ]]
     then
         awsetbg "$HOME/images/hostname/`hostname`.jpg"
     else

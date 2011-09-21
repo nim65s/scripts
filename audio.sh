@@ -1,5 +1,8 @@
 #! /bin/bash
 # script de gestion de l'audio
+
+. ~/.password
+
 player=mpd
 server=alsa
 #server=oss

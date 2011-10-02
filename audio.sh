@@ -133,6 +133,7 @@ case $1 in
 						[[ "$WM" == "awesome" ]] && echo "mpdmode.text ='C'" | awesome-client
 						mpc play
 						mpc consume on
+                        mpc random off
 				fi
 
 				;;

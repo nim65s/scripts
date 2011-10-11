@@ -8,7 +8,7 @@ case $1 in
         CMD="--image /home/saurelg/images/xcowsay/sacha.png GOTTA CATCH THEM ALL !"
         ;;
     *)
-        $1
+        CMD=$*
         ;;
 esac
 

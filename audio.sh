@@ -1,5 +1,8 @@
 #! /bin/bash
 # script de gestion de l'audio
+
+. ~/.password
+
 player=mpd
 server=alsa
 #server=oss
@@ -130,6 +133,7 @@ case $1 in
 						[[ "$WM" == "awesome" ]] && echo "mpdmode.text ='C'" | awesome-client
 						mpc play
 						mpc consume on
+                        mpc random off
 				fi
 
 				;;

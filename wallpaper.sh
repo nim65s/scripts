@@ -10,7 +10,7 @@ then
     fi
 else
     export DISPLAY=:0.0
-    awsetbg -r /home/nim/images/wallpaper/ -u feh
+    awsetbg -r $HOME/images/wallpaper/ -u feh
 fi
 
 exit

@@ -8,7 +8,7 @@
 
 echo -n "all: " >> Makefile
 for FILE in *.tex
-do echo -n "$(echo "$FILE " | grep -v '*' | sed 's/tex/pdf/')" >> Makefile
+do echo -n "$(echo "$FILE " | grep -v '*' | sed 's/\.tex/.pdf/')" >> Makefile
 done
 echo clean >> Makefile
 echo >> Makefile

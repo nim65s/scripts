@@ -22,7 +22,7 @@ fi
 echo >> Makefile
 echo 'clean:' >> Makefile
 echo -en "\t" >> Makefile
-echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *.tns *~ 2> /dev/null' >> Makefile
+echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *.tns *.pyg *.vrb *~ 2> /dev/null' >> Makefile
 
 [[ $1 == *m* ]] && sed "s/(( $TEX -shell-escape $< || ( rm \$@ && false )) && $TEX -shell-escape $< || ( rm \$@ && false )) && $TEX -shell-escape $</$TEX -shell-escape $</" Makefile > Makefile.quick
 

@@ -26,7 +26,7 @@ esac
 
 for((j=0;j<=$N;j++))
 do
-    for client in amy bender fry leela hermes farnsworth scruffy
+    for client in amy bender fry leela hermes farnsworth #scruffy
     do
         for((i=0;i<6;i++))
         do

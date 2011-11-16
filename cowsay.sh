@@ -12,11 +12,11 @@ fi
 case $1 in 
     pikachu)
         shift
-        CMD="--image /home/saurelg/images/xcowsay/pikachu.png $* PIKACHU !"
+        CMD="--image $HOME/images/xcowsay/pikachu.png $* PIKACHU !"
         ;;
     sacha)
         shift
-        CMD="--image /home/saurelg/images/xcowsay/sacha.png $* GOTTA CATCH THEM ALL !"
+        CMD="--image $HOME/images/xcowsay/sacha.png $* GOTTA CATCH THEM ALL !"
         ;;
     *)
         CMD=$*
@@ -24,15 +24,25 @@ case $1 in
 esac
 
 
-for((j=0;j<=$N;j++))
-do
-    for client in amy bender fry leela hermes farnsworth #scruffy
+if [[ "`hostname`" == "totoro" ]]
+then
+    for((j=0;j<=$N;j++))
     do
-        for((i=0;i<6;i++))
+        DISPLAY=:0.1 xcowsay $CMD &
+        sleep 1
+    done
+else
+    for((j=0;j<=$N;j++))
+    do
+        for client in amy bender fry leela hermes farnsworth scruffy
         do
-            ssh $client DISPLAY=:$i xcowsay $CMD &
+            for((i=0;i<6;i++))
+            do
+                ssh $client DISPLAY=:$i xcowsay $CMD &
+                sleep 1
+            done
         done
     done
-done
+fi
 
 wait

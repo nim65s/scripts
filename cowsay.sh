@@ -18,6 +18,15 @@ case $1 in
         shift
         CMD="--image $HOME/images/xcowsay/sacha.png $* GOTTA CATCH THEM ALL !"
         ;;
+    tortue)
+        shift
+        declare -a CMD
+        CMD0="--image $HOME/images/xcowsay/tortue_1.gif $* COWABUNGA !"  
+        CMD1="--image $HOME/images/xcowsay/tortue_2.gif $* COWABUNGA !"  
+        CMD2="--image $HOME/images/xcowsay/tortue_3.gif $* COWABUNGA !"  
+        CMD3="--image $HOME/images/xcowsay/tortue_4.gif $* COWABUNGA !"
+        CMD=($CMD0 $CMD1 $CMD2 $CMD3 $CMD4)
+        ;;
     *)
         CMD=$*
         ;;
@@ -28,7 +37,7 @@ if [[ "`hostname`" == "totoro" ]]
 then
     for((j=0;j<=$N;j++))
     do
-        DISPLAY=:0.1 xcowsay $CMD &
+        DISPLAY=:0.1 xcowsay ${CMD{$j}} &
         sleep 1
     done
 else

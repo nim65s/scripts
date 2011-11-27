@@ -74,7 +74,6 @@ if [ "$PLAYER" = "mpd" ]
     $RAND && mpc random on || mpc random off
 	mpc consume off
 	mpc single off
-	echo "mpdmode.text = 'N'" | awesome-client
     mpc load Reveil
     mpc volume $VOLINIT
     mpc enable 1

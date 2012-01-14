@@ -5,6 +5,9 @@ then
     if [[ -e "$HOME/images/hostname/`hostname`.jpg" ]]
     then
         awsetbg "$HOME/images/hostname/`hostname`.jpg"
+    elif [[ -e "$HOME/images/hostname/`hostname`.png" ]]
+    then
+        awsetbg "$HOME/images/hostname/`hostname`.png"
     else
         awsetbg "$HOME/images/hostname/totoro_parapluie.jpg"
     fi

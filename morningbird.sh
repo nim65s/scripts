@@ -12,6 +12,9 @@ RAND=false
 #modification par fichier de conf
 [[ -f $HOME/.morningbirdrc ]] && . $HOME/.morningbirdrc || echo 'Pas de $HOME/.morningbirdrc'
 
+#lecture du mot de passe mpd, s’il y en a un
+[[ -f $HOME/.password ]] && . $HOME/.password
+
 #modification par options
 while [ $# -ne 0 ]
   do

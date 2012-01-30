@@ -23,11 +23,22 @@ case $1 in
 				if [[ "$server" == "oss" ]]
 				then 
 						ossmix vmix0-outvol -- +2
-				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
+				        if [[ "$WM" == "awesome" ]] 
+                        then
+                                VAL=$(ossmix vmix0-outvol | cut -d' ' -f 10)
+                                echo "volwidget:set_value($VAL-15)" | awesome-client
+                        fi
 				elif [[ "$server" == "alsa" ]]
 				then 
-                        amixer set Master 3dB+
-                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//'))" | awesome-client
+                        amixer set Master 2dB+
+                        amixer set PCM 2dB+
+                        if [[ "$WM" == "awesome" ]] 
+                        then
+                                VAL1=$(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//')
+                                VAL2=$(amixer get PCM | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//')
+                                VAL=$((($VAL1+$VAL2)/2))
+                                echo "volwidget:set_value($VAL)" | awesome-client
+                        fi
 				fi
 				;;
 		p+) # player's volume up
@@ -37,14 +48,25 @@ case $1 in
 				fi
 				;;
 		-) # volume down
-				if [[ "$server" == "oss" ]]
+                if [[ "$server" == "oss" ]]
 				then 
 						ossmix vmix0-outvol -- -2
-				        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(ossmix vmix0-outvol | cut -d' ' -f 10)-15)" | awesome-client
-                elif [[ "$server" == "alsa" ]]
-                then
-                        amixer set Master 3dB-
-                        [[ "$WM" == "awesome" ]] && echo "volwidget:set_value($(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//'))" | awesome-client
+				        if [[ "$WM" == "awesome" ]] 
+                        then
+                                VAL=$(ossmix vmix0-outvol | cut -d' ' -f 10)
+                                echo "volwidget:set_value($VAL-15)" | awesome-client
+                        fi
+				elif [[ "$server" == "alsa" ]]
+				then 
+                        amixer set Master 2dB-
+                        amixer set PCM 2dB-
+                        if [[ "$WM" == "awesome" ]] 
+                        then
+                                VAL1=$(amixer get Master | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//')
+                                VAL2=$(amixer get PCM | tail -n 1 | cut -d' ' -f 6 | sed 's/\[//;s/%\]//')
+                                VAL=$((($VAL1+$VAL2)/2))
+                                echo "volwidget:set_value($VAL)" | awesome-client
+                        fi
 				fi
 				;;
 		p-)
@@ -190,4 +212,3 @@ case $1 in
 esac
 
 exit 0
-				

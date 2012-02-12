@@ -8,7 +8,6 @@ for d in ${git[*]}
 do
     cd ~/$d
     echo -e "\t\t\033[1;32m git : $d \033[m"
-    pwd
     git pull
     git commit -a
     git push

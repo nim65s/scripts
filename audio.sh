@@ -13,8 +13,8 @@ alarm_volume_init=80
 alarm_volume_max=100
 alarm_time_inc=1
 
-MUTE_ICON="spkricone.image = image(beautiful.spkr_icon)"
-SPKR_ICON="spkricone.image = image(beautiful.mute_icon)"
+MUTE_ICON="spkricone.image = image(beautiful.mute_icon)"
+SPKR_ICON="spkricone.image = image(beautiful.spkr_icon)"
 
 add_random()
 {
@@ -89,10 +89,10 @@ case $1 in
             if [[ "$(ossmix misc.front-mute | cut -d" " -f 10)" == "ON" ]]
             then
                 ossmix misc.front-mute OFF
-                [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
+                [[ "$WM" == "awesome" ]] && echo $MUTE_ICON | awesome-client
             else
                 ossmix misc.front-mute ON
-                [[ "$WM" == "awesome" ]] && echo $MUTE_ICON | awesome-client
+                [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
             fi
         elif [[ "$server" == "alsa" ]]
         then

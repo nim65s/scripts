@@ -3,12 +3,12 @@
 prefix=/dev/sd$1
 shift
 
-cd /mnt/nim
+mnt=/mnt/nim
 for i in $@
 do
-    if [[ ! -d $i ]] 
+    if [[ ! -d $mnt$i ]] 
     then
-        sudo mkdir $i
+        sudo mkdir -p $mnt$i
     fi
-    sudo mount ${prefix}$i $i
+    sudo mount $prefix$i $mnt$i
 done

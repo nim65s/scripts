@@ -3,7 +3,7 @@
 prefix=/dev/sd$1
 shift
 
-mnt=/mnt/nim
+mnt=/mnt/nim/
 for i in $@
 do
     if [[ ! -d $mnt$i ]] 

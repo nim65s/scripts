@@ -9,7 +9,7 @@ then
     then
         awsetbg "$HOME/images/hostname/`hostname`.png"
     else
-        awsetbg "$HOME/images/hostname/totoro_parapluie.jpg"
+        awsetbg "$HOME/images/hostname/ghibli.png"
     fi
 else
     export DISPLAY=:0.0

@@ -1,22 +1,21 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-import urllib, os
+import os, webbrowser, feedparser
 from BeautifulSoup import BeautifulSoup
 
 try:
-    fichier = open("/tmp/9gag.txt", "r")
-    old_gagid = fichier.read()
+    fichier = open("%s/.9gag" % os.environ['HOME'], "r")
+    old_gagtitle = fichier.read()
     fichier.close()
 except IOError:
-    old_gagid = ''
+    old_gagtitle = ''
 
-url = urllib.urlopen('http://9gag.com')
-soup = BeautifulSoup(url.read())
-(i,last_gagid) = soup.find("li",{"class":" entry-item"}).attrs[3]
+feed = feedparser.parse('http://9gag.com/rss/site/feed.rss')
+last_gagtitle = feed["items"][0]["title"]
 
-if old_gagid != last_gagid:
-    os.system('chromium http://9gag.com')
-    fichier = open("/tmp/9gag.txt", "w")
-    fichier.write(last_gagid)
+if old_gagtitle != last_gagtitle:
+    webbrowser.open('chromium http://9gag.com')
+    fichier = open("%s/.9gag" % os.environ['HOME'], "w")
+    fichier.write(last_gagtitle)
     fichier.close()

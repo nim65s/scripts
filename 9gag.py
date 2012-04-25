@@ -2,7 +2,6 @@
 #-*- coding: utf-8 -*-
 
 import os, webbrowser, feedparser
-from BeautifulSoup import BeautifulSoup
 
 try:
     fichier = open("%s/.9gag" % os.environ['HOME'], "r")

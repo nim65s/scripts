@@ -4,6 +4,21 @@
 from __future__ import print_function
 
 style = [0,1,3,4]
+for a in range(8):
+    for i in range(30,38):
+        if a == 0:
+            print('\033[%im  \\033[%im\033[0m '%(i,i),end='')
+        else:
+            print('\033[%i;%im\\033[%i;%im\033[0m '%(a,i,a,i),end='')
+        for j in range(40,48):
+            if a == 0:
+                print('\033[%i;%im  \\033[%i;%im\033[0m '%(i,j,i,j),end='')
+            else:
+                print('\033[%i;%i;%im\\033[%i;%i;%im\033[0m '%(a,i,j,a,i,j),end='')
+        print()
+    print()
+print()
+
 for a in style:
     print('\033[%0m ', end='')
     print('\033[%im' % a, end='')

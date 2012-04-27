@@ -42,10 +42,3 @@ for a in style:
     for i in range(232,256):
         print('\033[38;5;%im%i ' % (i,i),end='')
     print()
-
-for i in range(40):
-    for j in range(40):
-        for k in range(255):
-            print('\033[%0m', end='')
-            print('\033[%i;%i;%imX'%(i,j,k),end='')
-        print()

@@ -4,11 +4,14 @@
 from __future__ import print_function
 
 import os, sys, re, time, shelve, datetime
-import feedparser, urllib, webbrowser
+import feedparser, urllib, webbrowser, pprint
 from BeautifulSoup import BeautifulSoup
 
+reset=False
+sleep=0
+
 try:
-    date = shelve.open('%s/.js_shelve' % os.environ['HOME'], writeback=True)
+    date = shelve.open(os.path.expanduser('~/.js_shelve'), writeback=True)
 except:
     date = {}
 
@@ -30,12 +33,21 @@ url_re = re.compile(r'http://www\.japan-shin\.com/lectureenligne/reader/read/(?P
 def checkChapters():
     pass
 
-def run():
-    if not date.has_key(site) or len(sys.argv) > 1:
+def run(reset=False):
+    if reset:
         date[site] = time.gmtime(0)
 
     feed = feedparser.parse(url_rss)
-    if date[site] < feed['entries'][0]['published_parsed']:
+
+    nouvelles_entrees = False
+    try:
+        nouvelle_entrees = date[site] < feed['entries'][0]['published_parsed']
+    except IndexError:
+        print('\033[1;31m<DEBUG>\033[0m')
+        pprint.PrettyPrinter(indent=4).pprint(feed)
+        print('\033[1;31m</DEBUG>\033[0m')
+
+    if nouvelles_entrees:
         print(datetime.datetime.now())
         for entrie in feed['entries']:
             url_lel = entrie['links'][0]['href']
@@ -60,10 +72,29 @@ def run():
                 break
         date[site] = feed['entries'][0]['published_parsed']
     else:
-        print('.', end='')
-
-    date.close()
+        if sleep == 0:
+            print('rien')
+        else:
+            print('.', end='')
 
 if __name__ == '__main__':
-    run()
+    if len(sys.argv) > 1:
+        try:
+            sleep = int(sys.argv[1])
+            reset = False
+        except ValueError:
+            sleep = 0
+            reset = True
+    if not date.has_key(site):
+        reset = True
+    if sleep == 0:
+        run(reset)
+    else:
+        try:
+            while 1:
+                run(reset)
+                time.sleep(sleep)
+        except KeyboardInterrupt:
+            pass
 
+date.close()

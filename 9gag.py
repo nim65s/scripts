@@ -4,7 +4,7 @@
 import os, webbrowser, feedparser
 
 try:
-    fichier = open("%s/.9gag" % os.environ['HOME'], "r")
+    fichier = open(os.path.expanduser("~/.9gag"), "r")
     old_gagtitle = fichier.read()
     fichier.close()
 except IOError:

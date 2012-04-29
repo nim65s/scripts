@@ -1,0 +1,202 @@
+#!/usr/bin/python2
+#-*- coding: utf-8 -*-
+
+import os, re, sys, shutil
+from couleurs import *
+
+#scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Claymore', 'Metallica Metalluca']
+
+#r = scans[0]
+#for scan in scans[1:]:
+    #r = r + '|' + scan
+
+#series = {
+        #'re': re.compile(r.replace(' ','.?'),re.I),
+        #'titles': [(scan,re.compile(scan.replace(' ','.?'),re.I)) for scan in scans]
+        #}
+
+tome_re = re.compile('Tome ', re.I)
+
+class Serie:
+    def __init__(self, titre):
+        self.titre = os.path.basename(titre)
+        self.re = re.compile(titre.replace(' ','.?'),re.I)
+        self._tomes = []
+        self._chapitres = []
+        self._tomes_manquants = []
+        self._chapitres_manquants = []
+
+        for dossier in os.listdir(titre):
+            if os.path.isdir(os.path.join(titre,dossier)) and dossier != 'HS':
+                if tome_re.search(dossier):
+                    Serie._set_tomes(self, os.path.join(titre, dossier))
+                else:
+                    Serie._set_chapitres(self, os.path.join(titre,dossier))
+            elif not os.path.isdir(os.path.join(titre,dossier)):
+                rouge('fichier: %s' % dossier)
+
+        if self._tomes:
+            self._tomes.sort()
+        if self._chapitres:
+            self._chapitres.sort()
+
+        Serie.check(self)
+        Serie.classer(self)
+
+    def __repr__(self):
+        return self.titre
+
+    def _set_chapitres(self, chapitre, tome=0):
+        if not os.path.isdir(chapitre) and type(chapitre) != int:
+            raise TypeError('chapitre doit être un dossier ou un entier')
+        elif os.path.isdir(chapitre):
+            chapitre_number = int(re.findall(r'\d+',os.path.basename(chapitre))[0])
+        if chapitre_number in self.chapitres:
+            rouge('TODO: chapitre en trop : %s' % (chapitre))
+        else:
+            self._chapitres.append((chapitre_number,tome))
+            self._chapitres.sort()
+
+    def _get_chapitres(self):
+        return [i for i,j in self._chapitres]
+
+    chapitres = property(_get_chapitres, _set_chapitres)
+
+    def _set_chapitres_et_tomes(self, (chapitre, tome)):
+        Serie._set_chapitres(self, chapitre, tome)
+
+    def _get_chapitres_et_tomes(self):
+        return self._chapitres
+
+    chapitres_et_tomes = property(_get_chapitres_et_tomes, _set_chapitres_et_tomes)
+
+    def _set_tomes(self, tome):
+       if not os.path.isdir(tome) and type(tome) != int:
+           raise TypeError('tome doit être un dossier ou un entier')
+       elif os.path.isdir(tome):
+           tome_number = int(re.findall(r'\d+', os.path.basename(tome))[0])
+           for fichier in os.listdir(tome):
+               if os.path.isdir(os.path.join(tome,fichier)):
+                   Serie._set_chapitres(self, os.path.join(tome, fichier), tome_number)
+           tome = tome_number
+       if tome in self._tomes:
+           rouge('TODO: Tome en trop : %s/%s' % (self.titre, tome))
+       else:
+           self._tomes.append(tome)
+           self._tomes.sort()
+
+    def _get_tomes(self):
+        return self._tomes
+
+    tomes = property(_get_tomes, _set_tomes)
+
+    def _set_chapitres_manquants(self, chapitre):
+        if chapitre in self._chapitres_manquants:
+            rouge('TODO: Chapitre manquant en trop: %s' % chapitre)
+        else:
+            self._chapitres_manquants.append(chapitre)
+            self._chapitres_manquants.sort()
+
+    def _get_chapitres_manquants(self):
+        return self._chapitres_manquants
+
+    chapitres_manquants = property(_get_chapitres_manquants, _set_chapitres_manquants)
+
+    def _set_tomes_manquants(self, tome):
+        if tome in self._tomes_manquants:
+            rouge('TODO: Tome manquant en trop: %s' % tome)
+        else:
+            self._tomes_manquants.append(tome)
+            self._tomes_manquants.sort()
+
+    def _get_tomes_manquants(self):
+        return self._tomes_manquants
+
+    tomes_manquants = property(_get_tomes_manquants, _set_tomes_manquants)
+
+    def check(self):
+        if self._tomes and len(self._tomes) != self._tomes[-1]-self._tomes[0]+1:
+            for i in range(self._tomes[0], self._tomes[-1]):
+                if not i in self._tomes:
+                    Serie._set_tomes_manquants(self, i)
+            return False
+        if self._chapitres and len(self._chapitres) != self._chapitres[-1][0]-self._chapitres[0][0]+1:
+            for i in range(self._chapitres[0][0], self._chapitres[-1][0]):
+                if not i in self.chapitres:
+                    Serie._set_chapitres_manquants(self, i)
+            return False
+        return True
+
+    def tome_du_chapitre(self, chapitre):
+        if chapitre in self.chapitres:
+            for i,j in self.chapitres_et_tomes:
+                if i == chapitre:
+                    return j
+        else:
+            raise ValueError('Ce chapitre n’est pas présent.')
+
+    def deduire_tome(self, chapitre):
+        p = chapitre # chapitre précédent
+        n = chapitre # chapitre suivant
+        tp = 0 # tome du chapitre précédent 
+        tn = 0
+        while p >= self._chapitres[0][0]:
+            p = p-1
+            if p in self.chapitres and Serie.tome_du_chapitre(self, p) != 0:
+                tp = Serie.tome_du_chapitre(self, p)
+                break
+        while n <= self._chapitres[-1][0]:
+            n = n+1
+            if n in self.chapitres and Serie.tome_du_chapitre(self, n) != 0:
+                tn = Serie.tome_du_chapitre(self, n)
+                break
+        if tp == tn:
+            return tp
+        else:
+            return 0
+
+    def classer(self):
+        for i,j in self.chapitres_et_tomes:
+            if j == 0:
+                k = self.deduire_tome(i)
+                if k > 0:
+                    src = os.path.join(os.path.expanduser('~/Scans'),self.titre, str(i))
+                    dst = os.path.join(os.path.expanduser('~/Scans'),self.titre, 'Tome ' + str(k))
+                    vert(src+' va dans '+dst)
+                    shutil.move(src, dst)
+
+class Chapitre:
+    def __init__(self,name):
+        self.titre=''
+        self.tome=0
+        self.chapitre=0
+        self.lu=False
+        #for titre,regex in series['titles']:
+            #if regex.search(fichier):
+                #self.titre=titre
+
+
+path = os.path.expanduser('~/Scans')
+if len(sys.argv) > 1 and os.path.isdir(os.path.join(path, sys.argv[1])):
+    i = Serie(os.path.join(path,sys.argv[1]))
+    print i, i.tomes, i.chapitres_et_tomes, i.tomes_manquants, i.chapitres_manquants
+else:
+    for dossier in os.listdir(path):
+        print dossier
+        objet = Serie(os.path.join(path,dossier))
+        objet.check()
+        print
+
+
+
+#fichiers = os.listdir('.')
+
+#for fichier in fichiers:
+    #if series['re'].search(fichier):
+        #vert(fichier)
+        #for titre,regex in series['titles']:
+            #if regex.search(fichier):
+                #print titre
+    #else:
+        #rouge(fichier)
+

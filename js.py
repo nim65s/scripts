@@ -44,7 +44,7 @@ def run(reset=False):
 
     feed = feedparser.parse(url_rss)
     if feed['bozo']:
-        rouge(u'Téléchargement raté')
+        rouge(u'Bozo')
         return
 
     nouvelles_entrees = False

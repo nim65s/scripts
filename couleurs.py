@@ -13,6 +13,10 @@ def vert(texte):
     """printe un «texte» en vert gras"""
     print('\033[1;32m%s\033[0m' % texte)
 
+def jaune(texte):
+    """printe un «texte» en vert gras"""
+    print('\033[1;33m%s\033[0m' % texte)
+
 def style(texte, style):
     """printe un «texte» formaté selon le «style»"""
     print('\033[%sm%s\033[0m' % (style,texte))

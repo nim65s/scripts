@@ -7,24 +7,29 @@ import os, sys, re, time, shelve, datetime
 import feedparser, urllib, webbrowser, pprint
 from BeautifulSoup import BeautifulSoup
 
+from couleurs import *
+
 reset=False
 sleep=0
+date_shelve = False
 
 try:
     date = shelve.open(os.path.expanduser('~/.js_shelve'), writeback=True)
+    date_shelve = True
 except:
+    print('Ratage de l’ouverture du shelve')
     date = {}
 
 site = 'japanshin'
-scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Claymore']
+scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Claymore', 'Metallica Metalluca']
 
-r = '^' + scans[0]
+r = scans[0]
 for scan in scans[1:]:
-    r = r + '|^' + scan
+    r = r + '|' + scan
 
 series = {
-        're': re.compile(r,re.I),
-        'titles': [(scan,re.compile(scan.replace(' ','*'),re.I)) for scan in scans]
+        're': re.compile(r.replace(' ','.?'),re.I),
+        'titles': [(scan,re.compile(scan.replace(' ','.?'),re.I)) for scan in scans]
         }
 
 url_rss = 'http://www.japan-shin.com/lectureenligne/reader/feeds/rss/'
@@ -38,14 +43,17 @@ def run(reset=False):
         date[site] = time.gmtime(0)
 
     feed = feedparser.parse(url_rss)
+    if feed['bozo']:
+        rouge(u'Téléchargement raté')
+        return
 
     nouvelles_entrees = False
     try:
-        nouvelle_entrees = date[site] < feed['entries'][0]['published_parsed']
+        nouvelles_entrees = date[site] < feed['entries'][0]['published_parsed']
     except IndexError:
-        print('\033[1;31m<DEBUG>\033[0m')
+        rouge('<DEBUG>')
         pprint.PrettyPrinter(indent=4).pprint(feed)
-        print('\033[1;31m</DEBUG>\033[0m')
+        rouge('</DEBUG>')
 
     if nouvelles_entrees:
         print(datetime.datetime.now())
@@ -57,18 +65,21 @@ def run(reset=False):
                 print('FAIL')
             if date[site] < entrie['published_parsed']:
                 if series['re'].search(entrie['title']):
-                    print(entrie['title'], '…')
-                    url_lel = entrie['links'][0]['href']
-                    url_dl = re.sub(r'/read/','/download/', url_lel)
-                    webbrowser.open(url_dl)
+                    if date_shelve:
+                        print(entrie['title'], '…')
+                        url_lel = entrie['links'][0]['href']
+                        url_dl = re.sub(r'/read/','/download/', url_lel)
+                        webbrowser.open(url_dl)
+                    else:
+                        print
                     
                 else:
                     print('- %s' % entrie['title'])
             elif date[site] == entrie['published_parsed']:
-                print('\033[1;32mrevenu à la dernière entrée sauvegardé sur %s.\033[0m' % site)
+                vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
                 break
             else:
-                print('ATTENTION il manque probablement des trucs sur %s !' % site)
+                rouge('ATTENTION il manque probablement des trucs sur %s !' % site)
                 break
         date[site] = feed['entries'][0]['published_parsed']
     else:
@@ -97,4 +108,5 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             pass
 
-date.close()
+if date_shelve:
+    date.close()

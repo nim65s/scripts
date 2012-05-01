@@ -30,6 +30,10 @@ MP = ['presents','manquants']
 AL = ['lus','a_lire']
  
 class SerieProperty(object):
+    """ Classe remplançant la fonction buildin «property»,
+    histoire d’éviter la duplication de code.
+    Largement copié collé de http://stackoverflow.com/questions/1380566/can-i-add-parameters-to-a-python-property-to-reduce-code-duplication
+    TODO: le setter marchp pas du tout, le reste du programme appelle directement _setter c’est dégueu :/""" 
     def __init__(self, tc, mp, al):
         self.tc = tc
         self.mp = mp
@@ -43,6 +47,7 @@ class SerieProperty(object):
         Serie._setter(obj, val, 0, self.tc, self.mp, self.al)
     
 class SerieException(Exception):
+    """Une exception sans grandes prétentions, si ce n’est d’être exceptionnelle"""
     def __init__(self, message):
         self.message = message
 
@@ -50,6 +55,8 @@ class SerieException(Exception):
         return self.message
 
 class Serie:
+    """classe «bibliothèque» contenant les infos sur les séries: tomes et chapitres,
+    lus et non lus, présents et manquants"""
     chapitres                  = SerieProperty('chapitres','presents' ,'lus'   )
     tomes                      = SerieProperty('tomes',    'presents' ,'lus'   )
     chapitres_manquants        = SerieProperty('chapitres','manquants','lus'   )
@@ -62,6 +69,9 @@ class Serie:
     chapitres_et_tomes_a_lire  = SerieProperty('chapitres_et_tomes','presents','a_lire')
 
     def __init__(self, path, classer=False):
+        """Va chercher tous chapitres et tomes présents dans le répertoire SCAN_PATH/<serie>
+        Vérifie les chapitres manquants, et peut classer les chapitres dans les tomes pour des 
+        cas simples"""
         self.titre = ''
         if isdir(path):
             self.titre = basename(path)
@@ -103,6 +113,7 @@ class Serie:
         return self.titre
 
     def _setter(self, num_or_path, tome_num=0, tc='chapitres', mp='presents', al='lus'):
+        """Le setter universel des données de la série"""
         is_dir = False
         if not isinstance(num_or_path, int) and isdir(num_or_path):
             is_dir = True
@@ -128,16 +139,16 @@ class Serie:
         self._data[tc,mp,al].append(tc_num)
 
     def _getter(self, tc='chapitres', mp='presents', al='lus'):
+        """Le getter universel des données de la série"""
         if tc == 'chapitres':
             return [i for i,j in self._data[(tc,mp,al)]]
         if tc == 'chapitres_et_tomes':
             tc = 'chapitres'
         return self._data[(tc,mp,al)]
 
-    def SeriePropert(self, tc, mp, al):
-        return (_getter(tc=tc, mp=mp, al=al),_setter(tc=tc, mp=mp, al=al))
-    
     def check(self, al='lus'):
+        """Fonction qui vérifie les données de la série à la recherche de tomes ou de chapitres manquants.
+        Peut être invoquée pour les scans lus (par défaut), ou ceux qui viennent d’être téléchargés (al='a_lire')"""
         ret = True
         for tc in TC:
             if self._data[(tc,'presents',al)]: 
@@ -184,6 +195,7 @@ class Serie:
         return ret
 
     def tome_du_chapitre(self, chapitre, al='lus'):
+        """Va chercher le tome correspondant au chapitre, lu ou non, s’il est connu"""
         for i,j in self._data[('chapitres','presents',al)]:
             if i == chapitre:
                 return j
@@ -193,6 +205,7 @@ class Serie:
         raise ValueError('Le chapitre %s n’est même pas présent dans la liste des chapitres %s manquants…. Faut lancer Serie.check() !' % (chapitre, al.replace('a_','à ')))
 
     def deduire_tome(self, chapitre):
+        """Trouve le tome d’un chapitre, (lu…) dans les cas simples"""
         p = chapitre # chapitre précédent
         n = chapitre # chapitre suivant
         tp = 0 # tome du chapitre précédent 
@@ -213,6 +226,8 @@ class Serie:
             return 0
 
     def classer(self):
+        """Cherche d’éventuels tomes déduis et s’il en trouve, déplace les chapitres orphelins dans ces tomes déduis
+        ATTENTION: C’est long !"""
         for i,j in self.chapitres_et_tomes:
             if j == 0:
                 k = self.deduire_tome(i)
@@ -229,6 +244,20 @@ class Serie:
                         rouge('%s n’est pas un répertoire source' % src)
 
     def check_preparation(self):
+        """Fonction similaire à l’__init__, mais pour des données pas encore lues"""
+        for dossier in os.listdir(join(LECT_PATH,self.titre)):
+            if isdir(join(LECT_PATH, self.titre, dossier)) and dossier != 'HS':
+                if TOME_RE.search(dossier):
+                    self._setter(join(LECT_PATH, self.titre, dossier), tc='tomes', mp='presents', al='a_lire')
+                else:
+                    self._setter(join(LECT_PATH, self.titre, dossier), tc='chapitres', mp='presents', al='a_lire')
+
+        self.check(al='a_lire')
+
+        for tc in TC:
+            for mp in MP:
+                self._data[(tc,mp,'a_lire')] = []
+
         for dossier in os.listdir(join(LECT_PATH,self.titre)):
             if isdir(join(LECT_PATH, self.titre, dossier)) and dossier != 'HS':
                 if TOME_RE.search(dossier):
@@ -250,12 +279,8 @@ class Serie:
         if self._data[('chapitres','manquants','a_lire')]:
             self._data[('chapitres','manquants','a_lire')].sort()
 
-    def clear_preparation(self):
-        for tc in TC:
-            for mp in MP:
-                self._data[(tc,mp,'a_lire')] = []
-
 class Chapitre:
+    """classe des informations trouvées sur les fichiers qui viennent d’être téléchargés"""
     def __init__(self, fichier, SERIES):
         self.serie = ''
         self.tome = 0
@@ -301,6 +326,7 @@ class Chapitre:
             return 'Chapitre n°%s de %s.' % (self.chapitre, self.serie)
 
 def trouver_series():
+    """Fonction qui lance bêtement tous les __init__ nécessaires de Serie et donnes des infos à ce propos"""
     for dossier in SCANS:
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier] = Serie(join(SCAN_PATH,dossier), classer=True)
@@ -313,6 +339,7 @@ def trouver_series():
 
 
 def traiter_dl():
+    """Fonction qui regarde les fichiers dans DL_PATH à la recherche de nouveaux chapitres"""
     doublon_re = re.compile(' \(\d\)')
     fichiers = os.listdir(DL_PATH)
     for fichier in fichiers:
@@ -332,6 +359,7 @@ def traiter_dl():
             rouge('Rien à voir : ' + fichier)
 
 def nettoyer(path):
+    """Fonction qui enlève les fichiers et dossiers inutiles récursivement dans path"""
     for dirpath, dirnames, filenames in os.walk(path):
         for useless_dir in USELESS_DIRS:
             if useless_dir in dirnames:
@@ -347,6 +375,7 @@ def nettoyer(path):
             os.removedirs(dirpath)
 
 def preparer_chapitres():
+    """Fonction qui prépare les chapitrse trouvés par traiter_dl à la lecture"""
     for c in CHAPITRES_TELECHARGES:
         path = ''
         if c.tome == 0:
@@ -406,6 +435,7 @@ def preparer_chapitres():
     nettoyer(DL_PATH)
 
 def check_preparation():
+    """Fonction qui vérifie que les chapitres prêts pour la lecture sont bons"""
     for dossier in os.listdir(LECT_PATH):
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier].check_preparation()

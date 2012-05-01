@@ -44,7 +44,7 @@ def run(reset=False):
 
     feed = feedparser.parse(url_rss)
     if feed['bozo']:
-        rouge(u'Bozo')
+        sys.stdout.write('b')
         return
 
     nouvelles_entrees = False

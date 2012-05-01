@@ -228,20 +228,39 @@ class Serie:
     def classer(self):
         """Cherche d’éventuels tomes déduis et s’il en trouve, déplace les chapitres orphelins dans ces tomes déduis
         ATTENTION: C’est long !"""
-        for i,j in self.chapitres_et_tomes:
-            if j == 0:
-                k = self.deduire_tome(i)
-                if k > 0:
-                    src = join(SCAN_PATH,self.titre, str(i))
-                    if isdir(src):
-                        dst = join(SCAN_PATH,self.titre, 'Tome ' + str(k))
-                        if isdir(dst):
-                            jaune(src+' va dans '+dst)
-                            shutil.move(src, dst)
-                        else:
-                            rouge('%s n’est pas un répertoire de destination' % dst)
-                    else:
-                        rouge('%s n’est pas un répertoire source' % src)
+        tomes = [j for i,j in self.chapitres_et_tomes]
+        if tomes:
+            if min(tomes) == max(tomes):
+                if min(tomes) != 0:
+                    k = min(tomes)
+                    for i,j in self.chapitres_et_tomes:
+                        if j == 0:
+                            src = join(SCAN_PATH,self.titre, str(i))
+                            if isdir(src):
+                                dst = join(SCAN_PATH,self.titre, 'Tome ' + str(k))
+                                if isdir(dst):
+                                    jaune(src+' va dans '+dst)
+                                    shutil.move(src, dst)
+                                else:
+                                    rouge('%s n’est pas un répertoire de destination' % dst)
+                            else:
+                                rouge('%s n’est pas un répertoire source' % src)
+
+            else:
+                for i,j in self.chapitres_et_tomes:
+                    if j == 0:
+                        k = self.deduire_tome(i)
+                        if k > 0:
+                            src = join(SCAN_PATH,self.titre, str(i))
+                            if isdir(src):
+                                dst = join(SCAN_PATH,self.titre, 'Tome ' + str(k))
+                                if isdir(dst):
+                                    jaune(src+' va dans '+dst)
+                                    shutil.move(src, dst)
+                                else:
+                                    rouge('%s n’est pas un répertoire de destination' % dst)
+                            else:
+                                rouge('%s n’est pas un répertoire source' % src)
 
     def check_preparation(self):
         """Fonction similaire à l’__init__, mais pour des données pas encore lues"""
@@ -325,11 +344,11 @@ class Chapitre:
         else:
             return 'Chapitre n°%s de %s.' % (self.chapitre, self.serie)
 
-def trouver_series():
+def trouver_series(classer=False):
     """Fonction qui lance bêtement tous les __init__ nécessaires de Serie et donnes des infos à ce propos"""
     for dossier in SCANS:
         sys.stdout.write('\n • ' + dossier + ' ')
-        SERIES[dossier] = Serie(join(SCAN_PATH,dossier), classer=True)
+        SERIES[dossier] = Serie(join(SCAN_PATH,dossier), classer)
         if SERIES[dossier].tomes_manquants:
             rouge('Tomes manquants:')
             print SERIES[dossier].tomes_manquants
@@ -451,7 +470,7 @@ def check_preparation():
 
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
-    trouver_series()
+    trouver_series(classer=True)
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print

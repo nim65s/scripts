@@ -1,160 +1,197 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-import os, re, sys, shutil, filecmp, zipfile, rarfile
+import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint
 from os.path import expanduser, join, basename, isdir, splitext, exists
 from couleurs import *
 
-tome_re = re.compile('Tome ', re.I)
-badarch = re.compile('\.\./|^/')
+TOME_RE = re.compile('Tome ', re.I)
+BADARCH = re.compile('\.\./|^/')
 
-PATH = expanduser('~/Scans')
 DL_PATH = expanduser('~/Telechargements')
+SCAN_PATH = expanduser('~/Scans')
 LECT_PATH = expanduser('~/Lecture')
 
 USELESS_FILES = ['.directory','Thumbs.db','._.BridgeSort','._.DS_Store']
 USELESS_DIRS = ['__MACOSX']
 
-scans = os.listdir(PATH)
+SCANS = os.listdir(SCAN_PATH)
 
-r = scans[0]
-for scan in scans[1:]:
+r = SCANS[0]
+for scan in SCANS[1:]:
     r = r + '|' + scan
 
-series = {}
-series_re = re.compile(r.replace(' ','.?'),re.I)
-chapitres_telecharges = []
+SERIES = {}
+SERIES_RE = re.compile(r.replace(' ','.?'),re.I)
+CHAPITRES_TELECHARGES = []
+
+TC = ['chapitres','tomes']
+MP = ['presents','manquants']
+AL = ['lus','a_lire']
+ 
+class SerieProperty(object):
+    def __init__(self, tc, mp, al):
+        self.tc = tc
+        self.mp = mp
+        self.al = al
+
+    def __get__(self, obj, objtype):
+        return Serie._getter(obj, self.tc, self.mp, self.al)
+
+    def __set__(self, obj, val):
+        print 'TATA'
+        Serie._setter(obj, val, 0, self.tc, self.mp, self.al)
+    
+class SerieException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 class Serie:
-    def __init__(self, titre, classer=False):
-        self.titre = ''
-        if isdir(titre):
-            self.titre = basename(titre)
-        else:
-            self.titre = titre
-            titre = join(PATH,titre)
-        self.re = re.compile(titre.replace(' ','.?'),re.I)
-        self._tomes = []
-        self._chapitres = []
-        self._tomes_manquants = []
-        self._chapitres_manquants = []
-        self.re = re.compile(self.titre.replace(' ','.?'),re.I)
+    chapitres                  = SerieProperty('chapitres','presents' ,'lus'   )
+    tomes                      = SerieProperty('tomes',    'presents' ,'lus'   )
+    chapitres_manquants        = SerieProperty('chapitres','manquants','lus'   )
+    tomes_manquants            = SerieProperty('tomes',    'manquants','lus'   )
+    chapitres_a_lire           = SerieProperty('chapitres','presents' ,'a_lire')
+    tomes_a_lire               = SerieProperty('tomes',    'presents' ,'a_lire')
+    chapitres_manquants_a_lire = SerieProperty('chapitres','manquants','a_lire')
+    tomes_manquants_a_lire     = SerieProperty('tomes',    'manquants','a_lire')
+    chapitres_et_tomes         = SerieProperty('chapitres_et_tomes','presents','lus')
+    chapitres_et_tomes_a_lire  = SerieProperty('chapitres_et_tomes','presents','a_lire')
 
-        for dossier in os.listdir(titre):
-            if isdir(join(titre,dossier)) and dossier != 'HS':
-                if tome_re.search(dossier):
-                    Serie._set_tomes(self, join(titre, dossier))
+    def __init__(self, path, classer=False):
+        self.titre = ''
+        if isdir(path):
+            self.titre = basename(path)
+        else:
+            self.titre = path
+            path = join(SCAN_PATH,path)
+        self.re = re.compile(self.titre.replace(' ','.?'),re.I)
+        self._data = {}
+
+        for tc in TC:
+            for mp in MP:
+                for al in AL:
+                    self._data[(tc,mp,al)] = []
+
+        for dossier in os.listdir(path):
+            if isdir(join(path,dossier)) and dossier != 'HS':
+                if TOME_RE.search(dossier):
+                    self._setter(join(path,dossier),tc='tomes')
                 else:
-                    Serie._set_chapitres(self, join(titre,dossier))
-            elif not isdir(join(titre,dossier)):
+                    self._setter(join(path,dossier))
+            elif not isdir(join(path,dossier)):
                 rouge('fichier: %s' % dossier)
 
-        if self._tomes:
-            self._tomes.sort()
-        if self._chapitres:
-            self._chapitres.sort()
+        if self._data[('tomes','presents','lus')]:
+            self._data[('tomes','presents','lus')].sort()
+        if self._data[('chapitres','presents','lus')]:
+            self._data[('chapitres','presents','lus')].sort()
 
         Serie.check(self)
+        if self._data[('tomes','manquants','lus')]:
+            self._data[('tomes','manquants','lus')].sort()
+        if self._data[('chapitres','manquants','lus')]:
+            self._data[('chapitres','manquants','lus')].sort()
+
         if classer:
-            Serie.classer(self)
+            Serie.classer(self) #TODO: le chap de naruto a classe…
 
     def __repr__(self):
         return self.titre
 
-    def _set_chapitres(self, chapitre, tome=0):
-        is_dir = isdir(chapitre)
-        if not is_dir and isinstance(chapitre, int):
-            raise TypeError('chapitre doit être un dossier ou un entier')
-        elif is_dir:
-            chapitre_number = int(re.findall(r'\d+',basename(chapitre))[0])
-        if chapitre_number in self.chapitres:
-            rouge('TODO: chapitre en trop : %s' % (chapitre))
+    def _setter(self, num_or_path, tome_num=0, tc='chapitres', mp='presents', al='lus'):
+        is_dir = False
+        if not isinstance(num_or_path, int) and isdir(num_or_path):
+            is_dir = True
+        elif not isinstance(num_or_path, int):
+            raise TypeError('le %s «%s» doit être un dossier ou un entier' % (tc.replace('s',''), num_or_path))
+        tc_num = 0
+        if is_dir:
+            tc_num = int(re.findall(r'\d+',basename(num_or_path))[0])
         else:
-            self._chapitres.append((chapitre_number,tome))
-
-    def _get_chapitres(self):
-        return [i for i,j in self._chapitres]
-
-    chapitres = property(_get_chapitres, _set_chapitres)
-
-    def _set_chapitres_et_tomes(self, (chapitre, tome)):
-        Serie._set_chapitres(self, chapitre, tome)
-
-    def _get_chapitres_et_tomes(self):
-        return self._chapitres
-
-    chapitres_et_tomes = property(_get_chapitres_et_tomes, _set_chapitres_et_tomes)
-
-    def _set_tomes(self, tome):
-       is_dir = isdir(tome)
-       if not is_dir and isinstance(tome, int):
-           raise TypeError('tome doit être un dossier ou un entier')
-       elif is_dir:
-           tome_number = int(re.findall(r'\d+', basename(tome))[0])
-           for fichier in os.listdir(tome):
-               if isdir(join(tome,fichier)):
-                   Serie._set_chapitres(self, join(tome, fichier), tome_number)
-           tome = tome_number
-       if tome in self._tomes:
-           rouge('TODO: Tome en trop : %s/%s' % (self.titre, tome))
-       else:
-           self._tomes.append(tome)
-
-    def _get_tomes(self):
-        return self._tomes
-
-    tomes = property(_get_tomes, _set_tomes)
-
-    def _set_chapitres_manquants(self, chapitre):
-        if chapitre in self._chapitres_manquants:
-            rouge('TODO: Chapitre manquant en trop: %s' % chapitre)
+            tc_num = num_or_path
+        if tc == 'tomes':
+            if is_dir:
+                for dossier in os.listdir(num_or_path):
+                    if isdir(join(num_or_path, dossier)):
+                        self._setter(join(num_or_path, dossier), tc_num, al=al)
+            if tc_num in self._data[(tc,mp,al)]:
+                raise SerieException('%s est déjà dans les %s %s %s' % (num_or_path,tc,mp,al.replace('a_', 'à '))) 
         else:
-            self._chapitres_manquants.append(chapitre)
+            #TODO: on peut déduire le tome avec des regex \o/
+            if tc_num in [i for i,j in self._data[(tc,mp,al)]]:
+                raise SerieException('%s est déjà dans les %s %s %s' % (num_or_path,tc,mp,al.replace('a_', 'à '))) 
+            tc_num = (tc_num, tome_num)
+        self._data[tc,mp,al].append(tc_num)
 
-    def _get_chapitres_manquants(self):
-        return self._chapitres_manquants
+    def _getter(self, tc='chapitres', mp='presents', al='lus'):
+        if tc == 'chapitres':
+            return [i for i,j in self._data[(tc,mp,al)]]
+        if tc == 'chapitres_et_tomes':
+            tc = 'chapitres'
+        return self._data[(tc,mp,al)]
 
-    chapitres_manquants = property(_get_chapitres_manquants, _set_chapitres_manquants)
-
-    def _set_tomes_manquants(self, tome):
-        if tome in self._tomes_manquants:
-            rouge('TODO: Tome manquant en trop: %s' % tome)
+    def SeriePropert(self, tc, mp, al):
+        return (_getter(tc=tc, mp=mp, al=al),_setter(tc=tc, mp=mp, al=al))
+    
+    def check(self, al='lus'):
+        ret = True
+        for tc in TC:
+            if self._data[(tc,'presents',al)]: 
+                presents = self._getter(tc,'presents',al)
+                if al == 'a_lire':
+                    presents = presents + self._getter(tc,'presents','lus')
+                min_tc = min(presents)
+                max_tc = max(presents)
+                length = len(presents)
+                if length != (max_tc-min_tc+1):
+                    ret = False
+                    rouge('Il manque des %s %s dans %s' % (tc,al.replace('a_','à '),self.titre))
+                    for i in range(min_tc, max_tc):
+                        if not i in presents:
+                            self._setter(i, tc=tc,mp='manquants',al=al)
+        if al == 'a_lire':
+            for chapitre_a_lire in self.chapitres_a_lire:
+                if chapitre_a_lire in self.chapitres:
+                    tome_du_chapitre_a_lire = self.tome_du_chapitre(chapitre_a_lire, 'a_lire')
+                    if  tome_du_chapitre_a_lire != 0 and tome_du_chapitre_a_lire != self.tome_du_chapitre(chapitre_a_lire, 'lus'):
+                        jaune('Tome du chapitre lu %s de %s Trouvé (%s)! Déplacement du «lu» et suppression du «à lire»' % (chapitre_a_lire, self.titre, tome_du_chapitre_a_lire))
+                        src = join(SCAN_PATH, self.titre, str(chapitre_a_lire))
+                        dst = join(SCAN_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire)
+                        sup = join(LECT_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire, str(chapitre_a_lire))
+                        if exists(src) and exists(sup):
+                            shutil.move(src,dst)
+                            shutil.rmtree(sup)
+                        else:
+                            rouge('Ou pas: «%s» ou «%s» n’existe pas' % (src, sup))
+                    else:
+                        jaune('Le chapitre à lire %s de %s est déjà lu… Suppression du «à lire» !' % (chapitre_a_lire, self.titre))
+                        path = ''
+                        if tome_du_chapitre_a_lire == 0:
+                            path = join(LECT_PATH, self.titre, str(chapitre_a_lire))
+                        else:
+                            path = join(LECT_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire, str(chapitre_a_lire))
+                        if exists(path):
+                            shutil.rmtree(path)
+                        else:
+                            rouge('Ou pas: %s n’est pas un répertoire :(' % path)
+        if ret:
+            vert('Checked !')
         else:
-            self._tomes_manquants.append(tome)
+            rouge('Check failed…')
+        return ret
 
-    def _get_tomes_manquants(self):
-        return self._tomes_manquants
-
-    tomes_manquants = property(_get_tomes_manquants, _set_tomes_manquants)
-
-
-    def check(self):
-        if self._tomes: 
-            min_tomes = min(self.tomes)
-            max_tomes = max(self.tomes)
-            if len(self._tomes) != max_tomes-min_tomes+1:
-                for i in range(min_tomes, max_tomes):
-                    if not i in self._tomes:
-                        Serie._set_tomes_manquants(self, i)
-                return False
-        if self._chapitres:
-            min_chapitres = min(self.chapitres)
-            max_chapitres = max(self.chapitres)
-            if len(self._chapitres) != max_chapitres-min_chapitres+1:
-                for i in range(min_chapitres, max_chapitres):
-                    if not i in self.chapitres:
-                        Serie._set_chapitres_manquants(self, i)
-                return False
-        vert('Checked')
-        return True
-
-    def tome_du_chapitre(self, chapitre):
-        if chapitre in self.chapitres:
-            for i,j in self.chapitres_et_tomes:
-                if i == chapitre:
-                    return j
-        else:
-            raise ValueError('Ce chapitre n’est pas présent.')
+    def tome_du_chapitre(self, chapitre, al='lus'):
+        for i,j in self._data[('chapitres','presents',al)]:
+            if i == chapitre:
+                return j
+        for i,j in self._data[('chapitres','manquants',al)]:
+            if i == chapitre:
+                raise ValueError('Le chapitre %s est présent dans la liste des chapitres %s manquants….' % (chapitre, al.replace('a_','à ')))
+        raise ValueError('Le chapitre %s n’est même pas présent dans la liste des chapitres %s manquants…. Faut lancer Serie.check() !' % (chapitre, al.replace('a_','à ')))
 
     def deduire_tome(self, chapitre):
         p = chapitre # chapitre précédent
@@ -181,9 +218,9 @@ class Serie:
             if j == 0:
                 k = self.deduire_tome(i)
                 if k > 0:
-                    src = join(expanduser('~/Scans'),self.titre, str(i))
+                    src = join(expanduser('~/SCANS'),self.titre, str(i))
                     if isdir(src):
-                        dst = join(expanduser('~/Scans'),self.titre, 'Tome ' + str(k))
+                        dst = join(expanduser('~/SCANS'),self.titre, 'Tome ' + str(k))
                         if isdir(dst):
                             jaune(src+' va dans '+dst)
                             shutil.move(src, dst)
@@ -192,8 +229,35 @@ class Serie:
                     else:
                         rouge('%s n’est pas un répertoire source' % dst)
 
+    def check_preparation(self):
+        for dossier in os.listdir(join(LECT_PATH,self.titre)):
+            if isdir(join(LECT_PATH, self.titre, dossier)) and dossier != 'HS':
+                if TOME_RE.search(dossier):
+                    self._setter(join(LECT_PATH, self.titre, dossier), tc='tomes', mp='presents', al='a_lire')
+                else:
+                    self._setter(join(LECT_PATH, self.titre, dossier), tc='chapitres', mp='presents', al='a_lire')
+            elif not isdir(join(LECT_PATH,dossier)):
+                rouge('fichier: %s' % dossier)
+
+        if self._data[('tomes','presents','a_lire')]:
+            self._data[('tomes','presents','a_lire')].sort()
+        if self._data[('chapitres','presents','a_lire')]:
+            self._data[('chapitres','presents','a_lire')].sort()
+
+        self.check(al='a_lire')
+
+        if self._data[('tomes','manquants','a_lire')]:
+            self._data[('tomes','manquants','a_lire')].sort()
+        if self._data[('chapitres','manquants','a_lire')]:
+            self._data[('chapitres','manquants','a_lire')].sort()
+
+    def clear_preparation(self):
+        for tc in TC:
+            for mp in MP:
+                self._data[(tc,mp,'a_lire')] = []
+
 class Chapitre:
-    def __init__(self, fichier, series):
+    def __init__(self, fichier, SERIES):
         self.serie = ''
         self.tome = 0
         self.chapitre = 0
@@ -201,9 +265,9 @@ class Chapitre:
         self.is_rar = False
         self.dossier = False
         self.path = ''
-        for s in series:
-            if series[s].re.search(fichier):
-                self.serie = series[s]
+        for s in SERIES:
+            if SERIES[s].re.search(fichier):
+                self.serie = SERIES[s]
                 fichier_path = join(DL_PATH, fichier)
                 self.path = fichier_path
                 if isdir(fichier_path):
@@ -228,7 +292,7 @@ class Chapitre:
                     self.chapitre = chapitres[0]
                 else:
                     raise ValueError('Parsage de chapitre raté dans %s' % fichier)
-                if self.chapitre in series[s].chapitres:
+                if self.chapitre in SERIES[s].chapitres:
                     rouge('Ce chapitre a déjà été lu : ' + self.__repr__()) 
 
     def __repr__(self):
@@ -238,22 +302,29 @@ class Chapitre:
             return 'Chapitre n°%s de %s.' % (self.chapitre, self.serie)
 
 def trouver_series():
-    for dossier in scans:
-        sys.stdout.write(' • ' + dossier + ' ')
-        series[dossier] = Serie(join(PATH,dossier))
-        if series[dossier].tomes_manquants:
+    for dossier in SCANS:
+        sys.stdout.write('\n • ' + dossier + ' ')
+        SERIES[dossier] = Serie(join(SCAN_PATH,dossier))
+        if SERIES[dossier].tomes:
+            sys.stdout.write('\tTomes: ')
+            print SERIES[dossier].tomes
+        if SERIES[dossier].chapitres:
+            sys.stdout.write('\tChapitres: ')
+            print SERIES[dossier].chapitres
+        if SERIES[dossier].tomes_manquants:
             rouge('Tomes manquants:')
-            print series[dossier].tomes_manquants
-        if series[dossier].chapitres_manquants:
+            print SERIES[dossier].tomes_manquants
+        if SERIES[dossier].chapitres_manquants:
             rouge('Chapitres manquants:')
-            print series[dossier].chapitres_manquants
+            print SERIES[dossier].chapitres_manquants
+        #pprint.PrettyPrinter(indent=4).pprint(SERIES[dossier]._data)
 
 
 def traiter_dl():
     doublon_re = re.compile(' \(\d\)')
     fichiers = os.listdir(DL_PATH)
     for fichier in fichiers:
-        if series_re.search(fichier):
+        if SERIES_RE.search(fichier):
             est_unique = True
             if doublon_re.search(fichier):
                 doublon = join(DL_PATH, fichier)
@@ -264,7 +335,7 @@ def traiter_dl():
                         jaune(fichier + ' est un doublon, on le supprime')
                         os.remove(doublon)
             if est_unique:
-                chapitres_telecharges.append(Chapitre(fichier, series))
+                CHAPITRES_TELECHARGES.append(Chapitre(fichier, SERIES))
         else:
             rouge('Rien à voir : ' + fichier)
 
@@ -284,7 +355,7 @@ def nettoyer(path):
             os.removedirs(dirpath)
 
 def preparer_chapitres():
-    for c in chapitres_telecharges:
+    for c in CHAPITRES_TELECHARGES:
         path = ''
         if c.tome == 0:
             path = join(LECT_PATH,c.serie.titre,c.chapitre)
@@ -299,7 +370,7 @@ def preparer_chapitres():
                 rouge('Zip corrompu: ' + path)
             fichiers = z.namelist()
             for fichier in fichiers:
-                if badarch.search(fichier):
+                if BADARCH.search(fichier):
                     rouge('Zip vicieu: ' + fichier)
                     extract = False
             if extract:
@@ -319,7 +390,7 @@ def preparer_chapitres():
                 rouge('Rar corrompu: ' + path)
             fichiers = z.namelist()
             for fichier in fichiers:
-                if badarch.search(fichier):
+                if BADARCH.search(fichier):
                     extract = False
                     rouge('Rar vicieu: ' + fichier)
             if extract:
@@ -338,15 +409,45 @@ def preparer_chapitres():
             shutil.rmtree(c.path)
         else:
             rouge('FAIL')
-        vert(' • ' + c.__repr__() + ' traité')
+        vert(' • Traité: ' + c.__repr__())
     nettoyer(LECT_PATH)
     nettoyer(DL_PATH)
 
+def check_preparation():
+    for dossier in os.listdir(LECT_PATH):
+        sys.stdout.write('\n • ' + dossier + ' ')
+        SERIES[dossier].check_preparation()
+        SERIES[dossier].clear_preparation()
+        SERIES[dossier].check_preparation()
+        if SERIES[dossier].tomes_a_lire:
+            sys.stdout.write('\tTomes à lire: ')
+            print SERIES[dossier].tomes_a_lire
+        if SERIES[dossier].chapitres_a_lire:
+            sys.stdout.write('\tChapitres à lire: ')
+            print SERIES[dossier].chapitres_a_lire
+        if SERIES[dossier].tomes_manquants_a_lire:
+            rouge('Tomes manquants à lire:')
+            print SERIES[dossier].tomes_manquants_a_lire
+        if SERIES[dossier].chapitres_manquants_a_lire:
+            rouge('Chapitres manquants à lire:')
+            print SERIES[dossier].chapitres_manquants_a_lire
+            jaune('\tDernier chapitre présent lu de %s: %s' % (dossier, SERIES[dossier].chapitres[-1]))
+        #pprint.PrettyPrinter(indent=4).pprint(SERIES[dossier]._data)
+
 if __name__ == '__main__':
+    print
+    jaune('='*80)
+    print
     trouver_series()
+    print
     jaune('='*80)
     print
     traiter_dl()
+    print
     jaune('='*80)
     print
     preparer_chapitres()
+    print
+    jaune('='*80)
+    print
+    check_preparation()

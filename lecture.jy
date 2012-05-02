@@ -94,6 +94,7 @@ class Serie:
             path = join(SCAN_PATH,path)
         self.re = re.compile(self.titre.replace(' ','.?'),re.I)
         self._data = {}
+        self.lecture_ready = False
 
         for tc in TC:
             for mp in MP:
@@ -472,22 +473,31 @@ def check_preparation():
     for dossier in os.listdir(LECT_PATH):
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier].check_preparation()
-        if SERIES[dossier].tomes_manquants_a_lire:
+        SERIES[dossier].lecture_ready = True
+        if SERIES[dossier].tomes_manquants_a_lire and SERIES[dossier].tomes_manquants_a_lire[-1] > SERIES[dossier].tomes[-1]:
             rouge('Tomes manquants à lire:')
             print SERIES[dossier].tomes_manquants_a_lire
-        if SERIES[dossier].chapitres_manquants_a_lire:
+            SERIES[dossier].lecture_ready = False
+        if SERIES[dossier].chapitres_manquants_a_lire and SERIES[dossier].chapitres_manquants_a_lire[-1] > SERIES[dossier].chapitres[-1]:
             rouge('Chapitres manquants à lire:')
             print SERIES[dossier].chapitres_manquants_a_lire
             jaune('\tDernier chapitre présent lu de %s: %s' % (dossier, SERIES[dossier].chapitres[-1]))
+            SERIES[dossier].lecture_ready = False
 
-def telecharger_missing():
+def telecharger_missing(bloquants_only=True):
     """ Télécharge automatiquement les chapitres qui manquent """
     for s in SERIES:
         if s in JS.keys():
             titre = SERIES[s].titre
             titre = titre.lower()
             titre = titre.replace(' ','_')
-            for c,t in SERIES[s].chapitres_et_tomes_manquants + SERIES[s].chapitres_et_tomes_manquants_a_lire:
+            chapitres_et_tomes_manquants = SERIES[s].chapitres_et_tomes_manquants + SERIES[s].chapitres_et_tomes_manquants_a_lire
+            if bloquants_only:
+                dernier_lu = SERIES[s].chapitres[-1]
+                for i,j in chapitres_et_tomes_manquants:
+                    if i < dernier_lu:
+                        chapitres_et_tomes_manquants.remove((i,j))
+            for c,t in chapitres_et_tomes_manquants:
                 if not JS[s]:
                     webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>','0').replace('<chapitre>',str(c)))
                     time.sleep(5)
@@ -498,7 +508,7 @@ def telecharger_missing():
 
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
-    trouver_series(classer=True)
+    trouver_series(classer=False)
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print
@@ -518,4 +528,4 @@ if __name__ == '__main__':
     print
     jaune('−'*24 + ' Téléchargement des manquants… ' + '−'*25)
     print
-    #telecharger_missing()
+    telecharger_missing(bloquants_only=True)

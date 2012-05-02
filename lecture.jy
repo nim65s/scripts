@@ -161,7 +161,7 @@ class Serie:
             tc = 'chapitres'
         return self._data[(tc,mp,al)]
 
-    def check(self, al='lus'):
+    def check(self, al='lus', affichage=True):
         """Fonction qui vérifie les données de la série à la recherche de tomes ou de chapitres manquants.
         Peut être invoquée pour les scans lus (par défaut), ou ceux qui viennent d’être téléchargés (al='a_lire')"""
         ret = True
@@ -203,10 +203,11 @@ class Serie:
                             shutil.rmtree(path)
                         else:
                             rouge('Ou pas: %s n’est pas un répertoire :(' % path)
-        if ret:
-            vert('Checked !')
-        else:
-            rouge('Check failed…')
+        if affichage:
+            if ret:
+                vert('Checked !')
+            else:
+                rouge('Check failed…')
         return ret
 
     def tome_du_chapitre(self, chapitre, al='lus'):
@@ -306,7 +307,7 @@ class Serie:
         if self._data[('chapitres','presents','a_lire')]:
             self._data[('chapitres','presents','a_lire')].sort()
 
-        self.check(al='a_lire')
+        self.check(al='a_lire', affichage=False)
 
         if self._data[('tomes','manquants','a_lire')]:
             self._data[('tomes','manquants','a_lire')].sort()
@@ -493,10 +494,12 @@ def telecharger_missing(bloquants_only=True):
             titre = titre.replace(' ','_')
             chapitres_et_tomes_manquants = SERIES[s].chapitres_et_tomes_manquants + SERIES[s].chapitres_et_tomes_manquants_a_lire
             if bloquants_only:
+                c = []
                 dernier_lu = SERIES[s].chapitres[-1]
-                for i,j in chapitres_et_tomes_manquants:
-                    if i < dernier_lu:
-                        chapitres_et_tomes_manquants.remove((i,j))
+                for i in chapitres_et_tomes_manquants:
+                    if i[0] > dernier_lu:
+                        c.append(i)
+                chapitres_et_tomes_manquants = c
             for c,t in chapitres_et_tomes_manquants:
                 if not JS[s]:
                     webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>','0').replace('<chapitre>',str(c)))

@@ -172,7 +172,7 @@ class Serie:
                 min_tc = min(presents)
                 max_tc = max(presents)
                 length = len(presents)
-                if length != (max_tc-min_tc+1):
+                if length < (max_tc-min_tc+1):
                     ret = False
                     for i in range(min_tc, max_tc):
                         if not i in presents:
@@ -442,7 +442,7 @@ def preparer_chapitres():
             if r.testrar():
                 extract = False
                 rouge('Rar corrompu: ' + path)
-            fichiers = z.namelist()
+            fichiers = r.namelist()
             for fichier in fichiers:
                 if BADARCH.search(fichier):
                     extract = False
@@ -498,7 +498,7 @@ def telecharger_missing():
 
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
-    trouver_series(classer=False)
+    trouver_series(classer=True)
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print

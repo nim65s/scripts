@@ -360,17 +360,18 @@ class Chapitre:
         else:
             return 'Chapitre n°%s de %s.' % (self.chapitre, self.serie)
 
-def trouver_series(classer=False):
+def trouver_series(classer=False, affichage=False):
     """Fonction qui lance bêtement tous les __init__ nécessaires de Serie et donnes des infos à ce propos"""
     for dossier in SCANS:
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier] = Serie(join(SCAN_PATH,dossier), classer)
-        if SERIES[dossier].tomes_manquants:
-            rouge('Tomes manquants:')
-            print SERIES[dossier].tomes_manquants
-        if SERIES[dossier].chapitres_manquants:
-            rouge('Chapitres manquants:')
-            print SERIES[dossier].chapitres_manquants
+        if affichage:
+            if SERIES[dossier].tomes_manquants:
+                rouge('Tomes manquants:')
+                print SERIES[dossier].tomes_manquants
+            if SERIES[dossier].chapitres_manquants:
+                rouge('Chapitres manquants:')
+                print SERIES[dossier].chapitres_manquants
 
 
 def traiter_dl():
@@ -511,7 +512,7 @@ def telecharger_missing(bloquants_only=True):
 
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
-    trouver_series(classer=False)
+    trouver_series(classer=False, affichage=False)
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print

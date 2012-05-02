@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint
+import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint, time, webbrowser
 from os.path import expanduser, join, basename, isdir, splitext, exists
 from couleurs import *
 
@@ -28,6 +28,18 @@ CHAPITRES_TELECHARGES = []
 TC = ['chapitres','tomes']
 MP = ['presents','manquants']
 AL = ['lus','a_lire']
+
+JS = {
+    'Kenichi': True,
+    'One Piece': False,
+    'Naruto': False,
+    'Fairy Tail': False,
+    'Black Butler': False,
+    'Claymore': False,
+}
+
+JS_DOWN = 'http://www.japan-shin.com/lectureenligne/reader/download/<serie>/fr/<tome>/<chapitre>/'
+
  
 class SerieProperty(object):
     """ Classe remplançant la fonction buildin «property»,
@@ -57,16 +69,18 @@ class SerieException(Exception):
 class Serie:
     """classe «bibliothèque» contenant les infos sur les séries: tomes et chapitres,
     lus et non lus, présents et manquants"""
-    chapitres                  = SerieProperty('chapitres','presents' ,'lus'   )
-    tomes                      = SerieProperty('tomes',    'presents' ,'lus'   )
-    chapitres_manquants        = SerieProperty('chapitres','manquants','lus'   )
-    tomes_manquants            = SerieProperty('tomes',    'manquants','lus'   )
-    chapitres_a_lire           = SerieProperty('chapitres','presents' ,'a_lire')
-    tomes_a_lire               = SerieProperty('tomes',    'presents' ,'a_lire')
-    chapitres_manquants_a_lire = SerieProperty('chapitres','manquants','a_lire')
-    tomes_manquants_a_lire     = SerieProperty('tomes',    'manquants','a_lire')
-    chapitres_et_tomes         = SerieProperty('chapitres_et_tomes','presents','lus')
-    chapitres_et_tomes_a_lire  = SerieProperty('chapitres_et_tomes','presents','a_lire')
+    chapitres                            = SerieProperty('chapitres',         'presents', 'lus'   )
+    tomes                                = SerieProperty('tomes',             'presents', 'lus'   )
+    chapitres_manquants                  = SerieProperty('chapitres',         'manquants','lus'   )
+    tomes_manquants                      = SerieProperty('tomes',             'manquants','lus'   )
+    chapitres_a_lire                     = SerieProperty('chapitres',         'presents', 'a_lire')
+    tomes_a_lire                         = SerieProperty('tomes',             'presents', 'a_lire')
+    chapitres_manquants_a_lire           = SerieProperty('chapitres',         'manquants','a_lire')
+    tomes_manquants_a_lire               = SerieProperty('tomes',             'manquants','a_lire')
+    chapitres_et_tomes                   = SerieProperty('chapitres_et_tomes','presents', 'lus')
+    chapitres_et_tomes_a_lire            = SerieProperty('chapitres_et_tomes','presents', 'a_lire')
+    chapitres_et_tomes_manquants         = SerieProperty('chapitres_et_tomes','manquants','lus')
+    chapitres_et_tomes_manquants_a_lire  = SerieProperty('chapitres_et_tomes','manquants','a_lire')
 
     def __init__(self, path, classer=False):
         """Va chercher tous chapitres et tomes présents dans le répertoire SCAN_PATH/<serie>
@@ -170,7 +184,7 @@ class Serie:
                     if  tome_du_chapitre_a_lire != 0 and tome_du_chapitre_a_lire != self.tome_du_chapitre(chapitre_a_lire, 'lus'):
                         jaune('Tome du chapitre lu %s de %s Trouvé (%s)! Déplacement du «lu» et suppression du «à lire»' % (chapitre_a_lire, self.titre, tome_du_chapitre_a_lire))
                         src = join(SCAN_PATH, self.titre, str(chapitre_a_lire))
-                        dst = join(SCAN_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire)
+                        dst = join(SCAN_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire, str(chapitre_a_lire))#TODO: tester, je viens de rajouter chapitre_a_lire
                         sup = join(LECT_PATH, self.titre, 'Tome %s' % tome_du_chapitre_a_lire, str(chapitre_a_lire))
                         if exists(src) and exists(sup):
                             shutil.move(src,dst)
@@ -458,8 +472,6 @@ def check_preparation():
     for dossier in os.listdir(LECT_PATH):
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier].check_preparation()
-        SERIES[dossier].clear_preparation()
-        SERIES[dossier].check_preparation()
         if SERIES[dossier].tomes_manquants_a_lire:
             rouge('Tomes manquants à lire:')
             print SERIES[dossier].tomes_manquants_a_lire
@@ -468,9 +480,25 @@ def check_preparation():
             print SERIES[dossier].chapitres_manquants_a_lire
             jaune('\tDernier chapitre présent lu de %s: %s' % (dossier, SERIES[dossier].chapitres[-1]))
 
+def telecharger_missing():
+    """ Télécharge automatiquement les chapitres qui manquent """
+    for s in SERIES:
+        if s in JS.keys():
+            titre = SERIES[s].titre
+            titre = titre.lower()
+            titre = titre.replace(' ','_')
+            for c,t in SERIES[s].chapitres_et_tomes_manquants + SERIES[s].chapitres_et_tomes_manquants_a_lire:
+                if not JS[s]:
+                    webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>','0').replace('<chapitre>',str(c)))
+                    time.sleep(5)
+                elif t == 0:
+                    rouge('TODO')
+                else:
+                    rouge('TODO2')
+
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
-    trouver_series(classer=True)
+    trouver_series(classer=False)
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print
@@ -487,3 +515,7 @@ if __name__ == '__main__':
     if not isdir(LECT_PATH):
         os.mkdir(LECT_PATH)
     check_preparation()
+    print
+    jaune('−'*24 + ' Téléchargement des manquants… ' + '−'*25)
+    print
+    #telecharger_missing()

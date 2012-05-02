@@ -510,6 +510,22 @@ def telecharger_missing(bloquants_only=True):
                 else:
                     rouge('TODO2')
 
+def lecture():
+    """ La seule et véritable utilité de ce script est de LIRE \o/"""
+    path = ''
+    for s in os.listdir(LECT_PATH):
+        vert('\n • ' + s + ' ')
+        for c,t in SERIES[s].chapitres_et_tomes_a_lire:
+            if t == 0:
+                path=join(LECT_PATH,s,str(c))
+            else:
+                path=join(LECT_PATH,s,'Tome %s' % t,str(c))
+            print '\t', path
+            if isdir(path):
+                os.system("feh -FZrSname '%s'" % path)
+            else:
+                rouge('«%s» n’est pas un dossier oO' % path)
+
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
     trouver_series(classer=False, affichage=False)
@@ -533,3 +549,7 @@ if __name__ == '__main__':
     jaune('−'*24 + ' Téléchargement des manquants… ' + '−'*25)
     print
     telecharger_missing(bloquants_only=True)
+    print
+    jaune('−'*24 + ' Lecture… ' + '−'*46)
+    print
+    lecture()

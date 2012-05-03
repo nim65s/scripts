@@ -35,16 +35,13 @@ series = {
 url_rss = 'http://www.japan-shin.com/lectureenligne/reader/feeds/rss/'
 url_re = re.compile(r'http://www\.japan-shin\.com/lectureenligne/reader/read/(?P<serie_url>[a-z0-9_-]*)/fr/(?P<tome>[0-9]*)/(?P<chapt>[0-9]*)/')
 
-def checkChapters():
-    pass
-
 def run(reset=False):
     if reset:
         date[site] = time.gmtime(0)
 
     feed = feedparser.parse(url_rss)
     if feed['bozo']:
-        sys.stdout.write('b')
+        rouge('bozo')
         return
 
     nouvelles_entrees = False
@@ -65,14 +62,10 @@ def run(reset=False):
                 print('FAIL')
             if date[site] < entrie['published_parsed']:
                 if series['re'].search(entrie['title']):
-                    if date_shelve:
-                        print(entrie['title'], '…')
-                        url_lel = entrie['links'][0]['href']
-                        url_dl = re.sub(r'/read/','/download/', url_lel)
-                        webbrowser.open(url_dl)
-                    else:
-                        print
-                    
+                    print(entrie['title'], '…')
+                    url_lel = entrie['links'][0]['href']
+                    url_dl = re.sub(r'/read/','/download/', url_lel)
+                    webbrowser.open(url_dl)
                 else:
                     print('- %s' % entrie['title'])
             elif date[site] == entrie['published_parsed']:
@@ -82,31 +75,12 @@ def run(reset=False):
                 rouge('ATTENTION il manque probablement des trucs sur %s !' % site)
                 break
         date[site] = feed['entries'][0]['published_parsed']
-    else:
-        if sleep == 0:
-            print('rien')
-        else:
-            print('.', end='')
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        try:
-            sleep = int(sys.argv[1])
-            reset = False
-        except ValueError:
-            sleep = 0
-            reset = True
+    reset = False
     if not date.has_key(site):
         reset = True
-    if sleep == 0:
-        run(reset)
-    else:
-        try:
-            while 1:
-                run(reset)
-                time.sleep(sleep)
-        except KeyboardInterrupt:
-            pass
+    run(reset)
 
 if date_shelve:
     date.close()

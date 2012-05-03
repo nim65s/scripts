@@ -522,20 +522,18 @@ def lecture():
                 path=join(LECT_PATH,s,'Tome %s' % t,str(c))
             print '\t', path
             if isdir(path):
-                os.system("feh -FZrSname '%s'" % path)
+                os.system("feh -FZrSname --cycle-once '%s'" % path)
             else:
                 rouge('«%s» n’est pas un dossier oO' % path)
 
 def question(txt, default=True):
     txt += " [O/n] " if default else " [o/N] "
-    while True:
-        i = raw_input(txt).upper()
-        if i == '':
-            return default
-        if i == 'O':
-            return True
-        if i == 'N':
-            return False
+    i = raw_input(txt).upper()
+    if i == 'O':
+        return True
+    if i == 'N':
+        return False
+    return default
         
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)

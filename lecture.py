@@ -227,12 +227,12 @@ class Serie:
         tp = 0 # tome du chapitre précédent 
         tn = 0
         while p >= min(self.chapitres):
-            p = p-1
+            p -= 1
             if p in self.chapitres and Serie.tome_du_chapitre(self, p) != 0:
                 tp = Serie.tome_du_chapitre(self, p)
                 break
         while n <= max(self.chapitres):
-            n = n+1
+            n += 1
             if n in self.chapitres and Serie.tome_du_chapitre(self, n) != 0:
                 tn = Serie.tome_du_chapitre(self, n)
                 break
@@ -526,6 +526,17 @@ def lecture():
             else:
                 rouge('«%s» n’est pas un dossier oO' % path)
 
+def question(txt, default=True):
+    txt += " [O/n] " if default else " [o/N] "
+    while True:
+        i = raw_input(txt).upper()
+        if i == '':
+            return default
+        if i == 'O':
+            return True
+        if i == 'N':
+            return False
+        
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
     trouver_series(classer=False, affichage=False)

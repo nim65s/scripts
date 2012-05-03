@@ -1,0 +1,3 @@
+[submodule "vimpager"]
+	path = vimpager
+	url = ./vimpager

@@ -19,5 +19,3 @@ if not os.system("xset q|tail -n 1|grep -q 'On'"):
         fichier = open("%s/.9gag" % os.environ['HOME'], "w")
         fichier.write(last_gagtitle)
         fichier.close()
-else:
-    print 'absent'

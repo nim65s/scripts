@@ -1,9 +1,7 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 #-*- coding: utf-8 -*-
 
 """module pour colorer la sortie des consoles et apprendre à écrire des modules \o/"""
-
-from __future__ import print_function
 
 def rouge(texte):
     """printe un «texte» en rouge gras"""

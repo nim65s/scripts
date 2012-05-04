@@ -1,9 +1,9 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 #-*- coding: utf-8 -*-
 
 import os, webbrowser, feedparser
 
-if not os.system("xset q|tail -n 1|grep -q 'On'"):
+if os.system("xset q|tail -n 1|grep -q 'Off'"):
     try:
         fichier = open(os.path.expanduser("~/.9gag"), "r")
         old_gagtitle = fichier.read()
@@ -19,5 +19,3 @@ if not os.system("xset q|tail -n 1|grep -q 'On'"):
         fichier = open("%s/.9gag" % os.environ['HOME'], "w")
         fichier.write(last_gagtitle)
         fichier.close()
-else:
-    print 'absent'

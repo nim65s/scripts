@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint, time, webbrowser
-from os.path import expanduser, join, basename, isdir, splitext, exists
+from os.path import expanduser, join, basename, isdir, splitext, exists, splitext
 from couleurs import *
 
 TOME_RE = re.compile('Tome ', re.I)
@@ -14,6 +14,8 @@ LECT_PATH = expanduser('~/Lecture')
 
 USELESS_FILES = ['.directory','Thumbs.db','._.BridgeSort','._.DS_Store']
 USELESS_DIRS = ['__MACOSX']
+
+NOT_SCANS_EXTENSIONS = ['.mp4','.torrent']
 
 SCANS = os.listdir(SCAN_PATH)
 
@@ -379,7 +381,7 @@ def traiter_dl():
     doublon_re = re.compile(' \(\d\)')
     fichiers = os.listdir(DL_PATH)
     for fichier in fichiers:
-        if SERIES_RE.search(fichier):
+        if SERIES_RE.search(fichier) and splitext(fichier)[1] not in NOT_SCANS_EXTENSIONS:
             est_unique = True
             if doublon_re.search(fichier):
                 doublon = join(DL_PATH, fichier)
@@ -409,6 +411,9 @@ def nettoyer(path):
         if not dirnames and not filenames:
             jaune('Suppression récursive inverse de %s' % dirpath)
             os.removedirs(dirpath)
+    if not isdir(DL_PATH):
+        os.mkdir(DL_PATH)
+
 
 def preparer_chapitres():
     """Fonction qui prépare les chapitrse trouvés par traiter_dl à la lecture"""

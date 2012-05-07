@@ -12,19 +12,15 @@ DAEMON="cron"
 NOTIFY=0
 UPDATE=0
 ALARM=0
+HIDE=0
 
 for args in $@
 do
 	case $args in
-		n*)
-			NOTIFY=1
-			;;
-		u*)
-			UPDATE=1
-			;;
-		a*)
-			ALARM=1
-			;;
+		n*) NOTIFY=1 ;;
+		u*) UPDATE=1 ;;
+		a*) ALARM=1 ;;
+        h*) HIDE=1 ;;
 		*)
 			echo " Nim's edt.sh :"
 			echo "         Usage :"
@@ -54,7 +50,10 @@ then
 	[[ "`head -n 1 .edt.txt`" == "" ]] && sed -i '1d' .edt.txt
 fi
 
-[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "`cat .edt.txt`" || cat .edt.txt
+if [[ "$NOTIFY" == 1 ]]
+then notify-send -t 15000 "`cat .edt.txt`"
+elif [[ "$HIDE" == 0 ]] cat .edt.txt
+fi
 
 if [[ "$ALARM" == 1 ]]
 then
@@ -74,8 +73,7 @@ then
 #		kalarm -t $DATE3 -e $CMD3
 #		[[ "$NOTIFY" == 1 ]] && notify-send -t 15000 "k-alarme @ $DATE" || echo "k-alarm @ $DATE"
 	elif [[ "$DAEMON" == "at" ]]
-	then
-		echo "TODO : le 'at', marche pas sur mon pc -_-' "
+	then echo "TODO : le 'at', marche pas sur mon pc -_-' "
 	elif [[ "$DAEMON" == "cron" ]]
 	then
 			FICHIERTEMP=$(mktemp)

@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-import os, sys, re, time, shelve, datetime
+import os, sys, re, time, shelve
 import feedparser, urllib, webbrowser, pprint
 from BeautifulSoup import BeautifulSoup
 
@@ -53,7 +53,6 @@ def run(reset=False):
         rouge('</DEBUG>')
 
     if nouvelles_entrees:
-        print(datetime.datetime.now())
         for entrie in feed['entries']:
             url_lel = entrie['links'][0]['href']
             url_dl = re.sub(r'/read/','/download/', url_lel)
@@ -67,7 +66,7 @@ def run(reset=False):
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)
                 else:
-                    print('- %s' % entrie['title'])
+                    print(u'- %s' % entrie['title'])
             elif date[site] == entrie['published_parsed']:
                 vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
                 break
@@ -75,6 +74,8 @@ def run(reset=False):
                 rouge('ATTENTION il manque probablement des trucs sur %s !' % site)
                 break
         date[site] = feed['entries'][0]['published_parsed']
+    else:
+        print('.')
 
 if __name__ == '__main__':
     reset = False

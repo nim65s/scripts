@@ -9,8 +9,6 @@ CMD3="mpc stop; DISPLAY=:0.1 notify-send -u urgent -t 20000 '<br/><br/><br/><br/
 CMD4="crontab -l | egrep -v 'morningbird|notify-send' | crontab -"
 DAEMON="cron"
 
-#[[ -n "$DISPLAY" ]] || export DISPLAY:=0.1
-
 NOTIFY=0
 UPDATE=0
 ALARM=0

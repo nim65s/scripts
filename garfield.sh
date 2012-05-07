@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export DISPLAY=:0.0
 cd $HOME/images
 
 [[ -e garfield.gif ]] && rm garfield.gif

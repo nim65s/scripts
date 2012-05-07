@@ -408,11 +408,9 @@ def nettoyer(path):
                 jaune('Suppression de %s/%s' % (dirpath,useless_file))
                 os.remove(join(dirpath,useless_file))
     for dirpath, dirnames, filenames in os.walk(path):
-        if not dirnames and not filenames:
+        if not dirnames and not filenames and not dirpath in [DL_PATH,LECT_PATH,SCAN_PATH]:
             jaune('Suppression récursive inverse de %s' % dirpath)
             os.removedirs(dirpath)
-    if not isdir(DL_PATH):
-        os.mkdir(DL_PATH)
 
 
 def preparer_chapitres():
@@ -515,22 +513,6 @@ def telecharger_missing(bloquants_only=True):
                 else:
                     rouge('TODO2')
 
-def lecture():
-    """ La seule et véritable utilité de ce script est de LIRE \o/"""
-    path = ''
-    for s in os.listdir(LECT_PATH):
-        vert('\n • ' + s + ' ')
-        for c,t in SERIES[s].chapitres_et_tomes_a_lire:
-            if t == 0:
-                path=join(LECT_PATH,s,str(c))
-            else:
-                path=join(LECT_PATH,s,'Tome %s' % t,str(c))
-            print '\t', path
-            if isdir(path):
-                os.system("feh -FZrSname --cycle-once '%s'" % path)
-            else:
-                rouge('«%s» n’est pas un dossier oO' % path)
-
 def question(txt, default=True):
     txt += " [O/n] " if default else " [o/N] "
     i = raw_input(txt).upper()
@@ -539,7 +521,33 @@ def question(txt, default=True):
     if i == 'N':
         return False
     return default
-        
+
+def lecture():
+    """ La seule et véritable utilité de ce script est de LIRE \o/"""
+    path = ''
+    for s in os.listdir(LECT_PATH):
+        vert('\n • ' + s + ' ')
+        for c,t in SERIES[s].chapitres_et_tomes_a_lire:
+            if t:
+                path=join(LECT_PATH,s,'Tome %s' % t,str(c))
+            else:
+                path=join(LECT_PATH,s,str(c))
+            print '\t', path
+            if isdir(path):
+                os.system("feh -FZrSname --cycle-once '%s'" % path)
+                if question("Ranger le chapitre qui vient d’être lu ?"):
+                    dst = ''
+                    if t:
+                        dst = join(SCAN_PATH,s,'Tome %s' % t)
+                    else:
+                        dst = join(SCAN_PATH,s)
+                    if not isdir(dst):
+                        os.mkdir(dst)
+                    vert("%s => %s" % (path,dst))
+                    shutil.move(path,dst)
+            else:
+                rouge('«%s» n’est pas un dossier oO' % path)
+
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
     trouver_series(classer=False, affichage=False)
@@ -567,3 +575,5 @@ if __name__ == '__main__':
     jaune('−'*24 + ' Lecture… ' + '−'*46)
     print
     lecture()
+    if not os.listdir(LECT_PATH):
+        os.rmdir(LECT_PATH)

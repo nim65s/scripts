@@ -52,7 +52,8 @@ fi
 
 if [[ "$NOTIFY" == 1 ]]
 then notify-send -t 15000 "`cat .edt.txt`"
-elif [[ "$HIDE" == 0 ]] cat .edt.txt
+elif [[ "$HIDE" == 0 ]] 
+then cat .edt.txt
 fi
 
 if [[ "$ALARM" == 1 ]]

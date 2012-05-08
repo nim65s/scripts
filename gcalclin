@@ -808,12 +808,10 @@ class GoogleCalendar:
                         cron3.dom().on(int(cronDate3.strftime('%d')))
                         cron3.month().on(int(cronDate3.strftime('%m')))
                         cron3.parse(cron3.render())
-                        print('SUCCESS')
 
         tab.write()
 
-        print('Votre nouvelle crontab : ')
-        print(tab.render())
+        print('Réveil programmé \o/')
 
 
     def CalQuery(self, cmd, startText='', count=1):

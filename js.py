@@ -1,8 +1,6 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 import os, sys, re, time, shelve
 import feedparser, urllib, webbrowser, pprint
 from BeautifulSoup import BeautifulSoup
@@ -17,7 +15,7 @@ try:
     date = shelve.open(os.path.expanduser('~/.js_shelve'), writeback=True)
     date_shelve = True
 except:
-    print('Ratage de l’ouverture du shelve')
+    print 'Ratage de l’ouverture du shelve'
     date = {}
 
 site = 'japanshin'
@@ -58,15 +56,20 @@ def run(reset=False):
             url_dl = re.sub(r'/read/','/download/', url_lel)
             m = url_re.match(url_lel)
             if not m:
-                print('FAIL')
+                print 'FAIL'
             if date[site] < entrie['published_parsed']:
                 if series['re'].search(entrie['title']):
-                    print(entrie['title'], '…')
+                    print entrie['title'], u'…'
                     url_lel = entrie['links'][0]['href']
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)
                 else:
-                    print(u'- %s' % entrie['title'])
+                    try:
+                        print u'- %s' % entrie['title']
+                    except UnicodeEncodeError as e:
+                        print e
+                        print u'types d’entrie["title"]'
+                        print type(entrie['title'])
             elif date[site] == entrie['published_parsed']:
                 vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
                 break
@@ -75,7 +78,7 @@ def run(reset=False):
                 break
         date[site] = feed['entries'][0]['published_parsed']
     else:
-        print('.')
+        print '.'
 
 if __name__ == '__main__':
     reset = False

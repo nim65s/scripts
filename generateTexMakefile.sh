@@ -3,8 +3,7 @@
 [[ -f Makefile ]] && rm -v Makefile
 [[ -f Makefile.quick ]] && rm -v Makefile.quick
 
-[[ $1 == *x* ]] && TEX="xelatex" || TEX="pdflatex"
-
+$(grep -q xunicode *.tex) && TEX="xelatex" || TEX="pdflatex"
 
 echo -n "all: " >> Makefile
 for FILE in *.tex

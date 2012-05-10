@@ -68,7 +68,7 @@ def run(reset=False):
                         print u'- %s' % entrie['title']
                     except UnicodeEncodeError as e:
                         print e
-                        print u'types d’entrie["title"]'
+                        print u'types de entrie["title"]'
                         print type(entrie['title'])
             elif date[site] == entrie['published_parsed']:
                 vert('revenu à la dernière entrée sauvegardé sur %s.' % site)

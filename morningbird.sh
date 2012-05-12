@@ -8,6 +8,8 @@ VOLINC=1
 PLAYER=mpd
 TIMEWAIT=180
 RAND=false
+HOURMIN=06
+HOURMAX=12
 
 #modification par fichier de conf
 [[ -f $HOME/.morningbirdrc ]] && . $HOME/.morningbirdrc || echo 'Pas de $HOME/.morningbirdrc'
@@ -37,6 +39,12 @@ while [ $# -ne 0 ]
       timewait=*)
         TIMEWAIT=`echo $1 | sed "s/timewait=//"`
         ;;
+      hourmin=*)
+        HOURMIN=`echo $1 | sed "s/hourmin=//"`
+        ;;
+      hourmax=*)
+        HOURMAX=`echo $1 | sed "s/hourmax=//"`
+        ;;
       var)
 	echo "morningbird variables :"
 	echo "VOLINIT=$VOLINIT"
@@ -45,12 +53,15 @@ while [ $# -ne 0 ]
 	echo "VOLINC=$VOLINC"
 	echo "PLAYER=$PLAYER"
 	echo "TIMEWAIT=$TIMEWAIT"
+	echo "HOURMIN=$HOURMIN"
+	echo "HOURMAX=$HOURMAX"
 	;;
       *)
 	echo "morningbird : usage"
-	echo "    morningbird [volinit=P] [volmax=P] [volinc=P] [timeinc=N] [player=S] [timewait=N] [var]"
+	echo "    morningbird [volinit=P] [volmax=P] [volinc=P] [timeinc=N] [player=S] [timewait=N] [hourmin=H] [hourmax=H] [var]"
 	echo "    1 <= P <= 100"
 	echo "    N in seconds"
+	echo "    H in hours"
 	echo "    S = amarokapp | mpd"
 	exit 0
 	;;
@@ -58,15 +69,13 @@ while [ $# -ne 0 ]
     shift
   done
 
-echo "VOLINIT=$VOLINIT"
-echo "VOLMAX=$VOLMAX"
-echo "TIMEINC=$TIMEINC"
-echo "VOLINC=$VOLINC"
-echo "PLAYER=$PLAYER"
-echo "TIMEWAIT=$TIMEWAIT"
-echo "RAND=$RAND"
 
-export DISPLAY=:0.1
+HOUR=$(date +%H)
+if (( $HOUR > $HOURMAX || $HOUR < $HOURMIN ))
+then
+    echo 'Ça va pas de lancer le réveil à cette heure ?' > /dev/stderr
+    exit 1
+fi
 
 alsactl restore
 $HOME/scripts/audio.sh um # faut le script... 
@@ -75,19 +84,19 @@ $HOME/scripts/audio.sh ms
 
 if [ "$PLAYER" = "mpd" ]
   then
-    mpc clear
-    mpc repeat off
-    $RAND && mpc random on || mpc random off
-	mpc consume off
-	mpc single off
-    mpc load Reveil
-    mpc volume $VOLINIT
-    mpc enable 1
+    mpc clear > /dev/null
+    mpc repeat off > /dev/null
+    $RAND && mpc random on || mpc random off > /dev/null
+	mpc consume off > /dev/null
+	mpc single off > /dev/null
+    mpc load Reveil > /dev/null
+    mpc volume $VOLINIT > /dev/null
+    mpc enable 1 > /dev/null
     mpc play
     for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
 	do
 	    sleep $TIMEINC
-	    mpc volume +$VOLINC
+	    mpc volume +$VOLINC > /dev/null
 	done
   elif [ "$PLAYER" = "amarokapp" ]
   then

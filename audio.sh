@@ -49,8 +49,7 @@ case $1 in
         ;;
     p+) # player's volume up
         if [[ "$player" == "mpd" ]]
-        then
-            mpc volume +2
+        then mpc volume +2
         fi
         ;;
     -) # volume down
@@ -79,8 +78,7 @@ case $1 in
         ;;
     p-)
         if [[ "$player" == "mpd" ]]
-        then
-            mpc volume -2
+        then mpc volume -2
         fi
         ;;
     m) # toggle volume mute
@@ -108,15 +106,12 @@ case $1 in
         ;;
     ms) # toggle side mute
         if [[ "$server" == "oss" ]]
-        then
-            echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        then echo "PAS IMPLÉMENTÉ" >> /dev/stderr
         elif [[ "$server" == "alsa" ]]
         then
             if [[ "$(amixer get Side | tail -n 1 | cut -d[ -f 4)" == "on]" ]]
-            then
-                amixer set Side off
-            else
-                amixer set Side on
+            then amixer set Side off
+            else amixer set Side on
             fi
         fi
         ;;
@@ -137,31 +132,26 @@ case $1 in
         then
             amixer set Side on
             [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
-        else
-            echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        else echo "PAS IMPLÉMENTÉ" >> /dev/stderr
         fi
         ;;
 
     t) # play/pause
         if [[ "$player" == "mpd" ]]
-        then 
-            mpc toggle
+        then mpc toggle
         fi
         ;;
     s) # stop
         if [[ "$player" == "mpd" ]]
-        then 
-            mpc stop
+        then mpc stop
         fi
         ;;
     n) # next song
         if [[ "$player" == "mpd" ]]
         then
             if [[ "$(mpc status | tail -n 1 | awk '{print $9}')" == "on" ]]
-            then
-                mpc del 0
-            else
-                mpc next
+            then mpc del 0
+            else mpc next
             fi
         fi
         ;;
@@ -193,14 +183,12 @@ case $1 in
         ;;
     p) # play the previous song
         if [[ "$player" == "mpd" ]]
-        then 
-            mpc prev
+        then mpc prev
         fi
         ;;
     ar) # add a random song from the database
         if [[ "$player" == "mpd" ]]
-        then
-            add_random
+        then add_random
         fi
         ;;
     a) # start your alarm

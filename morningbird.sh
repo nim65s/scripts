@@ -19,56 +19,39 @@ HOURMAX=12
 
 #modification par options
 while [ $# -ne 0 ]
-  do
+do
     case $1 in
-      volinit=*)
-        VOLINIT=`echo $1 | sed "s/volinit=//"`
-        ;;
-      volmax=*)
-        VOLMAX=`echo $1 | sed "s/volmax=//"`
-        ;;
-      timeinc=*)
-        TIMEINC=`echo $1 | sed "s/timeinc=//"`
-        ;;
-      volinc=*)
-        VOLINC=`echo $1 | sed "s/volinc=//"`
-        ;;
-      player=*)
-        PLAYER=`echo $1 | sed "s/player=//"`
-        ;;
-      timewait=*)
-        TIMEWAIT=`echo $1 | sed "s/timewait=//"`
-        ;;
-      hourmin=*)
-        HOURMIN=`echo $1 | sed "s/hourmin=//"`
-        ;;
-      hourmax=*)
-        HOURMAX=`echo $1 | sed "s/hourmax=//"`
-        ;;
-      var)
-	echo "morningbird variables :"
-	echo "VOLINIT=$VOLINIT"
-	echo "VOLMAX=$VOLMAX"
-	echo "TIMEINC=$TIMEINC"
-	echo "VOLINC=$VOLINC"
-	echo "PLAYER=$PLAYER"
-	echo "TIMEWAIT=$TIMEWAIT"
-	echo "HOURMIN=$HOURMIN"
-	echo "HOURMAX=$HOURMAX"
-	;;
-      *)
-	echo "morningbird : usage"
-	echo "    morningbird [volinit=P] [volmax=P] [volinc=P] [timeinc=N] [player=S] [timewait=N] [hourmin=H] [hourmax=H] [var]"
-	echo "    1 <= P <= 100"
-	echo "    N in seconds"
-	echo "    H in hours"
-	echo "    S = amarokapp | mpd"
-	exit 0
-	;;
-      esac
+        volinit=*) VOLINIT=`echo $1 | sed "s/volinit=//"` ;;
+        volmax=*) VOLMAX=`echo $1 | sed "s/volmax=//"` ;;
+        timeinc=*) TIMEINC=`echo $1 | sed "s/timeinc=//"` ;;
+        volinc=*) VOLINC=`echo $1 | sed "s/volinc=//"` ;;
+        player=*) PLAYER=`echo $1 | sed "s/player=//"` ;;
+        timewait=*) TIMEWAIT=`echo $1 | sed "s/timewait=//"` ;;
+        hourmin=*) HOURMIN=`echo $1 | sed "s/hourmin=//"` ;;
+        hourmax=*) HOURMAX=`echo $1 | sed "s/hourmax=//"` ;;
+        var)
+            echo "morningbird variables :"
+            echo "VOLINIT=$VOLINIT"
+            echo "VOLMAX=$VOLMAX"
+            echo "TIMEINC=$TIMEINC"
+            echo "VOLINC=$VOLINC"
+            echo "PLAYER=$PLAYER"
+            echo "TIMEWAIT=$TIMEWAIT"
+            echo "HOURMIN=$HOURMIN"
+            echo "HOURMAX=$HOURMAX"
+            ;;
+        *)
+            echo "morningbird : usage"
+            echo "    morningbird [volinit=P] [volmax=P] [volinc=P] [timeinc=N] [player=S] [timewait=N] [hourmin=H] [hourmax=H] [var]"
+            echo "    1 <= P <= 100"
+            echo "    N in seconds"
+            echo "    H in hours"
+            echo "    S = amarokapp | mpd"
+            exit 0
+            ;;
+    esac
     shift
-  done
-
+done
 
 HOUR=$(date +%H)
 if (( $HOUR > $HOURMAX || $HOUR < $HOURMIN ))
@@ -82,64 +65,24 @@ $HOME/scripts/audio.sh um # faut le script...
 $HOME/scripts/audio.sh ums
 $HOME/scripts/audio.sh ms
 
-if [ "$PLAYER" = "mpd" ]
-  then
+if [[ "$PLAYER" = "mpd" ]]
+then
     mpc clear > /dev/null
     mpc repeat off > /dev/null
     $RAND && mpc random on || mpc random off > /dev/null
-	mpc consume off > /dev/null
-	mpc single off > /dev/null
+    mpc consume off > /dev/null
+    mpc single off > /dev/null
     mpc load Reveil > /dev/null
     mpc volume $VOLINIT > /dev/null
     mpc enable 1 > /dev/null
     mpc play
     for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
-	do
-	    sleep $TIMEINC
-	    mpc volume +$VOLINC > /dev/null
-	done
-  elif [ "$PLAYER" = "amarokapp" ]
-  then
-
-
-	if [[ `pidof $PLAYER` ]]
-	  then
-	    $PLAYER
-	  fi
-
-
-#    DCOPSERVER=`cat $HOME/.DCOPserver_animal_\:0 | grep local`
-#    dcop amarok player stop
-#	dcop amarok playlist clearPlaylist
-#	sleep 30
-	dcop amarok player enableRandomMode false
-	dcop amarok player enableRepeatPlaylist false
-	dcop amarok player setVolume $VOLINIT
-        dcop amarok playlistbrowser loadPlaylist "Reveil"
-    until `dcop amarok player isPlaying`
-      do
-	sleep 1
-      done
-    for(( vol=$VOLINIT; vol < $VOLMAX; vol++ ))
-	do
-	    sleep $TIMEINC
-	    dcop amarok player setVolumeRelative $VOLINC
-	done
-    while `dcop amarok player isPlaying`
-      do
-	sleep $TIMEWAIT
-      done
-    dcop amarok playlist clearPlaylist
-    dcop amarok player enableRandomMode true
-    dcop amarok playlistbrowser loadPlaylist Toute\ la\ collection
-    sleep 1
-    dcop amarok player stop
-    sleep 1
-    dcop amarok player stop
-    sleep 2
-    dcop amarok player stop
-    sleep 10
-    dcop amarok player stop
-  fi
+    do
+        sleep $TIMEINC
+        mpc volume +$VOLINC > /dev/null
+    done
+else
+    echo "Pas encore implémenté" > /dev/stderr
+fi
 
 exit 0

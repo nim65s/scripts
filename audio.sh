@@ -106,6 +106,21 @@ case $1 in
             fi
         fi
         ;;
+    ms) # toggle side mute
+        if [[ "$server" == "oss" ]]
+        then
+            echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        elif [[ "$server" == "alsa" ]]
+        then
+            if [[ "$(amixer get Side | tail -n 1 | cut -d[ -f 4)" == "on]" ]]
+            then
+                amixer set Side off
+            else
+                amixer set Side on
+            fi
+        fi
+        ;;
+
     um) # volume umute
         if [[ "$server" == "oss" ]]
         then
@@ -117,6 +132,16 @@ case $1 in
             [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
         fi
         ;;
+    ums) # umute side
+        if [[ "$server" == "alsa" ]]
+        then
+            amixer set Side on
+            [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
+        else
+            echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        fi
+        ;;
+
     t) # play/pause
         if [[ "$player" == "mpd" ]]
         then 
@@ -205,6 +230,8 @@ case $1 in
         echo "    p- : lower player's volume"
         echo "     m : toggle mute volume"
         echo "    um : unmute volume"
+        echo "    ms : toggle mute side"
+        echo "   ums : unmute side"
         echo "     t : toggle play/pause"
         echo "     s : stop music"
         echo "     n : play the next song"

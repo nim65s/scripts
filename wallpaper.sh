@@ -2,11 +2,12 @@
 
 if [[ "$1" == "hostname" ]]
 then
-    if [[ -e "$HOME/images/hostname/`hostname`.jpg" ]]
-    then awsetbg "$HOME/images/hostname/`hostname`.jpg"
-    elif [[ -e "$HOME/images/hostname/`hostname`.png" ]]
-    then awsetbg "$HOME/images/hostname/`hostname`.png"
-    else awsetbg "$HOME/images/hostname/ghibli.png"
+    cd $HOME/images/hostname || exit 1
+    if [[ -e `hostname`.jpg ]]
+    then awsetbg `hostname`.jpg
+    elif [[ -e `hostname`.png ]]
+    then awsetbg `hostname`.png
+    else awsetbg ghibli.png
     fi
 else
     awsetbg -r $HOME/images/wallpaper -u feh

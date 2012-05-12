@@ -68,8 +68,10 @@ echo "RAND=$RAND"
 
 export DISPLAY=:0.1
 
-$HOME/scripts/audio.sh um # faut le script... 
 alsactl restore
+$HOME/scripts/audio.sh um # faut le script... 
+$HOME/scripts/audio.sh ums
+$HOME/scripts/audio.sh ms
 
 if [ "$PLAYER" = "mpd" ]
   then

@@ -501,6 +501,7 @@ def check_preparation():
 
 def telecharger_missing(bloquants_only=True):
     """ Télécharge automatiquement les chapitres qui manquent """
+    yenavait = False
     for s in SERIES:
         if s in JS.keys():
             titre = SERIES[s].titre
@@ -517,13 +518,16 @@ def telecharger_missing(bloquants_only=True):
             for c,t in chapitres_et_tomes_manquants:
                 if not JS[s]:
                     webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>','0').replace('<chapitre>',str(c)))
+                    yenavait = True
                     time.sleep(5)
                 elif t == 0:
                     t = SERIES[s].deduire_tome(c)
                     webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t)).replace('<chapitre>',str(c)))
+                    yenavait = True
                     time.sleep(5)
                 else:
                     rouge('TODO2')
+    return yenavait
 
 def question(txt, default=True):
     txt += " [O/n] " if default else " [o/N] "
@@ -563,6 +567,11 @@ def lecture():
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
     trouver_series(classer=False, affichage=False)
+    if isdir(LECT_PATH):
+        print
+        jaune('−'*18 + ' Vérification de la préparation précédente… ' + '−'*18)
+        print
+        preparer_chapitres()
     print
     jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
     print
@@ -582,7 +591,28 @@ if __name__ == '__main__':
     print
     jaune('−'*24 + ' Téléchargement des manquants… ' + '−'*25)
     print
-    telecharger_missing(bloquants_only=True)
+    if telecharger_missing(bloquants_only=True):
+        print
+        print 'On attend une petite minute que les DLs se finissent…'
+        time.sleep(60)
+        print
+        jaune('−'*24 + ' Traitement des téléchargements… ' + '−'*23)
+        print
+        if not isdir(DL_PATH):
+            os.mkdir(DL_PATH)
+        traiter_dl()
+        print
+        jaune('−'*24 + ' Préparation des chapitres… ' + '−'*28)
+        print
+        preparer_chapitres()
+        print
+        jaune('−'*24 + ' Vérification de la préparation… ' + '−'*23)
+        print
+        if not isdir(LECT_PATH):
+            os.mkdir(LECT_PATH)
+        check_preparation()
+        print
+
     print
     jaune('−'*24 + ' Lecture… ' + '−'*46)
     print

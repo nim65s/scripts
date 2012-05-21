@@ -126,8 +126,11 @@ class Serie:
         if classer:
             Serie.classer(self)
 
-    def __repr__(self):
+    def __str__(self):
         return self.titre
+
+    def __repr__(self):
+        return self._data
 
     def _setter(self, num_or_path, tome_num=0, tc='chapitres', mp='presents', al='lus'):
         """Le setter universel des données de la série"""
@@ -238,6 +241,13 @@ class Serie:
             if n in self.chapitres and Serie.tome_du_chapitre(self, n) != 0:
                 tn = Serie.tome_du_chapitre(self, n)
                 break
+        if tn == 0 and self.chapitres_a_lire:
+            n = chapitre
+            while n <= max(self.chapitres_a_lire):
+                n += 1
+                if n in self.chapitres_a_lire and Serie.tome_du_chapitre(self, n, 'a_lire') != 0:
+                    tn = Serie.tome_du_chapitre(self, n, 'a_lire')
+                    break
         if tp == tn:
             return tp
         else:
@@ -509,7 +519,9 @@ def telecharger_missing(bloquants_only=True):
                     webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>','0').replace('<chapitre>',str(c)))
                     time.sleep(5)
                 elif t == 0:
-                    rouge('TODO')
+                    t = SERIES[s].deduire_tome(c)
+                    webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t)).replace('<chapitre>',str(c)))
+                    time.sleep(5)
                 else:
                     rouge('TODO2')
 

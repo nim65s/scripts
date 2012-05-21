@@ -47,7 +47,7 @@ def errThread():
     while 1:
         line = p.stderr.readline().strip()
         if line:
-            err.error(unicodedata.normalize('NFKD', '[%s] %s' % (now(),line)).encode('ascii','ignore'))
+            err.error(unicodedata.normalize('NFKD', u'[%s] %s' % (now(),line)).encode('ascii','ignore'))
         else:
             break
 

@@ -19,7 +19,7 @@ except:
     date = {}
 
 site = 'japanshin'
-scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Claymore', 'Metallica Metalluca']
+scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca']
 
 r = scans[0]
 for scan in scans[1:]:
@@ -64,12 +64,7 @@ def run(reset=False):
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)
                 else:
-                    try:
-                        print u'- %s' % entrie['title']
-                    except UnicodeEncodeError as e:
-                        print e
-                        print u'types de entrie["title"]'
-                        print type(entrie['title'])
+                    print u'- %s' % entrie['title']
             elif date[site] == entrie['published_parsed']:
                 vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
                 break

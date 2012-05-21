@@ -39,7 +39,7 @@ def logThread():
     while 1:
         line = p.stdout.readline().strip()
         if line:
-            log.info(unicodedata.normalize('NFKD', '[%s] %s' % (now(),line)).encode('ascii','ignore'))
+            log.info(unicodedata.normalize('NFKD', u'[%s] %s' % (now(),line)).encode('ascii','ignore'))
         else:
             break
 

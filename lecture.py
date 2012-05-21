@@ -250,6 +250,8 @@ class Serie:
                     break
         if tp == tn:
             return tp
+        elif tp == tn -1:
+            return (tp,tn)
         else:
             return 0
 
@@ -278,7 +280,7 @@ class Serie:
                 for i,j in self.chapitres_et_tomes:
                     if j == 0:
                         k = self.deduire_tome(i)
-                        if k > 0:
+                        if isinstance(k, int) and k > 0:
                             src = join(SCAN_PATH,self.titre, str(i))
                             if isdir(src):
                                 dst = join(SCAN_PATH,self.titre, 'Tome ' + str(k))
@@ -522,7 +524,11 @@ def telecharger_missing(bloquants_only=True):
                     time.sleep(5)
                 elif t == 0:
                     t = SERIES[s].deduire_tome(c)
-                    webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t)).replace('<chapitre>',str(c)))
+                    if isinstance(t, int):
+                        webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t)).replace('<chapitre>',str(c)))
+                    else:
+                        webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t[0])).replace('<chapitre>',str(c)))
+                        webbrowser.open(JS_DOWN.replace('<serie>', titre).replace('<tome>',str(t[1])).replace('<chapitre>',str(c)))
                     yenavait = True
                     time.sleep(5)
                 else:

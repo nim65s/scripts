@@ -1,9 +1,9 @@
-#!/bin/bash
+#!bash
 
-STATUS=/bin/false
-PULL=/bin/false
-COMMIT=/bin/false
-PUSH=/bin/false
+STATUS=false
+PULL=false
+COMMIT=false
+PUSH=false
 
 git=(N7 dotfiles scripts CV JE gdf)
 [[ $(hostname) == "totoro" ]] && git=(${git[*]} AOC_LaTeX)
@@ -11,25 +11,25 @@ hg=(net7/admin net7/botnet7-ng net7/doc net7/docs net7/pipo-parici net7/portail 
 
 if [[ "$1" == "status" ]]
 then
-    STATUS=/bin/true
+    STATUS=true
 fi
 
 if [[ "$1" == "pull" ]]
 then
-    PULL=/bin/true
+    PULL=true
 fi
 
 if [[ "$1" == "commit" ]]
 then
-    PULL=/bin/true
-    COMMIT=/bin/true
+    PULL=true
+    COMMIT=true
 fi
 
 if [[ "$1" == "push" ]]
 then
-    PULL=/bin/true
-    COMMIT=/bin/true
-    PUSH=/bin/true
+    PULL=true
+    COMMIT=true
+    PUSH=true
 fi
 
 for d in ${git[*]} 
@@ -42,6 +42,7 @@ do
     $PUSH && git push
 done
 
+# TODO: auth HG
 #for d in ${hg[*]}
 #do
 #    cd ~/$d

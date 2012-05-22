@@ -11,6 +11,8 @@ RAND=false
 HOURMIN=06
 HOURMAX=12
 
+echo SESSION: $SESSION --
+
 #modification par fichier de conf
 [[ -f $HOME/.morningbirdrc ]] && . $HOME/.morningbirdrc || echo 'Pas de $HOME/.morningbirdrc'
 

@@ -484,7 +484,7 @@ def preparer_chapitres():
         vert(' • Traité: ' + c.__repr__())
     nettoyer(LECT_PATH)
     nettoyer(DL_PATH)
-    CHAPITRES_TELECHARGES = []
+    del CHAPITRES_TELECHARGES[:]
 
 def check_preparation():
     """Fonction qui vérifie que les chapitres prêts pour la lecture sont bons"""

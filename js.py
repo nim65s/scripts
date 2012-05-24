@@ -59,7 +59,7 @@ def run(reset=False):
                 print 'FAIL'
             if date[site] < entrie['published_parsed']:
                 if series['re'].search(entrie['title']):
-                    print entrie['title'], u'…'
+                    print u'%s…' % entrie['title']
                     url_lel = entrie['links'][0]['href']
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)

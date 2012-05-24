@@ -64,7 +64,7 @@ def run(reset=False):
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)
                 else:
-                    print u'- %s' % entrie['title']
+                    print '-', entrie['title'].encode('utf-8')
             elif date[site] == entrie['published_parsed']:
                 vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
                 break

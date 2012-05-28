@@ -8,10 +8,8 @@ VOLINC=1
 PLAYER=mpd
 TIMEWAIT=180
 RAND=false
-HOURMIN=06
+HOURMIN=6
 HOURMAX=12
-
-echo SESSION: $SESSION --
 
 #modification par fichier de conf
 [[ -f $HOME/.morningbirdrc ]] && . $HOME/.morningbirdrc || echo 'Pas de $HOME/.morningbirdrc'
@@ -55,7 +53,7 @@ do
     shift
 done
 
-HOUR=$(date +%H)
+HOUR=$(date +%_H)
 if (( $HOUR > $HOURMAX || $HOUR < $HOURMIN ))
 then
     echo 'Ça va pas de lancer le réveil à cette heure ?' > /dev/stderr

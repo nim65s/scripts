@@ -4,26 +4,52 @@
 """module pour colorer la sortie des consoles et apprendre à écrire des modules \o/"""
 
 from __future__ import print_function
+import unicodedata, sys
 
 def rouge(texte):
     """printe un «texte» en rouge gras"""
-    print('\033[1;31m%s\033[0m' % texte)
+    if sys.stdout.encoding == 'UTF-8':
+        print('\033[1;31m%s\033[0m' % texte)
+    else:
+        if isinstance(texte,unicode):
+            texte = unicodedata.normalize('NFKD', texte).encode('ascii','ignore')
+        print('\033[1;31m%s\033[0m' % texte)
 
 def vert(texte):
     """printe un «texte» en vert gras"""
-    print('\033[1;32m%s\033[0m' % texte)
+    if sys.stdout.encoding == 'UTF-8':
+        print('\033[1;32m%s\033[0m' % texte)
+    else:
+        if isinstance(texte,unicode):
+            texte = unicodedata.normalize('NFKD', texte).encode('ascii','ignore')
+        print('\033[1;32m%s\033[0m' % texte)
 
 def jaune(texte):
     """printe un «texte» en vert gras"""
-    print('\033[1;33m%s\033[0m' % texte)
+    if sys.stdout.encoding == 'UTF-8':
+        print('\033[1;33m%s\033[0m' % texte)
+    else:
+        if isinstance(texte,unicode):
+            texte = unicodedata.normalize('NFKD', texte).encode('ascii','ignore')
+        print('\033[1;33m%s\033[0m' % texte)
 
 def style(texte, style):
     """printe un «texte» formaté selon le «style»"""
-    print('\033[%sm%s\033[0m' % (style,texte))
+    if sys.stdout.encoding == 'UTF-8':
+        print('\033[%sm%s\033[0m' % (style,texte))
+    else:
+        if isinstance(texte,unicode):
+            texte = unicodedata.normalize('NFKD', texte).encode('ascii','ignore')
+        print('\033[%sm%s\033[0m' % (style,texte))
 
 def colore_256(texte, couleur):
     """printe un «texte» coloré selon la «couleur»"""
-    print('\033[38;5;%sm%s\033[0m' % (couleur,texte))
+    if sys.stdout.encoding == 'UTF-8':
+        print(u'\033[38;5;%sm%s\033[0m' % (couleur,texte))
+    else:
+        if isinstance(texte,unicode):
+            texte = unicodedata.normalize('NFKD', texte).encode('ascii','ignore')
+        print(u'\033[38;5;%sm%s\033[0m' % (couleur,texte))
 
 def exemple():
     """Affiche un tas de couleurs"""

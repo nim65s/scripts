@@ -39,7 +39,11 @@ def logThread():
     while 1:
         line = p.stdout.readline().strip()
         if line:
-            log.info(unicodedata.normalize('NFKD', u'[%s] %s' % (now(),line)).encode('ascii','ignore'))
+            line = line.decode('utf-8','ignore')
+            line = u'[%s] %s' % (now(),line)
+            line = unicodedata.normalize('NFKD', line)
+            line = line.encode('ascii','ignore')
+            log.info(line)
         else:
             break
 
@@ -47,7 +51,11 @@ def errThread():
     while 1:
         line = p.stderr.readline().strip()
         if line:
-            err.error(unicodedata.normalize('NFKD', u'[%s] %s' % (now(),line)).encode('ascii','ignore'))
+            line = line.decode('utf-8','ignore')
+            line = u'[%s] %s' % (now(),line)
+            line = unicodedata.normalize('NFKD', line)
+            line = line.encode('ascii','ignore')
+            err.error(line)
         else:
             break
 

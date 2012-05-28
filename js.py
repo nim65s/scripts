@@ -66,7 +66,7 @@ def run(reset=False):
                 else:
                     print '-', entrie['title'].encode('utf-8')
             elif date[site] == entrie['published_parsed']:
-                vert('revenu à la dernière entrée sauvegardé sur %s.' % site)
+                vert('revenu à la dernière entrée sauvegardée sur %s.' % site)
                 break
             else:
                 rouge('ATTENTION il manque probablement des trucs sur %s !' % site)

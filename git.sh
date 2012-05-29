@@ -34,7 +34,7 @@ fi
 
 for d in ${git[*]} 
 do
-    if [[ -d $d ]]
+    if [[ -d ~/$d ]]
     then
         cd ~/$d
         echo -e "\t\t\033[1;32m git : $d \033[m"

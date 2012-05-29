@@ -34,12 +34,15 @@ fi
 
 for d in ${git[*]} 
 do
-    cd ~/$d
-    echo -e "\t\t\033[1;32m git : $d \033[m"
-    $STATUS && git status
-    $PULL && git pull
-    $COMMIT && git commit -a
-    $PUSH && git push
+    if [[ -d $d ]]
+    then
+        cd ~/$d
+        echo -e "\t\t\033[1;32m git : $d \033[m"
+        $STATUS && git status
+        $PULL && git pull
+        $COMMIT && git commit -a
+        $PUSH && git push
+    fi
 done
 
 # TODO: auth HG

@@ -106,7 +106,7 @@ case $1 in
         ;;
     ms) # toggle side mute
         if [[ "$server" == "oss" ]]
-        then echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        then echo "PAS IMPLÉMENTÉ" >> /dev/stderr
         elif [[ "$server" == "alsa" ]]
         then
             if [[ "$(amixer get Side | tail -n 1 | cut -d[ -f 4)" == "on]" ]]
@@ -129,10 +129,8 @@ case $1 in
         ;;
     ums) # umute side
         if [[ "$server" == "alsa" ]]
-        then
-            amixer set Side on
-            [[ "$WM" == "awesome" ]] && echo $SPKR_ICON | awesome-client
-        else echo "PAS IMPLÉMENTÉ" >> /dev/stderr
+        then amixer set Side on
+        else echo "PAS IMPLÉMENTÉ" >> /dev/stderr
         fi
         ;;
 

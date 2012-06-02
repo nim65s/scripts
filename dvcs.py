@@ -3,18 +3,21 @@
 
 #TODO: fenetres de textes dans les fenetres, pour pas faire clignoter bordures & titres
 
-e = ''
+from __future__ import with_statement
 
 import locale, curses, time, logging
 from os import chdir
 from sys import argv
 from os.path import expanduser, join
 from subprocess import *
-from threading import Thread
+from threading import Thread, Lock
 from datetime import datetime
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
+
+error = ''
+lock = Lock()
 
 LOG_PATH = expanduser('~/.logs')
 logfile = join(LOG_PATH,'DVCS.log')
@@ -31,6 +34,8 @@ class NimWindow(Thread):
     def __init__(self, height, width, j, k, nbr_win_y, reste_y, dvcs, path, stdscr, max_y):
         Thread.__init__(self)
         self.path = path
+        if not dvcs in ['git','hg']:
+            raise AttributeError('DVCS must be git or hg. get %s' % dvcs)
         self.dvcs = dvcs
         # Fenêtre: taille, bordure
         self.ncols = width - 1 # Colonnes utiles (-1 pour la bordure droite)
@@ -67,48 +72,51 @@ class NimWindow(Thread):
 
     def run(self):
         chdir(expanduser(self.path))
-        p = Popen(['cat','st'],stdout=PIPE)
+        p = Popen([self.dvcs,'status'],stdout=PIPE)
         while 1:
             line = p.stdout.readline().strip()
             if line:
                 self.addline(line)
             else:
                 break
+        self.addline('bépoauiebépotsrnvdljàyx.hgq')
 
     def addline(self, line):
         lines = []
-        line = line.replace('\t','    ')
+        line = line.replace('\t','    ').decode('utf-8')
         while len(line) > self.ncols:
             if len(lines) == 0:
                 lines.append(line[:self.ncols])
                 line = line[self.ncols:]
             else:
-                lines.append('↳' + line[:self.ncols-1])
+                lines.append(u'↳' + line[:self.ncols-1])
                 line = line[self.ncols-1:]
         if len(lines) == 0:
             lines.append(line)
         else:
-            lines.append('↳' + line)
+            lines.append(u'↳' + line)
         for i in range(self.nlines-len(lines)):
-            self.lines[self.nlines - i - 1] = self.lines[self.nlines - i - 1 - len(lines)]
+            line = self.lines[self.nlines - i - 1 - len(lines)]
+            self.lines[self.nlines - i - 1] = line + ' ' * (self.ncols - len(line))
         for i in range(len(lines)):
-            self.lines[i] = lines[-i-1]
+            line = lines[-i-1]
+            self.lines[i] = line + ' ' * (self.ncols - len(line))
 
         self.refresh()
 
     def refresh(self):
         for i in range(self.nlines):
-            line = self.lines[i] + ' ' * (self.ncols-len(self.lines[i]))
-            self.win.addstr(self.nlines - i,0,line)
+            self.win.addstr(self.nlines - i,0,self.lines[i].encode('utf-8'))
+        time.sleep(0.5)
+        with lock:
             self.win.refresh()
-            time.sleep(0.01)
-        self.win.refresh()
 
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()
 stdscr.keypad(1)
-stdscr.refresh()
+with lock:
+    stdscr.refresh()
 try:
     max_x,max_y = stdscr.getmaxyx()
     if YW > max_y:
@@ -127,15 +135,16 @@ try:
     while i < N:
         while j < nbr_win_y and i < N:
             t = NimWindow(YH, wid_win_y, j, k, nbr_win_y, reste_y, 'git', '~/AOC_LaTeX',stdscr, max_y)
-            t.run()
+            t.start()
             j += 1
             i += 1
         j = 0
         k += 1
+    time.sleep(6)
 
 except NameError as er:
     print er
-    e = er
+    error = er
 
 finally:
     curses.nocbreak()
@@ -143,5 +152,5 @@ finally:
     curses.echo()
     curses.endwin()
 
-print 'pipo', e
+print 'pipo', error
 #time.sleep(1)

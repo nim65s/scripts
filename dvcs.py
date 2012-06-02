@@ -49,7 +49,7 @@ class NimWindow(Thread):
             self.ncols += 1
         begin_y += min(j,reste_y)
         self.win = curses.newwin(height,width,k*height,begin_y)
-        self.win.border(' ',rs,' ',curses.ACS_HLINE,' ',tr,curses.ACS_HLINE,'X')
+        self.win.border(' ',rs,' ',curses.ACS_HLINE,' ',tr,curses.ACS_HLINE,br)
 
         # Fenêtre: titre
         if len(dvcs)+len(path) < self.ncols + 1:
@@ -59,13 +59,11 @@ class NimWindow(Thread):
             title = dvcs + ': ' + path
             self.title = title[:self.ncols]
         self.win.addstr(0,1,self.title)
-        #self.win.addstr(0,1, '%s %s %s %s %s' % (self.ncols,self.nlines,width,begin_y, max_y))
 
         # Fenêtre: lignes utiles
         self.lines = []
         for i in range(self.nlines):
             self.lines.append(' ')
-        #self.refresh()
 
     def run(self):
         chdir(expanduser(self.path))
@@ -79,23 +77,23 @@ class NimWindow(Thread):
 
     def addline(self, line):
         lines = []
-        #log.info('addline %s' % line)
         line = line.replace('\t','    ')
         while len(line) > self.ncols:
-            lines.append(line[:self.ncols])
-            #log.info('→' + line[:self.ncols] + '−' + line[self.ncols:])
-            line = line[self.ncols:]
-        lines.append(line)
-        #log.info(line)
+            if len(lines) == 0:
+                lines.append(line[:self.ncols])
+                line = line[self.ncols:]
+            else:
+                lines.append('↳' + line[:self.ncols-1])
+                line = line[self.ncols-1:]
+        if len(lines) == 0:
+            lines.append(line)
+        else:
+            lines.append('↳' + line)
         for i in range(self.nlines-len(lines)):
-            #print 'ICI', i, self.nlines
             self.lines[self.nlines - i - 1] = self.lines[self.nlines - i - 1 - len(lines)]
         for i in range(len(lines)):
             self.lines[i] = lines[-i-1]
 
-        #log.info('LINES')
-        #for i in range(len(self.lines)):
-            #log.info(self.lines[i])
         self.refresh()
 
     def refresh(self):
@@ -103,7 +101,7 @@ class NimWindow(Thread):
             line = self.lines[i] + ' ' * (self.ncols-len(self.lines[i]))
             self.win.addstr(self.nlines - i,0,line)
             self.win.refresh()
-            time.sleep(0.001)
+            time.sleep(0.01)
         self.win.refresh()
 
 stdscr = curses.initscr()

@@ -208,7 +208,8 @@ try:
     for thread in threads:
         thread.join()
     #time.sleep(30)
-    stdscr.getch()
+    if STATUS:
+        stdscr.getch()
 
 except NameError as er:
     print er

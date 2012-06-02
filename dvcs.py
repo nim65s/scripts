@@ -6,7 +6,7 @@
 from __future__ import with_statement
 
 import locale, curses, time, logging
-from os import chdir
+from os import chdir, putenv
 from sys import argv
 from os.path import expanduser, join
 from subprocess import *
@@ -16,8 +16,11 @@ from datetime import datetime
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
+putenv('EDITOR', 'gvim --nofork')
+
 error = ''
-lock = Lock()
+curses_lock = Lock()
+chdir_lock = Lock()
 
 LOG_PATH = expanduser('~/.logs')
 logfile = join(LOG_PATH,'DVCS.log')
@@ -25,10 +28,55 @@ log = logging.getLogger('log')
 log.setLevel(logging.INFO)
 log.addHandler(logging.FileHandler(logfile))
 
+git=['~/N7','~/dotfiles','~/scripts','~/CV','~/JE','~/gdf','~/net7/bots/pipobot']
+hg=['~/net7/admin','~/net7/bots/pipobot-modules','~/net7/doc','~/net7/docs','~/net7/portail','~/net7/scripts_live']
+
 YW = 40 # Largeur type d’une fenêtre
-YH = 28 # Hauteur
-#N = 13 # Nombre de fenetres
-N = 3 # Nombre de fenetres
+YH = 30 # Hauteur
+N = len(git) + len(hg) # Nombre de fenetres
+
+STATUS = False
+PULL   = False
+COMMIT = False
+PUSH   = False
+
+if len(argv) > 1:
+    if argv[1] == 'status':
+        STATUS = True
+    elif argv[1] == 'pull':
+        PULL = True
+    elif argv[1] == 'commit':
+        PULL = True
+        COMMIT = True
+    elif argv[1] == 'push':
+        PULL = True
+        COMMIT = True
+        PUSH = True
+else:
+    STATUS = True
+
+cmd = {
+        'status': {
+            'git': ['git','status'],
+            'hg' : ['hg','st'],
+            'go' : STATUS,
+            },
+        'pull': {
+            'git': ['git','pull'],
+            'hg' : ['hg','pull','-u'],
+            'go' : PULL,
+            },
+        'commit': {
+            'git': ['git','commit','-a'],
+            'hg' : ['hg','ci'],
+            'go' : COMMIT,
+            },
+        'push': {
+            'git': ['git','push'],
+            'hg' : ['hg','push'],
+            'go' : PUSH,
+            },
+        }
 
 class NimWindow(Thread):
     def __init__(self, height, width, j, k, nbr_win_y, reste_y, dvcs, path, stdscr, max_y):
@@ -63,23 +111,26 @@ class NimWindow(Thread):
         else:
             title = dvcs + ': ' + path
             self.title = title[:self.ncols]
-        self.win.addstr(0,1,self.title)
+        self.win.addstr(0,1,self.title,curses.color_pair(1)|curses.A_BOLD)
 
         # Fenêtre: lignes utiles
         self.lines = []
         for i in range(self.nlines):
-            self.lines.append(' ')
+            self.lines.append(' '*self.ncols)
+        self.refresh()
 
     def run(self):
-        chdir(expanduser(self.path))
-        p = Popen([self.dvcs,'status'],stdout=PIPE)
-        while 1:
-            line = p.stdout.readline().strip()
-            if line:
-                self.addline(line)
-            else:
-                break
-        self.addline('bépoauiebépotsrnvdljàyx.hgq')
+        for k in cmd.keys():
+            if cmd[k]['go']:
+                with chdir_lock:
+                    chdir(expanduser(self.path))
+                    p = Popen(cmd[k][self.dvcs],stdout=PIPE, stderr=STDOUT)
+                while 1:
+                    line = p.stdout.readline().strip()
+                    if line:
+                        self.addline(line)
+                    else:
+                        break
 
     def addline(self, line):
         lines = []
@@ -107,16 +158,18 @@ class NimWindow(Thread):
     def refresh(self):
         for i in range(self.nlines):
             self.win.addstr(self.nlines - i,0,self.lines[i].encode('utf-8'))
-        time.sleep(0.5)
-        with lock:
+        with curses_lock:
             self.win.refresh()
 
-
 stdscr = curses.initscr()
+curses.start_color()
+curses.use_default_colors()
+curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+#stdscr.curs_set(0)
 curses.noecho()
 curses.cbreak()
 stdscr.keypad(1)
-with lock:
+with curses_lock:
     stdscr.refresh()
 try:
     max_x,max_y = stdscr.getmaxyx()
@@ -133,15 +186,29 @@ try:
     i = 0
     j = 0
     k = 0
+    threads = []
+    while i < len(git):
+        while j < nbr_win_y and i < len(git):
+            threads.append(NimWindow(YH, wid_win_y, j, k, nbr_win_y, reste_y, 'git', git[i],stdscr, max_y))
+            threads[i].start()
+            j += 1
+            i += 1
+        if j == nbr_win_y:
+            j = 0
+            k += 1
     while i < N:
         while j < nbr_win_y and i < N:
-            t = NimWindow(YH, wid_win_y, j, k, nbr_win_y, reste_y, 'git', '~/AOC_LaTeX',stdscr, max_y)
-            t.start()
+            threads.append(NimWindow(YH, wid_win_y, j, k, nbr_win_y, reste_y, 'hg', hg[i-len(git)],stdscr, max_y))
+            threads[i].start()
             j += 1
             i += 1
         j = 0
         k += 1
-    time.sleep(6)
+
+    for thread in threads:
+        thread.join()
+    #time.sleep(30)
+    stdscr.getch()
 
 except NameError as er:
     print er

@@ -165,7 +165,6 @@ stdscr = curses.initscr()
 curses.start_color()
 curses.use_default_colors()
 curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-#stdscr.curs_set(0)
 curses.noecho()
 curses.cbreak()
 stdscr.keypad(1)
@@ -207,19 +206,14 @@ try:
 
     for thread in threads:
         thread.join()
-    #time.sleep(30)
     if STATUS:
         stdscr.getch()
 
-except NameError as er:
-    print er
-    error = er
+except :
+    pass
 
 finally:
     curses.nocbreak()
     stdscr.keypad(0)
     curses.echo()
     curses.endwin()
-
-print 'pipo', error
-#time.sleep(1)

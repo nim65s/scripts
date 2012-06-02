@@ -111,6 +111,7 @@ class NimWindow(Thread):
         with lock:
             self.win.refresh()
 
+
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()

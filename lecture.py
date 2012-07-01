@@ -636,4 +636,4 @@ if __name__ == '__main__':
     print
     lecture()
     if not os.listdir(LECT_PATH):
-        os.rmdir(LECT_PATH)
+        nettoyer(LECT_PATH)

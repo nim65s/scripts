@@ -635,5 +635,5 @@ if __name__ == '__main__':
     jaune('−'*24 + ' Lecture… ' + '−'*46)
     print
     lecture()
-    if not os.listdir(LECT_PATH):
-        nettoyer(LECT_PATH)
+    jaune('−'*24 + ' Nettoie… ' + '−'*46)
+    nettoyer(LECT_PATH)

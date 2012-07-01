@@ -811,7 +811,7 @@ class GoogleCalendar:
 
         tab.write()
 
-        print('Réveil programmé \\\o/')
+        print('Réveil programmé \\o/')
 
 
     def CalQuery(self, cmd, startText='', count=1):

@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-import os, sys, re, time, shelve
+import os, sys, re, time, shelve, unicodedata
 import feedparser, urllib, webbrowser, pprint
 from BeautifulSoup import BeautifulSoup
 
@@ -59,7 +59,8 @@ def run(reset=False):
                 print 'FAIL'
             if date[site] < entrie['published_parsed']:
                 if series['re'].search(entrie['title']):
-                    print u'%s…' % entrie['title']
+                    print '+', entrie['title'].encode('utf-8')
+                    #print unicodedata.normalize('NFKD',entrie['title']).encode('ascii','ignore')
                     url_lel = entrie['links'][0]['href']
                     url_dl = re.sub(r'/read/','/download/', url_lel)
                     webbrowser.open(url_dl)

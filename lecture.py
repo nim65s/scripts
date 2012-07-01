@@ -328,6 +328,11 @@ class Serie:
         if self._data[('chapitres','manquants','a_lire')]:
             self._data[('chapitres','manquants','a_lire')].sort()
 
+    def reset_preparation(self):
+        """Supprime les données issues d’une préparation antérieure"""
+        for tc in TC:
+            self._data[(tc,'presents','a_lire')] = []
+
 class Chapitre:
     """classe des informations trouvées sur les fichiers qui viennent d’être téléchargés"""
     def __init__(self, fichier, SERIES):
@@ -571,6 +576,11 @@ def lecture():
             else:
                 rouge('«%s» n’est pas un dossier oO' % path)
 
+def reset_preparation():
+    """Vide la liste des trucs présentes dans les chapitres/tomes à lire """
+    for dossier in os.listdir(LECT_PATH):
+        SERIES[dossier].reset_preparation()
+
 if __name__ == '__main__':
     jaune('−'*24 + ' Vérification des scans présents… ' + '−'*22)
     trouver_series(classer=False, affichage=False)
@@ -617,6 +627,7 @@ if __name__ == '__main__':
         print
         if not isdir(LECT_PATH):
             os.mkdir(LECT_PATH)
+        reset_preparation()
         check_preparation()
         print
 

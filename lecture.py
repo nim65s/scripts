@@ -397,6 +397,7 @@ def traiter_dl():
     """Fonction qui regarde les fichiers dans DL_PATH à la recherche de nouveaux chapitres"""
     doublon_re = re.compile(' \(\d\)')
     fichiers = os.listdir(DL_PATH)
+    rien_a_voir = []
     for fichier in fichiers:
         if SERIES_RE.search(fichier) and splitext(fichier)[1] not in NOT_SCANS_EXTENSIONS:
             est_unique = True
@@ -411,7 +412,9 @@ def traiter_dl():
             if est_unique:
                 CHAPITRES_TELECHARGES.append(Chapitre(fichier, SERIES))
         else:
-            rouge('Rien à voir : ' + fichier)
+            rien_a_voir.append(fichier)
+    if len(rien_a_voir):
+        rouge('Rien à voir: ' + ', '.join(rien_a_voir))
 
 def nettoyer(path):
     """Fonction qui enlève les fichiers et dossiers inutiles récursivement dans path"""

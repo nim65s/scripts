@@ -13,7 +13,7 @@ usage = """ Script appelé par Cron pour lancer les autres scripts.
 Il sert à mettre les bonnes variables et à logger.
 Utilisation : $0 script """
 
-putenv('DISPLAY', ':0.0')
+putenv('DISPLAY', ':0')
 putenv('BROWSER', 'chromium')
 
 PATH = expanduser('~/scripts')

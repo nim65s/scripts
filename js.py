@@ -19,7 +19,7 @@ except:
     date = {}
 
 site = 'japanshin'
-scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca']
+scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca', 'Bakuman']
 
 r = scans[0]
 for scan in scans[1:]:

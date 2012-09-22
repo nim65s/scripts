@@ -4,9 +4,12 @@
 import re
 import sys
 import json
+import codecs
 
 if len(sys.argv) < 2:
     sys.exit('Il me faut un fichier…')
+elif len(sys.argv) < 3:
+    sys.exit('Il me faut un numéro…')
 
 f = ''
 try:
@@ -17,6 +20,8 @@ except IOError:
 js = json.load(f)
 f.close()
 
+f = codecs.open('tex/%s-genere.tex' % sys.argv[2], encoding='utf-8', mode='w')
+
 cells = js['worksheets'][0]['cells']
 
 imgregex = re.compile(r"Image\('(\w+.png)'\)")
@@ -26,24 +31,20 @@ for cell in cells:
         imgs = imgregex.findall(cell['input'])
         if imgs:
             for img in imgs:
-                print '\includegraphics{img/%s}' % img
+                f.write('\\includegraphics{img/%s}\n' % img)
         else:
-            lines = cell['input'].split('\n')
-            print '\\begin{minted}[linenos]{python}'
-            for line in lines:
-                print line
-            print '\end{minted}'
+            f.write('\\begin{minted}[linenos]{python}\n')
+            f.write(cell['input'] + '\n')
+            f.write('\\end{minted}\n')
     elif cell['cell_type'] == 'markdown':
-        lines = cell['source'].split('\n')
-        for line in lines:
-            print line
+        f.write(cell['source'] + '\n')
     elif cell['cell_type'] == 'heading':
         if cell['level'] == 1:
-            print '\section{%s}' % cell['source']
+            f.write('\\section{%s}\n' % cell['source'])
         elif cell['level'] == 2:
-            print '\subsection{%s}' % cell['source']
+            f.write('\\subsection{%s}\n' % cell['source'])
         elif cell['level'] == 3:
-            print '\subsubsection{%s}' % cell['source']
+            f.write('\\subsubsection{%s}\n' % cell['source'])
     else:
         print 'FAAAAAAAAAAAAIL: type de la cellule non géré: %s' % cell['cell_type']
-
+f.close()

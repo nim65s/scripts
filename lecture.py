@@ -413,7 +413,7 @@ def traiter_dl():
                 CHAPITRES_TELECHARGES.append(Chapitre(fichier, SERIES))
         else:
             rien_a_voir.append(fichier)
-    if len(rien_a_voir):
+    if rien_a_voir:
         rouge('Rien à voir: ' + ', '.join(rien_a_voir))
 
 def nettoyer(path):

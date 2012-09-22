@@ -36,6 +36,10 @@ for cell in cells:
             f.write('\\begin{minted}[linenos]{python}\n')
             f.write(cell['input'] + '\n')
             f.write('\\end{minted}\n')
+            if cell['outputs'] and cell['outputs'][0]['output_type'] == 'stream':
+                f.write('\\begin{verbatim}\n')
+                f.write(cell['outputs'][0]['text'])
+                f.write('\\end{verbatim}\n')
     elif cell['cell_type'] == 'markdown':
         f.write('\n' + cell['source'] + '\n')
     elif cell['cell_type'] == 'heading':

@@ -31,13 +31,13 @@ for cell in cells:
         imgs = imgregex.findall(cell['input'])
         if imgs:
             for img in imgs:
-                f.write('\\includegraphics{img/%s}\n' % img)
+                f.write('\n\\includegraphics[width=\linewidth]{../img/%s}\n\n' % img)
         else:
             f.write('\\begin{minted}[linenos]{python}\n')
             f.write(cell['input'] + '\n')
             f.write('\\end{minted}\n')
     elif cell['cell_type'] == 'markdown':
-        f.write(cell['source'] + '\n')
+        f.write('\n' + cell['source'] + '\n')
     elif cell['cell_type'] == 'heading':
         if cell['level'] == 1:
             f.write('\\section{%s}\n' % cell['source'])

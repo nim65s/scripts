@@ -8,11 +8,17 @@ from os.path import expanduser, join, basename, isdir, isfile, splitext, exists,
 from couleurs import *
 
 DISPLAY = ':0'
+OLDDISPLAY = ':0'
+
+if os.environ.has_key('DISPLAY'):
+    OLDDISPLAY = os.environ['DISPLAY']
+    DISPLAY = OLDDISPLAY
+else:
+    return 'Pas de $DISPLAY… Ça va être tendu pour lire des images'
+
 if isfile(expanduser('~/.display')):
     with open(expanduser('~/.display')) as f:
         DISPLAY = f.read().strip()
-
-os.putenv('DISPLAY', DISPLAY)
 
 TOME_RE = re.compile('Tome ', re.I)
 BADARCH = re.compile('\.\./|^/')
@@ -51,7 +57,7 @@ JS = {
 
 JS_DOWN = 'http://www.japan-shin.com/lectureenligne/reader/download/<serie>/fr/<tome>/<chapitre>/'
 
- 
+
 class SerieProperty(object):
     """ Classe remplançant la fonction buildin «property»,
     histoire d’éviter la duplication de code.
@@ -522,6 +528,7 @@ def check_preparation():
 def telecharger_missing(bloquants_only=True):
     """ Télécharge automatiquement les chapitres qui manquent """
     yenavait = False
+    os.putenv('DISPLAY', DISPLAY)
     for s in SERIES:
         if s in JS.keys():
             titre = SERIES[s].titre
@@ -565,6 +572,7 @@ def question(txt, default=True):
 def lecture():
     """ La seule et véritable utilité de ce script est de LIRE \o/"""
     path = ''
+    os.putenv('DISPLAY', OLDDISPLAY)
     for s in os.listdir(LECT_PATH):
         vert('\n • ' + s + ' ')
         for c,t in SERIES[s].chapitres_et_tomes_a_lire:

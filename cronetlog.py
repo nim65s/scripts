@@ -1,9 +1,11 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
+from __future__ import with_statement
+
 from os import putenv, mkdir
 from sys import argv
-from os.path import expanduser, isdir, join
+from os.path import expanduser, isdir, isfile, join
 from subprocess import *
 from datetime import datetime
 from threading import Thread
@@ -13,7 +15,12 @@ usage = """ Script appelé par Cron pour lancer les autres scripts.
 Il sert à mettre les bonnes variables et à logger.
 Utilisation : $0 script """
 
-putenv('DISPLAY', ':0')
+DISPLAY = ':0'
+if isfile(expanduser('~/.display')):
+    with open(expanduser('~/.display')) as f:
+        DISPLAY = f.read().strip()
+
+putenv('DISPLAY', DISPLAY)
 putenv('BROWSER', 'chromium')
 
 PATH = expanduser('~/scripts')

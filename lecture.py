@@ -14,7 +14,8 @@ if os.environ.has_key('DISPLAY'):
     OLDDISPLAY = os.environ['DISPLAY']
     DISPLAY = OLDDISPLAY
 else:
-    return 'Pas de $DISPLAY… Ça va être tendu pour lire des images'
+    print 'Pas de $DISPLAY… Ça va être tendu pour lire des images'
+    exit()
 
 if isfile(expanduser('~/.display')):
     with open(expanduser('~/.display')) as f:

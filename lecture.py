@@ -1,9 +1,18 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
+from __future__ import with_statement
+
 import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint, time, webbrowser
-from os.path import expanduser, join, basename, isdir, splitext, exists, splitext
+from os.path import expanduser, join, basename, isdir, isfile, splitext, exists, splitext
 from couleurs import *
+
+DISPLAY = ':0'
+if isfile(expanduser('~/.display')):
+    with open(expanduser('~/.display')) as f:
+        DISPLAY = f.read().strip()
+
+os.putenv('DISPLAY', DISPLAY)
 
 TOME_RE = re.compile('Tome ', re.I)
 BADARCH = re.compile('\.\./|^/')

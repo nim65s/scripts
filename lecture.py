@@ -54,6 +54,8 @@ JS = {
     'Fairy Tail': False,
     'Black Butler': False,
     'Claymore': False,
+    'Bakuman': False,
+    'Air Gear': False
 }
 
 JS_DOWN = 'http://www.japan-shin.com/lectureenligne/reader/download/<serie>/fr/<tome>/<chapitre>/'
@@ -75,7 +77,7 @@ class SerieProperty(object):
     def __set__(self, obj, val):
         print 'TATA'
         Serie._setter(obj, val, 0, self.tc, self.mp, self.al)
-    
+
 class SerieException(Exception):
     """Une exception sans grandes prétentions, si ce n’est d’être exceptionnelle"""
     def __init__(self, message):
@@ -520,7 +522,7 @@ def check_preparation():
             rouge('Tomes manquants à lire:')
             print SERIES[dossier].tomes_manquants_a_lire
             SERIES[dossier].lecture_ready = False
-        if SERIES[dossier].chapitres_manquants_a_lire and SERIES[dossier].chapitres_manquants_a_lire[-1] > SERIES[dossier].chapitres[-1]:
+        if SERIES[dossier].chapitres_manquants_a_lire and SERIES[dossier].chapitres and SERIES[dossier].chapitres_manquants_a_lire[-1] > SERIES[dossier].chapitres[-1]:
             rouge('Chapitres manquants à lire:')
             print SERIES[dossier].chapitres_manquants_a_lire
             jaune('\tDernier chapitre présent lu de %s: %s' % (dossier, SERIES[dossier].chapitres[-1]))

@@ -24,7 +24,7 @@ f = codecs.open('tex/%s-genere.tex' % sys.argv[2], encoding='utf-8', mode='w')
 
 cells = js['worksheets'][0]['cells']
 
-imgregex = re.compile(r"Image\('(\w+.png)'\)")
+imgregex = re.compile(r"Image\(filename='(\w+.png)'\)")
 
 for cell in cells:
     if cell['cell_type'] == 'code':

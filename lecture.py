@@ -585,7 +585,7 @@ def lecture():
                 path=join(LECT_PATH,s,str(c))
             print '\t', path
             if isdir(path):
-                os.system("feh -FZrSname --cycle-once '%s'" % path)
+                os.system("eog -fs '%s'" % path)
                 if question("Ranger le chapitre qui vient d’être lu ?"):
                     dst = ''
                     if t:

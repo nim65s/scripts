@@ -4,7 +4,7 @@
 from __future__ import with_statement
 
 import os, re, sys, shutil, filecmp, zipfile, rarfile, pprint, time, webbrowser
-from os.path import expanduser, join, basename, isdir, isfile, splitext, exists, splitext
+from os.path import expanduser, join, basename, isdir, isfile, splitext, exists
 from couleurs import *
 
 DISPLAY = ':0'
@@ -34,6 +34,9 @@ USELESS_DIRS = ['__MACOSX']
 NOT_SCANS_EXTENSIONS = ['.mp4','.torrent']
 
 SCANS = os.listdir(SCAN_PATH)
+
+if 'Divers' in SCANS:
+    SCANS.remove('Divers')
 
 r = SCANS[0]
 for scan in SCANS[1:]:

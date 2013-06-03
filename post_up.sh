@@ -19,5 +19,5 @@ then
     [[ -f .synergy.conf ]] && rm .synergy.conf
     ln -s .synergy.conf.$1 .synergy.conf
     DISPLAY=:0 synergys
+    DISPLAY=:0 dropboxd &
 fi
-

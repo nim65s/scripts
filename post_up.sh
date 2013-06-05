@@ -10,9 +10,6 @@ cd ~/.config/pulse
 [[ -f client.conf ]] && rm client.conf
 ln -s $1 client.conf
 
-sleep 10
-DISPLAY=:0 ssh-add
-
 if [[ $1 == 'home' ]]
 then
     cd

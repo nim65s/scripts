@@ -1,8 +1,8 @@
 #!/bin/bash
 # curl https://raw.github.com/nim65s/scripts/master/install.sh | bash
 
-PACKAGES="git vim zsh ssh"
-which pacman && sudo pacman -Syu --noconfirm $PACKAGES
+PACKAGES="git vim zsh"
+which pacman && sudo pacman -Syu --noconfirm $PACKAGES openssh
 which apt-get && sudo apt-get install $PACKAGES
 
 for repo in dotfiles script

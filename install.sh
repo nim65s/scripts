@@ -12,6 +12,7 @@ do
     git submodule init
     git submodule update
     git submodule foreach git checkout master
+    cd ..
 done
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad

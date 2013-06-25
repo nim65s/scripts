@@ -2,12 +2,12 @@
 # curl https://raw.github.com/nim65s/scripts/master/install.sh | bash
 
 PACKAGES="git vim zsh"
-which pacman && sudo pacman -Syu --noconfirm $PACKAGES openssh
+which pacman && sudo pacman -Syu --noconfirm $PACKAGES
 which apt-get && sudo apt-get install $PACKAGES
 
 for repo in dotfiles script
 do
-    git clone git@github.com:nim65s/$repo.git
+    git clone https://github.com/nim65s/$repo.git
     cd $repo
     git submodule init
     git submodule update

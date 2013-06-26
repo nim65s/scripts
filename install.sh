@@ -25,10 +25,12 @@ rm .ssh/id_rsa
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim
 do
+    rm $file
     ln -s dotfiles/$file
 done
 
 for files in awesome dfc fish ipython pep8 ranger terminator zathura
 do
+    rm -rf .config/$files
     ln -s dotfiles/.config/$files .config
 done

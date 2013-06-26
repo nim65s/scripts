@@ -1,6 +1,8 @@
 #!/bin/bash
 # curl https://raw.github.com/nim65s/scripts/master/install.sh | bash
 
+cd
+
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim zsh openssh
 which apt-get 2> /dev/null && sudo apt-get install git zsh vim-gnome
 

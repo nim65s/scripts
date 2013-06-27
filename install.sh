@@ -5,8 +5,7 @@ cd
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim zsh openssh
 which apt-get 2> /dev/null && sudo apt-get install git zsh vim-gnome
-
-chsh -s $(which zsh) nim
+which yum 2> /dev/null && sudo yum install git zsh vim
 
 mkdir ~/.ssh
 scp saurelg@ssh.inpt.fr:.ssh/id_rsa .ssh
@@ -38,3 +37,5 @@ do
     rm -rf .config/$files
     ln -s dotfiles/.config/$files .config
 done
+
+echo "Don't forget to «chsh $(which zsh) $USER» and to «rm ~/.ssh/tmpagent»"

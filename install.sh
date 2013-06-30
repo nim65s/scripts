@@ -22,6 +22,7 @@ do
     git submodule update
     git submodule foreach git checkout master
     cd
+    grep -q $repo .gitrepos 2> /dev/null || echo $HOME/$repo >> .gitrepos
 done
 
 rm .ssh/id_rsa

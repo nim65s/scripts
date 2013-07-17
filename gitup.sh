@@ -15,7 +15,7 @@ while read repo ; do
         echo $TEMP >> $MAINTEMP
         echo > $TEMP
         echo $repo >> $TEMP
-        ( cd $repo && git pull && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) | grep -v 'Already up-to-date.\|nothing to commit,\? (\?working directory clean)\?\|# On branch master\|^Entering' 2>&1 >> $TEMP
+        ( cd $repo && git pull --rebase && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) | grep -v 'Already up-to-date.\|nothing to commit,\? (\?working directory clean)\?\|# On branch master\|^Entering' 2>&1 >> $TEMP
     ) &
 done < ~/.gitrepos
 

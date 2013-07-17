@@ -15,8 +15,8 @@ while read repo ; do
         echo $TEMP >> $MAINTEMP
         echo > $TEMP
         echo $repo >> $TEMP
-        ( cd $repo && git pull --rebase && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) 2>&1 >> $TEMP
-        sed -i '/up[- ]to[- ]date.$/d;/^nothing to commit/d;/^# On branch master/d;/^Entering/d' $TEMP
+        ( cd $repo && git pull --rebase 2>&1 && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) >> $TEMP
+        sed -i '/up[- ]to[- ]date.$/d;/^nothing to commit/d;/^# On branch master/d;/^Entering/d;/^ControlSocket/d' $TEMP
     ) &
 done < ~/.gitrepos
 

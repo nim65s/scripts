@@ -16,7 +16,7 @@ while read repo ; do
         echo > $TEMP
         echo $repo >> $TEMP
         ( cd $repo && git pull --rebase 2>&1 && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) >> $TEMP
-        sed -i '/up[- ]to[- ]date.$/d;/^nothing to commit/d;/^# On branch /d;/^Entering/d;/^ControlSocket/d' $TEMP
+        sed -i '/up[- ]to[- ]date.$/d;/^nothing to commit/d;/^# On branch /d;/^Entering/d;/^ControlSocket/d;/^# Sur la branche/d;/^rien à valider, la copie de travail est propre/d' $TEMP
     ) &
 done < ~/.gitrepos
 

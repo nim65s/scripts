@@ -2,10 +2,11 @@
 # Based on an idea of https://github.com/vigneshwaranr/bd
 
 from os import getcwd, chdir
-from sys import argv
+from sys import argv, stderr
 
 if len(argv) != 2:
-    print('I need an hint, and only one…')
+    stderr.write('I need an hint, and only one…\n')
+    print('.')
 else:
     newpwd = './'
     arg = argv[1]
@@ -18,4 +19,5 @@ else:
         else:
             newpwd += '../'
     else:
-        print("I didn't found a parent directory starting with %s" % arg)
+        stderr.write("I didn't found a parent directory starting with %s\n" % arg)
+        print('.')

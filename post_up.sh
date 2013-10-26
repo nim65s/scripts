@@ -12,8 +12,5 @@ ln -s $1 client.conf
 
 if [[ $1 == 'home' ]]
 then
-    cd
-    [[ -f .synergy.conf ]] && rm .synergy.conf
-    ln -s .synergy.conf.$1 .synergy.conf
-    DISPLAY=:0 synergys
+    DISPLAY=:0 synergyc ashitaka
 fi

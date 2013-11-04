@@ -20,8 +20,3 @@ ln -s $lieu config
 cd ~/.config/pulse
 [[ -f client.conf ]] && rm client.conf
 ln -s $lieu client.conf
-
-if [[ $lieu == 'home' ]]
-then
-    DISPLAY=:0 synergyc ashitaka
-fi

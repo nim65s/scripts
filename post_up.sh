@@ -1,16 +1,27 @@
 #!/bin/bash
 
-[[ $1 == 'home' || $1 == 'net7' || $1 == 'ailleurs' ]] || exit 1
+if [[ -n $1 ]]
+then lieu=$1
+elif grep -q n7 /etc/resolv.conf
+then lieu=net7
+elif grep -q saurel /etc/resolv.conf
+then lieu=home
+else exit 1
+fi
+
+echo post-up: $lieu
+
+[[ $lieu == 'home' || $lieu == 'net7' || $lieu == 'ailleurs' ]] || exit 2
 
 cd ~/.ssh
 [[ -f config ]] && rm config
-ln -s $1 config
+ln -s $lieu config
 
 cd ~/.config/pulse
 [[ -f client.conf ]] && rm client.conf
-ln -s $1 client.conf
+ln -s $lieu client.conf
 
-if [[ $1 == 'home' ]]
+if [[ $lieu == 'home' ]]
 then
     DISPLAY=:0 synergyc ashitaka
 fi

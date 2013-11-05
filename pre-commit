@@ -12,7 +12,7 @@ for path in findall(r'[AM]+\s*"?(?P<name>[^"\n]*)"?\n', check_output(['git', 'st
 
     if path.endswith('.py'):
         try:
-            print check_output(['pep8', path])
+            check_output(['pep8', path])
         except CalledProcessError, e:
             return_code += 1
             print e.output

@@ -5,7 +5,7 @@ from re import findall
 from subprocess import check_output, CalledProcessError
 from sys import exit
 
-ok = True
+return_code = 0
 
 for path in findall(r'[AM]+\s*"?(?P<name>[^"\n]*)"?\n', check_output(['git', 'status', '--porcelain'])):
     check_output(['git', 'add', path])
@@ -14,8 +14,7 @@ for path in findall(r'[AM]+\s*"?(?P<name>[^"\n]*)"?\n', check_output(['git', 'st
         try:
             print check_output(['pep8', path])
         except CalledProcessError, e:
-            ok = False
+            return_code += 1
             print e.output
 
-if not ok:
-    exit(1)
+exit(return_code)

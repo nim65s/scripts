@@ -7,9 +7,10 @@ from sys import exit
 
 ok = True
 
-for path in findall(r' [AM]+ (?P<name>.*\.py)', check_output(['git', 'status', '--porcelain'])):
+for path in findall(r'[AM]+\s*"?(?P<name>[^"]*)"?\n', check_output(['git', 'status', '--porcelain'])):
     try:
-        print check_output(['pep8', path])
+        if path.endswith('.py'):
+            print check_output(['pep8', path])
     except CalledProcessError, e:
         ok = False
         print e.output

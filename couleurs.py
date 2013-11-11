@@ -1,7 +1,8 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-"""module pour colorer la sortie des consoles et apprendre à écrire des modules: pas très utile en vrai…"""
+"""module pour colorer la sortie des consoles et apprendre à écrire des modules:
+    pas très utile en vrai…"""
 
 from __future__ import print_function
 import unicodedata

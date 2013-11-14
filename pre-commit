@@ -12,7 +12,9 @@ for path in findall(r'[AM]+\s*"?(?P<name>[^"\n]*)"?\n', check_output(['git', 'st
 
     if path.endswith('.py'):
         try:
+            check_output(["isort", "-p", "django", "-l", "160", path])
             check_output(['pep8', path])
+            check_output(['git', 'update-index', '--add', path])  # isort modifies the files…
         except CalledProcessError, e:
             return_code += 1
             print e.output

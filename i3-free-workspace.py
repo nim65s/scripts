@@ -29,10 +29,12 @@ if argv[2] == 'prev':
 
 used_ws = [ws['num'] for ws in i3.get_workspaces()]
 
-for ws in ws_list:
-    if ws not in used_ws:
-        if argv[1] == 'switch':
-            i3.command('workspace', str(ws))
-        else:
-            i3.command('move container to workspace', str(ws))
-        break
+try:
+    ws = next(ws for ws in ws_list if ws not in used_ws)
+except StopIteration:
+    sys.exit(3)
+
+if argv[1] == 'switch':
+    i3.command('workspace', str(ws))
+else:
+    i3.command('move container to workspace', str(ws))

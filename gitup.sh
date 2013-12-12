@@ -18,7 +18,7 @@ while read repo ; do
         sed -i '/up[- ]to[- ]date.$/d;/^nothing to commit/d;/^# On branch /d;/^Entering/d;/^ControlSocket/d' $TEMP
         sed -i '/^# Sur la branche/d;/^rien à valider, la copie de travail est propre/d;/^La branche courante master est à jour.$/d' $TEMP
         sed -i '/mise à jour en avance rapide sur/d;/^Premièrement, retour de head pour rejouer votre travail par-dessus.../d' $TEMP
-        sed -i '/^Votre branche est à jour avec /d;/^Sur la branche /d;/^$/d' $TEMP
+        sed -i '/^Votre branche est à jour avec /d;/^Sur la branche /d;/^$/d;/Entrée dans/d' $TEMP
         sed -i '/^Your branch is up-to-date with/d;/^On branch /d;/^$/d' $TEMP
     ) &
 done < ~/.gitrepos

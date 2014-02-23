@@ -1,14 +1,23 @@
 #!/usr/bin/python2
 #-*- coding: utf-8 -*-
 
-import os, sys, re, time, shelve, unicodedata
-import feedparser, urllib, webbrowser, pprint
+import os
+import pprint
+import re
+import shelve
+import sys
+import time
+import unicodedata
+import urllib
+import webbrowser
+
+import feedparser
 from BeautifulSoup import BeautifulSoup
 
 from couleurs import *
 
-reset=False
-sleep=0
+reset = False
+sleep = 0
 date_shelve = False
 
 try:
@@ -19,19 +28,20 @@ except:
     date = {}
 
 site = 'japanshin'
-scans = ['Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca', 'Bakuman']
+scans = ['Arslan Senki', 'Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca', 'Bakuman', 'Fuuka']
 
 r = scans[0]
 for scan in scans[1:]:
     r = r + '|' + scan
 
 series = {
-        're': re.compile(r.replace(' ','.?'),re.I),
-        'titles': [(scan,re.compile(scan.replace(' ','.?'),re.I)) for scan in scans]
+        're': re.compile(r.replace(' ', '.?'), re.I),
+        'titles': [(scan, re.compile(scan.replace(' ', '.?'), re.I)) for scan in scans]
         }
 
 url_rss = 'http://www.japan-shin.com/lectureenligne/reader/feeds/rss/'
 url_re = re.compile(r'http://www\.japan-shin\.com/lectureenligne/reader/read/(?P<serie_url>[a-z0-9_-]*)/fr/(?P<tome>[0-9]*)/(?P<chapt>[0-9]*)/')
+
 
 def run(reset=False):
     if reset:
@@ -53,7 +63,7 @@ def run(reset=False):
     if nouvelles_entrees:
         for entrie in feed['entries']:
             url_lel = entrie['links'][0]['href']
-            url_dl = re.sub(r'/read/','/download/', url_lel)
+            url_dl = re.sub(r'/read/', '/download/', url_lel)
             m = url_re.match(url_lel)
             if not m:
                 print 'FAIL'
@@ -62,7 +72,7 @@ def run(reset=False):
                     print '+', entrie['title'].encode('utf-8')
                     #print unicodedata.normalize('NFKD',entrie['title']).encode('ascii','ignore')
                     url_lel = entrie['links'][0]['href']
-                    url_dl = re.sub(r'/read/','/download/', url_lel)
+                    url_dl = re.sub(r'/read/', '/download/', url_lel)
                     webbrowser.open(url_dl)
                 else:
                     print '-', entrie['title'].encode('utf-8')
@@ -78,7 +88,7 @@ def run(reset=False):
 
 if __name__ == '__main__':
     reset = False
-    if not date.has_key(site):
+    if site not in date:
         reset = True
     run(reset)
 

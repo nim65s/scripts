@@ -1,96 +1,68 @@
 #!/usr/bin/python2
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-import os
-import pprint
 import re
 import shelve
-import sys
 import time
-import unicodedata
-import urllib
 import webbrowser
+from os import listdir
+from os.path import expanduser
 
 import feedparser
-from BeautifulSoup import BeautifulSoup
 
-from couleurs import *
+from couleurs import rouge, vert
 
-reset = False
-sleep = 0
-date_shelve = False
+scans = listdir(expanduser('~/Scans'))
+series = re.compile('|'.join(scans).replace(' ', '.?'), re.I)
 
-try:
-    date = shelve.open(os.path.expanduser('~/.js_shelve'), writeback=True)
-    date_shelve = True
-except:
-    print 'Ratage de l’ouverture du shelve'
-    date = {}
-
-site = 'japanshin'
-scans = ['Arslan Senki', 'Kenichi', 'Naruto', 'Fairy Tail', 'One Piece', 'Black Butler', 'Metallica Metalluca', 'Bakuman', 'Fuuka']
-
-r = scans[0]
-for scan in scans[1:]:
-    r = r + '|' + scan
-
-series = {
-        're': re.compile(r.replace(' ', '.?'), re.I),
-        'titles': [(scan, re.compile(scan.replace(' ', '.?'), re.I)) for scan in scans]
-        }
-
-url_rss = 'http://www.japan-shin.com/lectureenligne/reader/feeds/rss/'
-url_re = re.compile(r'http://www\.japan-shin\.com/lectureenligne/reader/read/(?P<serie_url>[a-z0-9_-]*)/fr/(?P<tome>[0-9]*)/(?P<chapt>[0-9]*)/')
+sites = [
+    ('japanshin', 'http://www.japan-shin.com/lectureenligne/'),
+    ('kangaryu', 'http://kangaryu-team.fr/'),
+    ]
 
 
-def run(reset=False):
-    if reset:
-        date[site] = time.gmtime(0)
+def run(nom, prefix_url, timestamp):
+    print nom
+    url_rss = prefix_url + 'reader/feeds/rss/'
+    url_re = re.compile(r'%sreader/read/(?P<serie_url>[a-z0-9_]*)/fr/(?P<tome>\d*)/(?P<chapitre>\d+)/' % prefix_url.replace('.', '\.'))
+    # TODO: Gestion de ces tome / chapitre
 
     feed = feedparser.parse(url_rss)
     if feed['bozo']:
         rouge('bozo')
         return
 
-    nouvelles_entrees = False
-    try:
-        nouvelles_entrees = date[site] < feed['entries'][0]['published_parsed']
-    except IndexError:
-        rouge('<DEBUG>')
-        pprint.PrettyPrinter(indent=4).pprint(feed)
-        rouge('</DEBUG>')
-
-    if nouvelles_entrees:
-        for entrie in feed['entries']:
-            url_lel = entrie['links'][0]['href']
-            url_dl = re.sub(r'/read/', '/download/', url_lel)
-            m = url_re.match(url_lel)
-            if not m:
-                print 'FAIL'
-            if date[site] < entrie['published_parsed']:
-                if series['re'].search(entrie['title']):
-                    print '+', entrie['title'].encode('utf-8')
-                    #print unicodedata.normalize('NFKD',entrie['title']).encode('ascii','ignore')
-                    url_lel = entrie['links'][0]['href']
-                    url_dl = re.sub(r'/read/', '/download/', url_lel)
-                    webbrowser.open(url_dl)
-                else:
-                    print '-', entrie['title'].encode('utf-8')
-            elif date[site] == entrie['published_parsed']:
-                vert('revenu à la dernière entrée sauvegardée sur %s.' % site)
-                break
+    for entrie in feed['entries']:
+        if timestamp < entrie['published_parsed']:
+            if series.search(entrie['title']):
+                print '+', entrie['title'].encode('utf-8')
+                webbrowser.open(re.sub(r'/read/', '/download/', entrie['links'][0]['href']))
             else:
-                rouge('ATTENTION il manque probablement des trucs sur %s !' % site)
-                break
-        date[site] = feed['entries'][0]['published_parsed']
-    else:
-        print '.'
+                print '-', entrie['title'].encode('utf-8')
+        elif timestamp == entrie['published_parsed']:
+            vert('revenu à la dernière entrée sauvegardée sur %s.' % nom)
+            break
+        else:
+            rouge('ATTENTION il manque probablement des trucs sur %s !' % nom)
+            break
+    return feed['entries'][0]['published_parsed']
+
 
 if __name__ == '__main__':
-    reset = False
-    if site not in date:
-        reset = True
-    run(reset)
+    try:
+        timestamps = shelve.open(expanduser('~/.js_shelve'), writeback=True)
+        date_shelve = True
+    except:
+        print 'Ratage de l’ouverture du shelve'
+        timestamps = {}
+        date_shelve = False
 
-if date_shelve:
-    date.close()
+    for nom, prefix_url in sites:
+        if nom in timestamps:
+            timestamp = timestamps[nom]
+        else:
+            timestamp = time.gmtime(0)
+        timestamps[nom] = run(nom, prefix_url, timestamp)
+
+    if date_shelve:
+        timestamps.close()

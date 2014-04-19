@@ -1,5 +1,5 @@
 #!/usr/bin/python2
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from __future__ import with_statement
 
@@ -186,7 +186,7 @@ class Serie:
             if tc_num in self._data[(tc, mp, al)]:
                 raise SerieException('%s est déjà dans les %s %s %s' % (num_or_path, tc, mp, al.replace('a_', 'à ')))
         else:
-            #TODO: on peut déduire le tome avec des regex \o/
+            # TODO: on peut déduire le tome avec des regex \o/
             if tc_num in [i for i, j in self._data[(tc, mp, al)]]:
                 raise SerieException('%s est déjà dans les %s %s %s' % (num_or_path, tc, mp, al.replace('a_', 'à ')))
             tc_num = (tc_num, tome_num)
@@ -215,7 +215,7 @@ class Serie:
                 if length < (max_tc - min_tc + 1):
                     ret = False
                     for i in range(min_tc, max_tc):
-                        if not i in presents:
+                        if i not in presents:
                             self._setter(i, tc=tc, mp='manquants', al=al)
         if al == 'a_lire':
             for chapitre_a_lire in self.chapitres_a_lire:
@@ -468,7 +468,7 @@ def nettoyer(path):
                 jaune('Suppression de %s/%s' % (dirpath, useless_file))
                 os.remove(join(dirpath, useless_file))
     for dirpath, dirnames, filenames in os.walk(path):
-        if not dirnames and not filenames and not dirpath in [DL_PATH, LECT_PATH, SCAN_PATH]:
+        if not dirnames and not filenames and dirpath not in [DL_PATH, LECT_PATH, SCAN_PATH]:
             jaune('Suppression récursive inverse de %s' % dirpath)
             os.removedirs(dirpath)
 
@@ -541,7 +541,7 @@ def check_preparation():
         sys.stdout.write('\n • ' + dossier + ' ')
         SERIES[dossier].check_preparation()
         SERIES[dossier].lecture_ready = True
-        if SERIES[dossier].tomes_manquants_a_lire and SERIES[dossier].tomes_manquants_a_lire[-1] > SERIES[dossier].tomes[-1]:
+        if SERIES[dossier].tomes_manquants_a_lire and SERIES[dossier].tomes and SERIES[dossier].tomes_manquants_a_lire[-1] > SERIES[dossier].tomes[-1]:
             rouge('Tomes manquants à lire:')
             print SERIES[dossier].tomes_manquants_a_lire
             SERIES[dossier].lecture_ready = False

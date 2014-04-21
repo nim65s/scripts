@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from subprocess import CalledProcessError, check_output
 from sys import exit
@@ -8,7 +8,7 @@ return_code = 0
 
 
 for path in check_output(['git', 'status', '--porcelain']).split('\n'):
-    if path.startswith(' A ') or path.startswith(' M '):
+    if path.startswith(' A ') or path.startswith('M  '):
         path = path[3:]
         if path.endswith('.py'):
             try:

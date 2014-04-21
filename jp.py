@@ -3,7 +3,6 @@
 import os
 import re
 from os.path import expanduser
-from urllib.parse import urljoin
 
 import requests
 

@@ -1,15 +1,18 @@
 #!/bin/bash
 
-cd
+mkdir -p ~/guignols
+cd ~/guignols
+touch ~/.guignols
 
-touch ~/.guignols_old
+curl 'http://www.canalplus.fr/c-divertissement/pid1784-c-les-guignols.html' | grep 'c-les-guignols.html?vid=' | tr ' ' '\n' | grep '^href' | cut -d'"' -f2 | sort | uniq > new
+diff ~/.guignols new | grep '>' | cut -d' ' -f2 > diff
 
-curl 'http://www.canalplus.fr/c-divertissement/pid1784-c-les-guignols.html' | grep 'c-les-guignols.html?vid=' | tr ' ' '\n' | grep '^href' | cut -d= -f2- | cut -d'>' -f1 | sort > ~/.guignols_new
-diff ~/.guignols_old ~/.guignols_new | grep '<' | cut -d' ' -f2 > ~/.guignols_diff
+while read url
+do youtube-dl $url &
+done < diff
 
-while read l
-do youtube-dl $l
-done < ~/.guignols_diff
+wait
 
-mv ~/.guignols_new ~/.guignols_old
-rm ~/.guignols_diff
+cat new ~/.guignols | sort | uniq > old
+mv old ~/.guignols
+rm new diff

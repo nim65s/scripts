@@ -29,7 +29,7 @@ rm .ssh/id_rsa
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim
 do
-    rm $file
+    rm -f $file
     ln -s dotfiles/$file
 done
 

@@ -39,4 +39,4 @@ do
     ln -s dotfiles/.config/$files .config
 done
 
-echo "Don't forget to «chsh $(which zsh) $USER» and to «rm ~/.ssh/tmpagent»"
+echo "Don't forget to «chsh -s $(which zsh) $USER» and to «rm ~/.ssh/tmpagent»"

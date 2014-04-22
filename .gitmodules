@@ -1,6 +1,6 @@
 [submodule "vimpager"]
     path = vimpager
-    url = https://github.com/rkitover/vimpager.git
+    url = git@github.com:rkitover/vimpager.git
 [submodule "nbconvert"]
 	path = nbconvert
-	url = https://github.com/ipython/nbconvert.git
+	url = git@github.com:ipython/nbconvert.git

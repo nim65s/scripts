@@ -1,6 +1,8 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import re
 import shelve
 import time

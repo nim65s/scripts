@@ -1,12 +1,14 @@
 #!/usr/bin/python2
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, unicode_literals
+
+import sys
+import unicodedata
+
 
 """module pour colorer la sortie des consoles et apprendre à écrire des modules:
     pas très utile en vrai…"""
-
-from __future__ import print_function
-import unicodedata
-import sys
 
 
 def rouge(texte):
@@ -52,11 +54,11 @@ def style(texte, style):
 def colore_256(texte, couleur):
     """printe un «texte» coloré selon la «couleur»"""
     if sys.stdout.encoding == 'UTF-8':
-        print(u'\033[38;5;%sm%s\033[0m' % (couleur, texte))
+        print('\033[38;5;%sm%s\033[0m' % (couleur, texte))
     else:
         if isinstance(texte, unicode):
             texte = unicodedata.normalize('NFKD', texte).encode('ascii', 'ignore')
-        print(u'\033[38;5;%sm%s\033[0m' % (couleur, texte))
+        print('\033[38;5;%sm%s\033[0m' % (couleur, texte))
 
 
 def exemple():

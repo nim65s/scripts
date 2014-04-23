@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-from __future__ import with_statement
+from __future__ import unicode_literals, with_statement
 
 import filecmp
 import os

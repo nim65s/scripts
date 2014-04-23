@@ -1,7 +1,7 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, with_statement
+from __future__ import print_function, unicode_literals, with_statement
 
 import filecmp
 import os
@@ -25,7 +25,7 @@ if 'DISPLAY' in os.environ:
     OLDDISPLAY = os.environ['DISPLAY']
     DISPLAY = OLDDISPLAY
 else:
-    print 'Pas de $DISPLAY… Ça va être tendu pour lire des images'
+    print('Pas de $DISPLAY… Ça va être tendu pour lire des images')
     exit()
 
 if isfile(expanduser('~/.display')):
@@ -89,7 +89,7 @@ class SerieProperty(object):
         return Serie._getter(obj, self.tc, self.mp, self.al)
 
     def __set__(self, obj, val):
-        print 'TATA'
+        print('TATA')
         Serie._setter(obj, val, 0, self.tc, self.mp, self.al)
 
 
@@ -426,10 +426,10 @@ def trouver_series(classer=False, affichage=False):
         if affichage:
             if SERIES[dossier].tomes_manquants:
                 rouge('Tomes manquants:')
-                print SERIES[dossier].tomes_manquants
+                print(SERIES[dossier].tomes_manquants)
             if SERIES[dossier].chapitres_manquants:
                 rouge('Chapitres manquants:')
-                print SERIES[dossier].chapitres_manquants
+                print(SERIES[dossier].chapitres_manquants)
 
 
 def traiter_dl():
@@ -543,12 +543,12 @@ def check_preparation():
         SERIES[dossier].lecture_ready = True
         if SERIES[dossier].tomes_manquants_a_lire and SERIES[dossier].tomes and SERIES[dossier].tomes_manquants_a_lire[-1] > SERIES[dossier].tomes[-1]:
             rouge('Tomes manquants à lire:')
-            print SERIES[dossier].tomes_manquants_a_lire
+            print(SERIES[dossier].tomes_manquants_a_lire)
             SERIES[dossier].lecture_ready = False
         if SERIES[dossier].chapitres_manquants_a_lire and SERIES[dossier].chapitres:
             if SERIES[dossier].chapitres_manquants_a_lire[-1] > SERIES[dossier].chapitres[-1]:
                 rouge('Chapitres manquants à lire:')
-                print SERIES[dossier].chapitres_manquants_a_lire
+                print(SERIES[dossier].chapitres_manquants_a_lire)
                 jaune('\tDernier chapitre présent lu de %s: %s' % (dossier, SERIES[dossier].chapitres[-1]))
                 SERIES[dossier].lecture_ready = False
 
@@ -594,7 +594,7 @@ def telecharger_missing(bloquants_only=True):
 
 def question(txt, default=True):
     txt += " [O/n] " if default else " [o/N] "
-    i = raw_input(txt).upper()
+    i = input(txt).upper()
     if i == 'O':
         return True
     if i == 'N':
@@ -613,7 +613,7 @@ def lecture():
                 path = join(LECT_PATH, s, 'Tome %s' % t, str(c))
             else:
                 path = join(LECT_PATH, s, str(c))
-            print '\t', path
+            print('\t', path)
             if isdir(path):
                 os.system("eog -f '%s'" % path)
                 if question("Ranger le chapitre qui vient d’être lu ?"):
@@ -639,55 +639,55 @@ if __name__ == '__main__':
     jaune('−' * 24 + ' Vérification des scans présents… ' + '−' * 22)
     trouver_series(classer=False, affichage=False)
     if isdir(LECT_PATH):
-        print
+        print()
         jaune('−' * 18 + ' Vérification de la préparation précédente… ' + '−' * 18)
-        print
+        print()
         preparer_chapitres()
-    print
+    print()
     jaune('−' * 24 + ' Traitement des téléchargements… ' + '−' * 23)
-    print
+    print()
     if not isdir(DL_PATH):
         os.mkdir(DL_PATH)
     traiter_dl()
-    print
+    print()
     jaune('−' * 24 + ' Préparation des chapitres… ' + '−' * 28)
-    print
+    print()
     preparer_chapitres()
-    print
+    print()
     jaune('−' * 24 + ' Vérification de la préparation… ' + '−' * 23)
-    print
+    print()
     if not isdir(LECT_PATH):
         os.mkdir(LECT_PATH)
     check_preparation()
-    print
+    print()
     jaune('−' * 24 + ' Téléchargement des manquants… ' + '−' * 25)
-    print
+    print()
     if telecharger_missing(bloquants_only=True):
-        print
-        print 'On attend une petite minute que les DLs se finissent…'
+        print()
+        print('On attend une petite minute que les DLs se finissent…')
         time.sleep(60)
-        print
+        print()
         jaune('−' * 24 + ' Traitement des téléchargements… ' + '−' * 23)
-        print
+        print()
         if not isdir(DL_PATH):
             os.mkdir(DL_PATH)
         traiter_dl()
-        print
+        print()
         jaune('−' * 24 + ' Préparation des chapitres… ' + '−' * 28)
-        print
+        print()
         preparer_chapitres()
-        print
+        print()
         jaune('−' * 24 + ' Vérification de la préparation… ' + '−' * 23)
-        print
+        print()
         if not isdir(LECT_PATH):
             os.mkdir(LECT_PATH)
         reset_preparation()
         check_preparation()
-        print
+        print()
 
-    print
+    print()
     jaune('−' * 24 + ' Lecture… ' + '−' * 46)
-    print
+    print()
     lecture()
     jaune('−' * 24 + ' Nettoie… ' + '−' * 46)
     nettoyer(LECT_PATH)

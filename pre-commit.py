@@ -10,7 +10,10 @@ return_code = 0
 
 
 for path in check_output(['git', 'status', '--porcelain']).split('\n'):
-    if path.startswith(' A ') or path.startswith('M  '):
+    path = path.strip()
+    if not path:
+        continue
+    if path[0] in 'AM':
         path = path[3:]
         if path.endswith('.py'):
             try:
@@ -23,7 +26,7 @@ for path in check_output(['git', 'status', '--porcelain']).split('\n'):
                 print e.output
         else:
             check_output(['git', 'update-index', '--add', path])
-    else:
+    elif path[0] != 'D':
         print path
 
 exit(return_code)

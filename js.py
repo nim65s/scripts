@@ -10,8 +10,6 @@ from os.path import expanduser
 
 import feedparser
 
-from couleurs import rouge, vert
-
 scans = listdir(expanduser('~/Scans'))
 series = re.compile('|'.join(scans).replace(' ', '.?'), re.I)
 
@@ -29,7 +27,7 @@ def run(nom, prefix_url, timestamp):
 
     feed = feedparser.parse(url_rss)
     if feed['bozo']:
-        rouge('bozo')
+        print 'bozo'
         return
 
     for entrie in feed['entries']:
@@ -40,10 +38,10 @@ def run(nom, prefix_url, timestamp):
             else:
                 print '-', entrie['title'].encode('utf-8')
         elif timestamp == entrie['published_parsed']:
-            vert('revenu à la dernière entrée sauvegardée sur %s.' % nom)
+            print 'revenu à la dernière entrée sauvegardée sur %s.' % nom
             break
         else:
-            rouge('ATTENTION il manque probablement des trucs sur %s !' % nom)
+            print 'attention il manque probablement des trucs sur %s !' % nom
             break
     return feed['entries'][0]['published_parsed']
 

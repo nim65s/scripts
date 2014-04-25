@@ -16,6 +16,6 @@ if not interface_power.Get('org.bluez.Adapter1', 'Powered'):
 proxy_connected = bus.get_object('org.bluez', '/org/bluez/hci0/dev_{}'.format(DEVICE))
 interface_connected = Interface(proxy_connected, dbus_interface='org.freedesktop.DBus.Properties')
 
-if not interface.Get('org.bluez.Device1', 'Connected'):
+if not interface_connected.Get('org.bluez.Device1', 'Connected'):
     interface_connect = Interface(proxy_connected, dbus_interface='org.bluez.Device1')
     interface_connect.Connect()

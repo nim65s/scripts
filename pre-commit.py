@@ -13,8 +13,11 @@ for path in check_output(['git', 'status', '--porcelain']).split('\n'):
     path = path.strip().split()
     if not path:
         continue
-    if path[0] in 'AM':
-        path = ' '.join(path[1:])
+    if path[0] in 'AMR':
+        debut_path = 1
+        if path[0] == 'R':
+            debut_path = 3
+        path = ' '.join(path[debut_path:])
         if path.endswith('.py'):
             try:
                 check_output(["isort", "-p", "django", "-l", "160", path])

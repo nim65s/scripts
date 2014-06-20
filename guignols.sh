@@ -16,3 +16,6 @@ wait
 cat new ~/.guignols | sort | uniq > old
 mv old ~/.guignols
 rm new diff
+
+rm -f "La semaine des Guignols - Semaine du "* 2> /dev/null
+rm -f "Les Guignols du "* 2> /dev/null

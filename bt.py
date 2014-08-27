@@ -18,7 +18,7 @@ while not interface_power.Get('org.bluez.Adapter1', 'Powered'):
     interface_power.Set('org.bluez.Adapter1', 'Powered', True)
     index = wait(index, text='powering')
 else:
-    print('Interface powered')
+    print('\nInterface powered')
 
 proxy_connected = bus.get_object('org.bluez', '/org/bluez/hci0/dev_{}'.format(DEVICE))
 interface_connected = Interface(proxy_connected, dbus_interface='org.freedesktop.DBus.Properties')
@@ -31,4 +31,4 @@ while not interface_connected.Get('org.bluez.Device1', 'Connected'):
     except DBusException as e:
         index = wait(index, text=e.get_dbus_message())
 else:
-    print('Device connected')
+    print('\nDevice connected')

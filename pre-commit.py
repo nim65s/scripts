@@ -20,7 +20,7 @@ for path in check_output(['git', 'status', '--porcelain']).split('\n'):
         path = ' '.join(path[debut_path:])
         if path.endswith('.py'):
             try:
-                check_output(["isort", "-p", "django", "-l", "160", path])
+                check_output(["isort", "-p", "django", "-p", "pipobot", "-l", "160", path])
                 check_output(['pep8', path])
                 # isort modifies the files…
                 check_output(['git', 'update-index', '--add', path])

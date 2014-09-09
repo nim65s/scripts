@@ -23,7 +23,7 @@ function download {
 }
 
 function watch {
-    [[ $(ls | wc -l) -gt 0]] && vlc $(ls | sort)
+    [[ $(ls | wc -l) -gt 0 ]] && vlc *
     echo -n "Tout supprimer ? [O/n] → "
     read -N 1 del
     if [[ $del != n && $del != N ]]

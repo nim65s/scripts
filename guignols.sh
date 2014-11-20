@@ -26,7 +26,7 @@ function watch {
     [[ $(ls | wc -l) -gt 0 ]] && vlc *
     echo -n "Tout supprimer ? [o/N] → "
     read -N 1 del
-    if [[ $del == o || $del == O ]]
+    if [[ $del == o ]]
     then rm * 2> /dev/null
     fi
 }

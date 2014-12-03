@@ -5,7 +5,7 @@ function gpg_table
     set -e argv[1]
     gpg --refresh-keys $argv
     set keys (echo $argv|tr ' ' '\n'|sort|uniq)
-    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><style> td, th { border: 1px solid black; } table { border-collapse: collapse; text-align: center; } .r { background: red; } .g { background: green; }</style><title>qui a signé qui ?</title></head><body><p>Est-ce que la clef de la ligne a signé la clef de la colonne ?</p><br><table><tr><td>clef</td><td>nom</td>' > {$name}.html
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><style> td, th { border: 1px solid black; } table { border-collapse: collapse; text-align: center; font-family: DejaVu Sans Monospace, monospace; } .r { background: red; } .g { background: green; }</style><title>qui a signé qui ?</title></head><body><p>Est-ce que la clef de la ligne a signé la clef de la colonne ?</p><br><table><tr><td>clef</td><td>nom</td>' > {$name}.html
     for k in $keys
         echo "<th>$k</th>" >> {$name}.html
     end
@@ -49,8 +49,9 @@ function gpg_table
     end
 end
 
-gpg_table net7 0031234D 0E38CD1F 0E999B9E 16D85D33 2F5788E9 4653CF28 8FCBF3FB DD5D7D00 E9586D75 F3B2CEDE 888E8A09
+gpg_table net7 0031234D 0E38CD1F 0E999B9E 16D85D33 2F5788E9 4653CF28 8FCBF3FB DD5D7D00 E9586D75 F3B2CEDE 888E8A09 4CBA45E8
 gpg_table CdL14 089047FE 382A5C4D 4653CF28 552CF98B 5F4445B5 682A3916 6B17EA1E 72F93B05 78758817 C2AA477E DD999172 F3B2CEDE
+gpg_table fosdem15 (curl https://ksp.fosdem.org/keys/|grep unknown|cut -d'"' -f8|sed 's/........//')
 
-scp {net7,CdL14}.{html,txt} n7:www_public/pgp
-rm -vf {net7,CdL14}.{html,txt}
+scp {net7,CdL14,fosdem15}.{html,txt} n7:www_public/pgp
+rm -vf {net7,CdL14,fosdem15}.{html,txt}

@@ -3,8 +3,9 @@
 function gpg_table
     set name $argv[1]
     set -e argv[1]
-    gpg --refresh-keys $argv
     set keys (echo $argv|tr ' ' '\n'|sort|uniq)
+    gpg --recv-keys $keys 2>| tail -n 2 | grep -q 'gpg: Total number processed:'
+    and exit
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><style> td, th { border: 1px solid black; } table { border-collapse: collapse; text-align: center; font-family: DejaVu Sans Monospace, monospace; } .r { background: red; } .g { background: green; }</style><title>qui a signé qui ?</title></head><body><p>Est-ce que la clef de la ligne a signé la clef de la colonne ?</p><br><table><tr><td>clef</td><td>nom</td>' > {$name}.html
     for k in $keys
         echo "<th>$k</th>" >> {$name}.html

@@ -37,3 +37,5 @@ elif [[ $1 == watch ]]
 then watch
 else download && watch
 fi
+
+rmdir --ignore-fail-on-non-empty ~/guignols

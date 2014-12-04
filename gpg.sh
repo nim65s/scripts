@@ -31,7 +31,9 @@ function gpg_table
         set c (math $c + 1)
     end
     echo
-    echo "</tr></table><script> var g = document.querySelectorAll('.g').length; </script><p>Signatures : <script>document.write(g);</script> / $S (<script>document.write(Math.round(100*g/$S));</script>%)</p></body></html>" >> {$name}.html
+    set s (grep -c ✔ {$name}.html)
+    set p (math "100 * $s / $S")
+    echo "</tr></table><p>Signatures : $s / $S ($p%)</p></body></html>" >> {$name}.html
     test -f {$name}.txt
     and rm {$name}.txt
     for key in $keys
@@ -55,6 +57,7 @@ function gpg_table
         set c (math $c + 1)
     end
     echo
+    echo "Signatures : $s / $S ($p%)" >> {$name}.txt
 end
 
 gpg_table net7 (curl http://www.bde.inp-toulouse.fr/clubs/inp-net/contact.php|grep OpenPGP-Key|cut -d'"' -f 4)

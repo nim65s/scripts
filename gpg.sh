@@ -6,8 +6,7 @@ function gpg_table
     set keys (echo $argv|tr ' ' '\n'|sort|uniq)
     set N (count $keys)
     set S (math "$N * $N - $N")
-    gpg --recv-keys $keys # 2>| tail -n 2 | grep -q 'gpg: Total number processed:'
-    #and exit
+    gpg --recv-keys $keys
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><style> td, th { border: 1px solid black; min-width: 2em;} table { border-collapse: collapse; text-align: center; font-family: DejaVu Sans Monospace, monospace; } .r { background: red; } .g { background: green; }</style><title>qui a signé qui ?</title></head><body><p>Est-ce que la clef de la ligne a signé la clef de la colonne ?</p><br><table><tr><td>clef</td><td>nom</td><td>N°</td>' > {$name}.html
     set c 1
     for k in $keys
@@ -58,7 +57,7 @@ function gpg_table
     echo
 end
 
-gpg_table net7 0031234D 0E38CD1F 0E999B9E 16D85D33 2F5788E9 4653CF28 8FCBF3FB DD5D7D00 E9586D75 F3B2CEDE 888E8A09 4CBA45E8
+gpg_table net7 (curl http://www.bde.inp-toulouse.fr/clubs/inp-net/contact.php|grep OpenPGP-Key|cut -d'"' -f 4)
 gpg_table CdL14 089047FE 382A5C4D 4653CF28 552CF98B 5F4445B5 682A3916 6B17EA1E 72F93B05 78758817 C2AA477E DD999172 F3B2CEDE
 gpg_table fosdem15 (curl https://ksp.fosdem.org/keys/|grep unknown|cut -d'"' -f8|sed 's/........//'|grep -v 132B94A6)
 

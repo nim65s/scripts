@@ -29,6 +29,9 @@ while read repo ; do
             sed -i "/Sur la branche master/d;/Votre branche est à jour avec 'origin\/master'./d" $TEMP
             sed -i "/rien à valider, la copie de travail est propre/d;/^Entrée dans '/d" $TEMP
             sed -i "/La branche courante master est à jour./d;/^Chemin de sous-module '/d" $TEMP
+            sed -i "/Current branch master is up to date./d;/^Entering '/d;/Submodule '/d" $TEMP
+            sed -i "/# On branch master/d;/nothing to commit (working directory clean)/d" $TEMP
+
         ) &
     fi
 done < ~/.gitrepos

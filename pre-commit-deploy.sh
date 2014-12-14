@@ -10,7 +10,7 @@ if [[ $1 == "sub" ]] ; then
 else
     while read repo ; do
         cd $repo
-        [[ -f .gitmodules ]] && git submodule foreach ~/scripts/pre-commit-deploy.sh sub
+        [[ -f .gitmodules ]] && git submodule foreach ~/scripts/pre-commit-deploy.sh sub | grep -v 'Entrée dans'
         cd .git/hooks
         pwd
         [[ -f pre-commit ]] && rm pre-commit

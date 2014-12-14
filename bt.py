@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from dbus import Boolean, Interface, SystemBus
+from dbus import Interface, SystemBus
 from dbus.exceptions import DBusException
+
 from wait import wait
 
 DEVICE = '00:0C:8A:67:96:90'

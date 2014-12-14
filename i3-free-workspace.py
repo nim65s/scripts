@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import argparse
+import sys
 
 import i3
 

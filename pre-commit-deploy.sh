@@ -1,7 +1,9 @@
 #!/bin/bash
 
 if [[ $1 == "sub" ]] ; then
-    cd $(cut -d: -f2 .git)/hooks
+    DIR=$(cut -d: -f2 .git)/hooks
+    [[ ! -d $DIR ]] && mkdir -p $DIR
+    cd $DIR
     pwd
     [[ -f pre-commit ]] && rm pre-commit
     ln -s ~/scripts/pre-commit.py pre-commit

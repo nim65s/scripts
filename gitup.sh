@@ -18,12 +18,12 @@ while read repo ; do
             echo $TEMP >> $MAINTEMP
             echo -e "\033[1;32m $repo \033[0m" >> $TEMP
             cd $repo || exit 1
-            git pull --rebase origin master >> $TEMP 2> /dev/null
+            git pull --rebase >> $TEMP 2> /dev/null
             if [[ -f .gitmodules ]] ; then
                 git submodule init >> $TEMP 2> /dev/null
                 git submodule update >> $TEMP 2> /dev/null
                 git submodule foreach git checkout master >> $TEMP 2> /dev/null
-                git submodule foreach git pull --rebase origin master >> $TEMP 2> /dev/null
+                git submodule foreach git pull --rebase >> $TEMP 2> /dev/null
             fi
             git status >> $TEMP
             sed -i "/Sur la branche master/d;/Votre branche est à jour avec 'origin\/master'./d" $TEMP

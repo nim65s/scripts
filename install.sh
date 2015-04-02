@@ -34,7 +34,7 @@ done
 
 RM_ID_RSA && rm .ssh/id_rsa
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .isort.cfg
 do
     rm -rf $file
     ln -s $HOME/dotfiles/$file

@@ -42,7 +42,7 @@ function gpg_table
     echo
     set s (grep -o ✔ {$name}.html | wc -l)
     set p (math "100 * $s / $S")
-    echo "</tr></table><p>Signatures : $s / $S ($p%)</p></body></html>" >> {$name}.html
+    echo "</tr></table><p>Signatures : $s / $S ($p%)</p><p>Envoyez vos modifications avec <pre>gpg --send-keys $keys</pre></p></body></html>" >> {$name}.html
     test -f {$name}.txt
     and rm {$name}.txt
     for key in $keys
@@ -70,8 +70,7 @@ function gpg_table
 end
 
 gpg_table net7 (curl http://www.bde.inp-toulouse.fr/clubs/inp-net/contact.php|grep OpenPGP-Key|cut -d'"' -f 4)
-gpg_table CdL14 089047FE 382A5C4D 4653CF28 552CF98B 5F4445B5 682A3916 6B17EA1E 72F93B05 78758817 C2AA477E DD999172 F3B2CEDE
-gpg_table fosdem15 (curl https://ksp.fosdem.org/keys/|grep unknown|cut -d'"' -f8|sed 's/........//'|grep -v '132B94A6\|92126B54')
+#gpg_table CdL14 089047FE 382A5C4D 4653CF28 552CF98B 5F4445B5 682A3916 6B17EA1E 72F93B05 78758817 C2AA477E DD999172 F3B2CEDE
 
-scp {net7,CdL14,fosdem15}.{html,txt} n7:www_public/pgp
-rm -vf {net7,CdL14,fosdem15}.{html,txt}
+scp net7.{html,txt} n7:www_public/pgp
+rm -vf net7.{html,txt}

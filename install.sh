@@ -32,7 +32,7 @@ do
     grep -q $repo .gitrepos 2> /dev/null || echo $HOME/$repo >> .gitrepos
 done
 
-RM_ID_RSA && rm .ssh/id_rsa
+$RM_ID_RSA && rm .ssh/id_rsa
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .isort.cfg
 do

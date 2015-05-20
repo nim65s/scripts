@@ -1,11 +1,14 @@
 #!/bin/bash
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
+# Fish sur Jessie:
+# echo 'deb http://download.opensuse.org/repositories/shells:/fish:/release:/2/Debian_8.0/ /' >> /etc/apt/sources.list.d/fish.list
+
 cd
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim zsh openssh
-which apt-get 2> /dev/null && yes|sudo apt-get install git zsh vim-gnome
-which yum 2> /dev/null && yes|sudo yum install git zsh vim
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh
+which apt-get 2> /dev/null && yes|sudo apt-get install git fish vim-gnome
+which yum 2> /dev/null && yes|sudo yum install git fish vim
 
 RM_ID_RSA=false
 
@@ -32,7 +35,7 @@ do
     grep -q $repo .gitrepos 2> /dev/null || echo $HOME/$repo >> .gitrepos
 done
 
-$RM_ID_RSA && rm .ssh/id_rsa
+$RM_ID_RSA && rm .ssh/{id_rsa,tmpagent}
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .isort.cfg
 do
@@ -46,4 +49,4 @@ do
     ln -s $HOME/dotfiles/.config/$files .config
 done
 
-echo "Don't forget to «chsh -s $(which zsh) $USER» and to «rm ~/.ssh/tmpagent»"
+echo "chsh -s $(grep fish /etc/shells)"

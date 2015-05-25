@@ -1,6 +1,8 @@
 [submodule "vimpager"]
     path = vimpager
     url = git@github.com:rkitover/vimpager.git
+	branch = master
 [submodule "nbconvert"]
 	path = nbconvert
 	url = git@github.com:ipython/nbconvert.git
+	branch = master

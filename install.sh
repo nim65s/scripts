@@ -46,7 +46,7 @@ done
 for files in awesome dfc fish ipython pep8 ranger terminator zathura
 do
     rm -rf .config/$files
-    ln -s $HOME/dotfiles/.config/$files .config
+    ln -s $HOME/dotfiles/.config/$files $HOME/.config/
 done
 
 echo "chsh -s $(grep fish /etc/shells)"

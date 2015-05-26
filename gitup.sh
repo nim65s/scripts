@@ -3,7 +3,7 @@
 # Simple version was:
 # while read repo
 # do ( cd $repo && git pull && [[ -f .gitmodules ]] && git submodule foreach git pull || true ; git status) &
-# done
+# done < ~/.gitrepos
 #
 # wait
 
@@ -21,8 +21,8 @@ while read repo ; do
             git pull --rebase >> $TEMP 2> /dev/null
             if [[ -f .gitmodules ]] ; then
                 git submodule init >> $TEMP 2> /dev/null
-                git submodule update --recursive --remote >> $TEMP 2> /dev/null
-                git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch' >> $TEMP 2> /dev/null
+                git submodule update --recursive --remote --rebase >> $TEMP 2> /dev/null
+                git submodule foreach -q --recursive "git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch)" >> $TEMP 2> /dev/null
             fi
             git status >> $TEMP
             sed -i "/Sur la branche master/d;/Votre branche est à jour avec 'origin\/master'./d" $TEMP

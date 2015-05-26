@@ -15,7 +15,7 @@ while read repo ; do
             if [[ -f .venv ]] ; then
                 if [[ -d $WORKON_HOME/$(cat .venv) ]] ; then
                     workon $(cat .venv)
-                    pip install -U -r requirements.txt -r ~/dotfiles/global_requirements.txt | grep -v 'Requirement already up-to-date:'
+                    pip install -U -r requirements.txt -r ~/dotfiles/global_requirements.txt | grep -v 'Requirement already up-to-date:\|Double requirement given:'
                 else
                     echo .venv here but no $WORKON_HOME/$(cat .venv)
                 fi

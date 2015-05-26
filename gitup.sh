@@ -22,7 +22,7 @@ while read repo ; do
             if [[ -f .gitmodules ]] ; then
                 git submodule init >> $TEMP 2> /dev/null
                 git submodule update --recursive --remote --rebase >> $TEMP 2> /dev/null
-                git submodule foreach -q --recursive "git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch)" >> $TEMP 2> /dev/null
+                git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' >> $TEMP 2> /dev/null
             fi
             git status >> $TEMP
             sed -i "/Sur la branche master/d;/Votre branche est à jour avec 'origin\/master'./d" $TEMP

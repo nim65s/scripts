@@ -9,8 +9,10 @@ if [[ $1 == "sub" ]] ; then
     ln -s ~/scripts/pre-commit.py pre-commit
 else
     while read repo ; do
+        [[ $repo == -* ]] && repo=${repo##-}
         cd $repo
         [[ -f .gitmodules ]] && git submodule foreach ~/scripts/pre-commit-deploy.sh sub | grep -v 'Entrée dans'
+        mkdir -p .git/hooks
         cd .git/hooks
         pwd
         [[ -f pre-commit ]] && rm pre-commit

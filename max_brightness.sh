@@ -1,5 +1,3 @@
 #!/bin/bash
 
-[[ -z $1 ]] && BRIGHT=$(cat /sys/class/backlight/intel_backlight/max_brightness) || BRIGHT=$1
-
-echo $BRIGHT > /sys/class/backlight/intel_backlight/brightness
+echo ${1:-$(cat /sys/class/backlight/intel_backlight/max_brightness)} > /sys/class/backlight/intel_backlight/brightness

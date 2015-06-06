@@ -1,10 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 from os import getenv
-from subprocess import CalledProcessError, check_output
+from subprocess import call, CalledProcessError, check_output
 from sys import exit
 
 from flake8.hooks import git_hook
@@ -18,7 +18,7 @@ LAZY = getenv('FLAKE8_LAZY', False)
 return_code = 0
 
 
-for path in check_output(['git', 'status', '--porcelain']).split('\n'):
+for path in check_output(['git', 'status', '--porcelain']).decode('utf-8').split('\n'):
     path = path.strip().split()
     if not path:
         continue
@@ -29,13 +29,13 @@ for path in check_output(['git', 'status', '--porcelain']).split('\n'):
         path = ' '.join(path[debut_path:])
         if path.endswith('.py'):
             try:
-                check_output(["isort", path])
+                call(["isort", path])
                 # isort modifies the files…
-            except CalledProcessError, e:
+            except CalledProcessError as e:
                 return_code += 1
-                print e.output
+                print(e.output)
         check_output(['git', 'update-index', '--add', path])
     elif path[0] != 'D':
-        print path
+        print(path)
 
 exit(return_code + git_hook(complexity=COMPLEXITY, strict=STRICT, ignore=IGNORE, lazy=LAZY))

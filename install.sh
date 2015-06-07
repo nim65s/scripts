@@ -33,8 +33,8 @@ do
     git clone git@github.com:nim65s/$repo.git
     cd $repo
     git submodule init
-    git submodule update
-    git submodule foreach git checkout master
+    git submodule update --recursive --remote --rebase
+    git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
     cd
     grep -q $repo .gitrepos 2> /dev/null || echo $HOME/$repo >> .gitrepos
 done

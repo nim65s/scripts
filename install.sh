@@ -49,7 +49,7 @@ do
     ln -s $HOME/dotfiles/$file
 done
 
-for files in awesome dfc fish ipython pep8 ranger terminator zathura
+for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8
 do
     rm -rf .config/$files
     ln -s $HOME/dotfiles/.config/$files $HOME/.config/

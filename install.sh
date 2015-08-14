@@ -8,7 +8,7 @@
 
 cd
 
-mkdir -p .config
+mkdir -p .config .virtualenvs
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh
 which apt-get 2> /dev/null && yes|sudo apt-get install git fish vim-gnome
@@ -54,5 +54,7 @@ do
     rm -rf .config/$files
     ln -s $HOME/dotfiles/.config/$files $HOME/.config/
 done
+
+ln -s $HOME/dotfiles/vf_requirements.txt $HOME/.virtualenvs/global_requirements.txt
 
 echo "chsh -s $(grep fish /etc/shells)"

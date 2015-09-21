@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/fish
 
 pip install -U pip
 pip-compile

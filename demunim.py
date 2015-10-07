@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from configparser import ConfigParser
 from datetime import datetime
 from distutils.spawn import find_executable
 from os import environ
@@ -15,27 +14,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
 
-PROJECT = 'demunim'
-CONFIG = Path(environ['XDG_CONFIG_HOME'] if 'XDG_CONFIG_HOME' in environ else expanduser('~/.config')) / PROJECT
-CACHE = Path(environ['XDG_CACHE_HOME'] if 'XDG_CACHE_HOME' in environ else expanduser('~/.cache')) / PROJECT
-
-
-def get_conf():
-    conf = ConfigParser()
-    conf.read_dict({
-        'database': {
-            'engine': 'sqlite',  # sqlite / mysql / postgresql
-            'path': str(CACHE / 'db.sqlite3'),  # for sqlite
-            'host': 'localhost',  # for mysql / postgresql
-            'name': PROJECT,  # for mysql / postgresql
-            'user': PROJECT,  # for mysql / postgresql
-            'password': 'ChangeMe',
-            },
-        })
-    conf.read(str(CONFIG))
-    return conf
-
-
 Base = declarative_base()
 
 
@@ -49,15 +27,11 @@ class Command(Base):
         return self.name
 
 
-def setup_database(conf):
-    if conf['engine'] == 'sqlite':
-        p = Path(conf['path'])
-        if ':memory:' not in str(p) and not p.parent.is_dir():
-            p.parent.mkdir(parents=True)
-        db = 'sqlite:///%s' % p
-    else:
-        db = '{engine}://{user}:{password}@{host}/{name}'.format(**conf)
-    engine = create_engine(db)
+def setup_database():
+    db = Path(environ['XDG_CACHE_HOME'] if 'XDG_CACHE_HOME' in environ else expanduser('~/.cache')) / 'demunim.sqlite'
+    if not db.parent.is_dir():
+        db.parent.mkdir(parents=True)
+    engine = create_engine('sqlite:///%s' % db)
     Base.metadata.create_all(engine)
     Session = sessionmaker()
     Session.configure(bind=engine)
@@ -70,18 +44,17 @@ def get_executables():
 
 
 def populate_database(session):
-    for command in get_executables():
-        if not session.query(exists().where(Command.name == command)).scalar():
-            session.add(Command(name=command))
     for command in session.query(Command):
         if find_executable(command.name) is None:
             session.delete(command)
+    for command in get_executables():
+        if not session.query(exists().where(Command.name == command)).scalar():
+            session.add(Command(name=command))
     session.commit()
 
 
 if __name__ == '__main__':
-    conf = get_conf()
-    session = setup_database(conf['database'])
+    session = setup_database()
 
     if len(argv) > 1:
         populate_database(session)

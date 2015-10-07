@@ -29,7 +29,7 @@ if __name__ == '__main__':
                     if f.is_file() and f.stat().st_mode & (S_IEXEC | S_IXGRP | S_IXOTH):
                         Command.create(name=f.name)
 
-    executables = (c.name for c in Command.select().order_by(Command.date.desc()))
+    executables = (c.name for c in Command.select().order_by(Command.date.desc(), Command.name))
     out = run(['dmenu'], input='\n'.join(executables), stdout=PIPE, universal_newlines=True).stdout.strip()
     if out:
         command = Command.get_or_create(name=out)[0]

@@ -4,10 +4,11 @@
 from __future__ import print_function, unicode_literals
 
 from os import getenv
-from subprocess import call, CalledProcessError, check_output
+from subprocess import check_output
 from sys import exit
 
 from flake8.hooks import git_hook
+from isort import SortImports
 
 COMPLEXITY = getenv('FLAKE8_COMPLEXITY', 10)
 STRICT = getenv('FLAKE8_STRICT', False)
@@ -28,12 +29,8 @@ for path in check_output(['git', 'status', '--porcelain']).decode('utf-8').split
             debut_path = 3
         path = ' '.join(path[debut_path:])
         if path.endswith('.py'):
-            try:
-                call(["isort", path])
-                # isort modifies the files…
-            except CalledProcessError as e:
-                return_code += 1
-                print(e.output)
+            SortImports(path)
+        # isort modifies the files…
         check_output(['git', 'update-index', '--add', path])
     elif path[0] != 'D':
         print(path)

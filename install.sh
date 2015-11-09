@@ -32,7 +32,7 @@ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDO1DwbWEyl9W9+VxqaIUH4XPVoKMpoxcyh2X
 for repo in dotfiles scripts
 do
     rm -rf $HOME/$repo
-    git clone git@github.com:nim65s/$repo.git
+    git clone git@github.com:nim65s/$repo.git --recursive
     cd $repo
     git submodule init
     git submodule update --recursive --remote --rebase

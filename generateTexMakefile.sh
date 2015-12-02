@@ -20,6 +20,6 @@ echo >> Makefile
 
 echo 'clean:' >> Makefile
 echo -en "\t" >> Makefile
-echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *.tns *.pyg *.vrb *~ *.orig *.gnuplot *.table *.fls *.fdb_latexmk *.blg 2> /dev/null' >> Makefile
+echo '-rm -vf *.aux *.log *.nav *.out *.snm *.toc *.tmp *.tns *.pyg *.vrb *~ *.orig *.gnuplot *.table *.fls *.fdb_latexmk *.blg *.bbl 2> /dev/null' >> Makefile
 
 cat Makefile

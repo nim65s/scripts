@@ -43,13 +43,13 @@ done
 
 $RM_ID && rm .ssh/{id_rsa,tmpagent}
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .isort.cfg
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .isort.cfg .compton.conf
 do
     rm -rf $file
     ln -s $HOME/dotfiles/$file
 done
 
-for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8
+for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology
 do
     rm -rf .config/$files
     ln -s $HOME/dotfiles/.config/$files $HOME/.config/

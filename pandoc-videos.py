@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Pandoc filter to convert markdown 's "%[caption](my_video.mp4)"
+Pandoc filter to convert markdown's "%[caption](my_video.mp4)"
 to html5 & latex video tags
 
 Same syntax as https://github.com/rekado/parkdown#extensions
@@ -26,9 +26,9 @@ PERCENT = {
 def media(key, value, format, meta):
     if key == 'Para' and value[0] == PERCENT and value[1]['t'] == 'Link':
         src = value[1]['c'][2][0]
-        for fk, fv in FORMATS.items():
-            if format in fv:
-                return [RawBlock(fk, TEMPLATES[fk] % src)]
+        for fmt_name, fmt_values in FORMATS.items():
+            if format in fmt_values:
+                return [RawBlock(fmt_name, TEMPLATES[fmt_name] % src)]
 
 if __name__ == "__main__":
     toJSONFilter(media)

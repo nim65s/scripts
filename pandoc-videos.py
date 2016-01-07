@@ -3,6 +3,8 @@
 """
 Pandoc filter to convert markdown 's "%[caption](my_video.mp4)"
 to html5 & latex video tags
+
+Same syntax as https://github.com/rekado/parkdown#extensions
 """
 
 from pandocfilters import RawBlock, toJSONFilter

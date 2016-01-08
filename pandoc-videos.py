@@ -14,7 +14,7 @@ FORMATS = {
         'html': ['revealjs', 'html', 'html5'],
         }
 TEMPLATES = {
-        'latex': r"\movie[width=8cm,height=4.5cm]{}{%s}",
+        'latex': r"\centering\movie[width=8cm,height=4.5cm]{}{%s}",
         'html': r"<video controls><source src='%s' type='video/mp4'></video>",
         }
 PERCENT = {

@@ -14,9 +14,12 @@ if not cmds:
     from pathlib import Path
     from stat import S_IEXEC, S_IXGRP, S_IXOTH
 
-    x = S_IEXEC | S_IXGRP | S_IXOTH  # executable files
+    def is_cmd(f):
+        x = S_IEXEC | S_IXGRP | S_IXOTH  # executable files
+        return f.is_file() and f.stat().st_mode & x and not f.name.startswith('.')
+
     path = (Path(d) for d in environ['PATH'].split(':'))
-    cmds = sorted([f.name for d in path for f in d.iterdir() if f.is_file() and f.stat().st_mode & x])
+    cmds = sorted([f.name for d in path for f in d.iterdir() if is_cmd(f)])
 
 out = run('dmenu', input='\n'.join(cmds), stdout=PIPE, universal_newlines=True).stdout.strip()
 

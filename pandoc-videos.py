@@ -13,12 +13,18 @@ FORMATS = {
         'html': ['revealjs', 'html', 'html5'],
         }
 TEMPLATES = {
-        'latex': r'''\begin{figure}[htbp]
-\centering
-\movie[width=8cm,height=4.5cm]{}{%s}
-\caption{%s}
-\end{figure}''',
-        'html': r"<video controls><source src='%s' type='video/mp4'>%s</video>",
+        'latex': r"""\begin{figure}[htbp]
+        \centering
+        \movie[width=8cm,height=4.5cm]{}{%s}
+        \caption{%s}
+        \end{figure}""",
+        'html': r"""<figure>
+        <video controls>
+        <source src='%s' type='video/mp4'>
+        Your player does not support the video tag
+        </video>
+        <figcaption>%s</figcaption>
+        </figure>""",
         }
 PERCENT = {
         't': 'Str',

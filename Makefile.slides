@@ -1,9 +1,9 @@
 SOURCES = $(wildcard slides/*.md)
-PANDOC = pandoc $< -s --highlight-style zenburn -S --toc --filter ~/scripts/pandoc-videos.py -o $@
+PANDOC = pandoc $< -s --highlight-style zenburn -S --toc --filter ~/scripts/pandoc-videos.py --filter pandoc-citeproc --bibliography ~/laas/references.bib -o $@
 TEX_OPTS = -t beamer --latex-engine lualatex
 WEB_OPTS = -t revealjs --mathjax
 
-all: pdf web
+all: web pdf
 tex: $(SOURCES:slides/%.md=media/%.tex)
 pdf: $(SOURCES:slides/%.md=media/%.pdf)
 web: $(SOURCES:slides/%.md=media/%.html)

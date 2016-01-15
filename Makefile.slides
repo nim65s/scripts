@@ -4,17 +4,17 @@ TEX_OPTS = -t beamer --latex-engine lualatex
 WEB_OPTS = -t revealjs --mathjax
 
 all: web pdf
-tex: $(SOURCES:slides/%.md=media/%.tex)
-pdf: $(SOURCES:slides/%.md=media/%.pdf)
-web: $(SOURCES:slides/%.md=media/%.html)
+tex: $(SOURCES:slides/%.md=documents/%.tex)
+pdf: $(SOURCES:slides/%.md=documents/%.pdf)
+web: $(SOURCES:slides/%.md=documents/%.html)
 
-media/%.tex: slides/%.md
+documents/%.tex: slides/%.md
 	$(PANDOC) $(TEX_OPTS)
 
-media/%.pdf: slides/%.md
+documents/%.pdf: slides/%.md
 	$(PANDOC) $(TEX_OPTS)
 
-media/%.html: slides/%.md
+documents/%.html: slides/%.md
 	$(PANDOC) $(WEB_OPTS)
 
 clean:

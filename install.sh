@@ -55,6 +55,7 @@ do
     ln -s $HOME/dotfiles/.config/$files $HOME/.config/
 done
 
-ln -s $HOME/dotfiles/vf_requirements.txt $HOME/.virtualenvs/global_requirements.txt
+mkdir -p $HOME/.virtualenvs
+ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt
 
 echo "chsh -s $(grep fish /etc/shells)"

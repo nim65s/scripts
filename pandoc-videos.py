@@ -9,7 +9,7 @@ Same syntax as https://github.com/rekado/parkdown#extensions
 
 from pandocfilters import RawBlock, toJSONFilter
 FORMATS = {
-        'latex': ['beamer', 'latex'],
+        'latex': ['beamer'],
         'html': ['revealjs', 'html', 'html5'],
         }
 TEMPLATES = {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-a=$(mktemp)
+a=${1:-$(mktemp)}
 b=$(mktemp)
 
 vim $a

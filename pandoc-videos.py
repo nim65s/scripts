@@ -35,7 +35,7 @@ PERCENT = {
 def media(key, value, format, meta):
     if key == 'Para' and value[0] == PERCENT and value[1]['t'] == 'Link':
         title, src = value[1]['c'][1], value[1]['c'][2][0]
-        title, src = ' '.join(d['c'] for d in title if d['t'] == u'Str')
+        title = ' '.join(d['c'] for d in title if d['t'] == u'Str')
         for fmt_name, fmt_values in FORMATS.items():
             if format in fmt_values:
                 return [RawBlock(fmt_name, TEMPLATES[fmt_name] % (src, title))]

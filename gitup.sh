@@ -31,6 +31,7 @@ while read repo ; do
             sed -i "/Current branch master is up to date./d;/^Entering '/d;/Submodule '/d" $TEMP
             sed -i "/# On branch master/d;/nothing to commit (working directory clean)/d" $TEMP
             sed -i "/Votre branche est à jour avec /d" $TEMP
+            sed -i "/^$/d" $TEMP
 
         ) &
     fi

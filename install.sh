@@ -43,7 +43,7 @@ done
 
 $RM_ID && rm .ssh/{id_rsa,tmpagent}
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .xbindkeyrc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .compton.conf .editorconfig
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .i3 .xinitrc .compton.conf .editorconfig
 do
     rm -rf $file
     ln -s $HOME/dotfiles/$file

@@ -9,7 +9,7 @@
 cd
 
 mkdir -p .config .virtualenvs .ssh .virtualenvs
-touch .gitrepos
+touch .gitrepos .ssh/authorized_keys
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc
 which apt-get 2> /dev/null && sudo apt-get install git fish vim-gnome tinc

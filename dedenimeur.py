@@ -5,16 +5,17 @@ import random
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog,
                              QMainWindow, QMessageBox, QPushButton, QWidget, qApp)
 
 
 class Board(QWidget):
-    def __init__(self, height=10, width=10, mines=10):
+    def __init__(self, height, width, mines, size):
         super(Board, self).__init__()
-        self.height, self.width, self.mines = height, width, mines
+        self.size, self.height, self.width, self.mines = size, height, width, mines
         self.grid = QGridLayout()
+        self.grid.setHorizontalSpacing(0)
+        self.grid.setVerticalSpacing(0)
         self.setLayout(self.grid)
         self.buttons = {}
         self.init()
@@ -28,14 +29,12 @@ class Board(QWidget):
                 btn = QPushButton(' ')
                 btn.position = (x, y)
                 btn.bomb = False
-                # btn.resize(10, 10)
+                btn.setFixedSize(self.size, self.size)
                 btn.clicked.connect(self.click)
                 btn.setContextMenuPolicy(Qt.CustomContextMenu)
                 btn.customContextMenuRequested.connect(self.right_click)
-                self.grid.addWidget(btn, x, y)
+                self.grid.addWidget(btn, y, x)
                 self.buttons[(x, y)] = btn
-        # self.setGeometry(0, 0, 10 * self.height, 10 * self.width)
-        # self.resize(self.height * 10, self.width * 10)
         for mine in range(self.mines):
             while True:
                 x, y = random.randrange(self.width), random.randrange(self.height)
@@ -44,7 +43,7 @@ class Board(QWidget):
                     break
 
     def click(self):
-        self.demine(self.sender())
+        self.demine(self.sender(), force=self.sender().isFlat())
         self.check_victory()
 
     def right_click(self):
@@ -55,6 +54,13 @@ class Board(QWidget):
             btn.setText('!' if btn.text() == ' ' else ' ')
         self.check_victory()
 
+    def around(self, x, y):
+        for i in [-1, 0, 1]:
+            if 0 <= x + i < self.width:
+                for j in [-1, 0, 1]:
+                    if 0 <= y + j < self.height:
+                        yield x + i, y + j
+
     def demine(self, btn, force=False):
         if not force and btn.isFlat() or btn.text() == '!':
             return True
@@ -64,20 +70,14 @@ class Board(QWidget):
             self.end()
             return False
         n = 0
-        for i in [-1, 0, 1]:
-            if 0 <= x + i < self.width:
-                for j in [-1, 0, 1]:
-                    if 0 <= y + j < self.height:
-                        if self.buttons[(x + i, y + j)].bomb:
-                            n += 1
+        for u, v in self.around(x, y):
+            if self.buttons[(u, v)].bomb:
+                n += 1
         btn.setText(str(n))
         if n == 0 or force:
-            for i in [-1, 0, 1]:
-                if 0 <= x + i < self.width:
-                    for j in [-1, 0, 1]:
-                        if 0 <= y + j < self.height:
-                            if not self.demine(self.buttons[(x + i, y + j)]):
-                                return False
+            for u, v in self.around(x, y):
+                if not self.demine(self.buttons[(u, v)]):
+                    return False
         return True
 
     def check_victory(self):
@@ -105,8 +105,8 @@ class DedeNimeur(QMainWindow):
         super(DedeNimeur, self).__init__()
         self.statusBar()
 
-        self.height, self.width, self.mines = 10, 10, 10
-        self.board = Board()
+        self.size, self.height, self.width, self.mines = 30, 10, 10, 10
+        self.board = Board(self.height, self.width, self.mines, self.size)
         self.setCentralWidget(self.board)
 
         start = QAction('Start', self)
@@ -128,15 +128,19 @@ class DedeNimeur(QMainWindow):
         mines = QAction('Mines', self)
         mines.setStatusTip('Set board mines')
         mines.triggered.connect(self.set_mines)
+        size = QAction('Size', self)
+        size.setStatusTip('Set button size')
+        size.triggered.connect(self.set_size)
 
         toolbar = self.addToolBar('Toolbar')
         toolbar.addAction(start)
         toolbar.addAction(width)
         toolbar.addAction(height)
         toolbar.addAction(mines)
+        toolbar.addAction(size)
         toolbar.addAction(exit)
 
-        self.setWindowTitle('Nim')
+        self.setWindowTitle(u'DédéNimeur')
         self.show()
 
     def init(self):
@@ -144,6 +148,7 @@ class DedeNimeur(QMainWindow):
             self.board.height = self.height
             self.board.width = self.width
             self.board.mines = self.mines
+            self.board.size = self.size
             self.board.init()
         else:
             QMessageBox.question(self, 'NOPE', u"Va falloir spécifier un truc cohérent…", QMessageBox.Ok)
@@ -152,16 +157,25 @@ class DedeNimeur(QMainWindow):
         text, ok = QInputDialog.getText(self, 'Settings', 'width')
         if ok:
             self.height = int(text)
+            self.init()
 
     def set_width(self):
         text, ok = QInputDialog.getText(self, 'Settings', 'height')
         if ok:
             self.width = int(text)
+            self.init()
 
     def set_mines(self):
         text, ok = QInputDialog.getText(self, 'Settings', 'mines')
         if ok:
             self.mines = int(text)
+            self.init()
+
+    def set_size(self):
+        text, ok = QInputDialog.getText(self, 'Settings', 'size')
+        if ok:
+            self.size = int(text)
+            self.init()
 
 
 if __name__ == '__main__':

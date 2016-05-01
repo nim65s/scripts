@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# TODO
+# facile / dur
+
 import random
 import sys
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog,
-                             QMainWindow, QMessageBox, QPushButton, QWidget, qApp)
+from PyQt5.QtCore import QBasicTimer, QElapsedTimer, Qt
+from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog, QLCDNumber,
+                             QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, qApp)
 
 
 class Board(QWidget):
-    def __init__(self, height, width, mines, size):
-        super(Board, self).__init__()
+    def __init__(self, height, width, mines, size, *args, **kwargs):
+        super(Board, self).__init__(*args, **kwargs)
         self.size, self.height, self.width, self.mines = size, height, width, mines
         self.grid = QGridLayout()
         self.grid.setHorizontalSpacing(0)
@@ -41,18 +44,19 @@ class Board(QWidget):
                 if not self.buttons[(x, y)].bomb:
                     self.buttons[(x, y)].bomb = True
                     break
+        self.started = False
 
     def click(self):
+        if not self.started:
+            self.parent().parent().start_timers()
+            self.started = True
         self.demine(self.sender(), force=self.sender().isFlat())
         self.check_victory()
 
     def right_click(self):
         btn = self.sender()
-        if btn.isFlat():
-            self.demine(btn, force=True)
-        else:
+        if not btn.isFlat():
             btn.setText('!' if btn.text() == ' ' else ' ')
-        self.check_victory()
 
     def around(self, x, y):
         for i in [-1, 0, 1]:
@@ -64,6 +68,17 @@ class Board(QWidget):
     def demine(self, btn, force=False):
         if not force and btn.isFlat() or btn.text() == '!':
             return True
+        if force and btn.isFlat():
+            n = 0
+            for x, y in self.around(*btn.position):
+                if self.buttons[(x, y)].isFlat():
+                    continue
+                if self.buttons[(x, y)].bomb:
+                    n += 1
+                if self.buttons[(x, y)].text() == '!':
+                    n -= 1
+            if n != 0:
+                return False
         btn.setFlat(True)
         x, y = btn.position
         if btn.bomb:
@@ -88,7 +103,7 @@ class Board(QWidget):
             for y in range(self.height):
                 if self.buttons[(x, y)].bomb:
                     self.buttons[(x, y)].setText('\\o/')
-        QMessageBox.question(self, 'Fin', "Gagné !", QMessageBox.Ok)
+        QMessageBox.question(self, 'Fin', "Gagné en %ims!" % self.parent().parent().stop_timers(), QMessageBox.Ok)
         self.init()
 
     def end(self):
@@ -96,6 +111,7 @@ class Board(QWidget):
             for y in range(self.height):
                 if self.buttons[(x, y)].bomb:
                     self.buttons[(x, y)].setText('/o\\')
+        self.parent().parent().stop_timers()
         QMessageBox.question(self, 'Fin', "Perdu !", QMessageBox.Ok)
         self.init()
 
@@ -106,8 +122,19 @@ class DedeNimeur(QMainWindow):
         self.statusBar()
 
         self.size, self.height, self.width, self.mines = 30, 10, 10, 10
+        self.lcd = QLCDNumber()
+        self.lcd.setFixedSize(300, 100)
         self.board = Board(self.height, self.width, self.mines, self.size)
-        self.setCentralWidget(self.board)
+        self.timer = QBasicTimer()
+        self.real_timer = QElapsedTimer()
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.lcd)
+        vbox.addWidget(self.board)
+
+        central = QWidget()
+        central.setLayout(vbox)
+        self.setCentralWidget(central)
 
         start = QAction('Start', self)
         start.setStatusTip('Start')
@@ -176,6 +203,18 @@ class DedeNimeur(QMainWindow):
         if ok:
             self.size = int(text)
             self.init()
+
+    def start_timers(self):
+        self.timer.start(100, self)
+        self.real_timer.start()
+        self.lcd.display(int(self.real_timer.elapsed() / 1000))
+
+    def stop_timers(self):
+        self.timer.stop()
+        return self.real_timer.elapsed()
+
+    def timerEvent(self, e):
+        self.lcd.display(int(self.real_timer.elapsed() / 1000))
 
 
 if __name__ == '__main__':

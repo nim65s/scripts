@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Based on an idea of https://github.com/vigneshwaranr/bd
 
-from os import getcwd, chdir
+from os import chdir, getcwd
 from sys import argv, stderr
 
 if len(argv) != 2:

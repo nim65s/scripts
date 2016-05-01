@@ -3,8 +3,9 @@
 from fcntl import ioctl
 from struct import unpack
 from sys import stdout
-from termios import TIOCGWINSZ
 from time import sleep
+
+from termios import TIOCGWINSZ
 
 
 def wait(index=0, sleep_time=0.25, symbols=['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'], text=""):

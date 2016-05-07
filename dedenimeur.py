@@ -11,7 +11,7 @@ from PyQt5.QtCore import QBasicTimer, QElapsedTimer, Qt
 from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog, QLCDNumber,
                              QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, qApp)
 
-COLORS = ["rgba(0, 0, 0, 0)", "blue", "green", "red", "darkBlue", "black", "pink", "violet", "brown"]
+COLORS = ["rgba(0, 0, 0, 0)", "blue", "green", "red", "DarkBlue", "black", "DeepPink", "violet", "brown"]
 
 
 class Board(QWidget):

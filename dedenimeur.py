@@ -11,6 +11,18 @@ from PyQt5.QtCore import QBasicTimer, QElapsedTimer, Qt
 from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog, QLCDNumber,
                              QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, qApp)
 
+COLORS = [
+    "white",
+    "blue",
+    "green",
+    "red",
+    "darkBlue",
+    "black",
+    "pink",
+    "violet",
+    "brown",
+]
+
 
 class Board(QWidget):
     def __init__(self, height, width, mines, size, *args, **kwargs):
@@ -89,6 +101,7 @@ class Board(QWidget):
             if self.buttons[(u, v)].bomb:
                 n += 1
         btn.setText(str(n))
+        btn.setStyleSheet("color: %s;" % COLORS[n])
         if n == 0 or force:
             for u, v in self.around(x, y):
                 if not self.demine(self.buttons[(u, v)]):
@@ -123,7 +136,7 @@ class DedeNimeur(QMainWindow):
 
         self.size, self.height, self.width, self.mines = 30, 10, 10, 10
         self.lcd = QLCDNumber()
-        self.lcd.setFixedSize(300, 100)
+        self.lcd.setFixedSize(300, 60)
         self.board = Board(self.height, self.width, self.mines, self.size)
         self.timer = QBasicTimer()
         self.real_timer = QElapsedTimer()
@@ -181,13 +194,13 @@ class DedeNimeur(QMainWindow):
             QMessageBox.question(self, 'NOPE', u"Va falloir spécifier un truc cohérent…", QMessageBox.Ok)
 
     def set_height(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'width')
+        text, ok = QInputDialog.getText(self, 'Settings', 'height')
         if ok:
             self.height = int(text)
             self.init()
 
     def set_width(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'height')
+        text, ok = QInputDialog.getText(self, 'Settings', 'width')
         if ok:
             self.width = int(text)
             self.init()

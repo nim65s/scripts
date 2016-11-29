@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from time import sleep
+
 import html2text
 import requests
 from bs4 import BeautifulSoup
@@ -40,9 +42,22 @@ class SpotifyLocalHTTPClient(object):
         artist, song = self.track()
         req = requests.get("http://lyrics.wikia.com/%s:%s" % (artist, song.split('-')[0].title()))
         lyrics = BeautifulSoup(req.content, 'html.parser').find_all('div', class_='lyricbox')
+        if not lyrics:
+            search = BeautifulSoup(req.content, 'html.parser').find_all('a', class_='external text')
+            if search:
+                req_s = requests.get(search[0].attrs['href'])
+                search_page = BeautifulSoup(req_s.content, 'html.parser').find_all('a', class_='result-link')
+                if search_page:
+                    req_final = requests.get(search_page[0].attrs['href'])
+                    lyrics = BeautifulSoup(req_final.content, 'html.parser').find_all('div', class_='lyricbox')
         return '<h1>%s</h1><h2>%s</h2>%s' % (artist, song, str(lyrics)[1:-1] if lyrics else req.url)
 
 
 if __name__ == '__main__':
     client = SpotifyLocalHTTPClient()
-    print(html2text.html2text(client.lyrics()))
+    track, artist = '', ''
+    while True:
+        if (track, artist) != client.track():
+            track, artist = client.track()
+            print(html2text.html2text(client.lyrics()))
+        sleep(1)

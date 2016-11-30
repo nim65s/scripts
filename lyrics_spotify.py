@@ -2,6 +2,7 @@
 
 import sys
 
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QTextEdit, QVBoxLayout, QWidget, qApp
 
 from web_spotify import SpotifyLocalHTTPClient
@@ -39,6 +40,10 @@ class App(QMainWindow):
         self.view.setReadOnly(True)
         self.lyrics()
         vbox.addWidget(self.view)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.lyrics)
+        self.timer.start(1000)
 
         self.setWindowTitle("Spotify's Lyrics from Wika")
         self.show()

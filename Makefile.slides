@@ -1,6 +1,6 @@
 SOURCES = $(wildcard slides/*.md)
 TIKZ = $(wildcard tikz/*.tex)
-PANDOC = pandoc $< -s --highlight-style zenburn -S --toc --filter ~/scripts/pandoc-videos.py --filter pandoc-citeproc --bibliography ~/laas/references.bib -o $@
+PANDOC = pandoc $< -s --highlight-style zenburn -S --filter ~/scripts/pandoc-videos.py --filter pandoc-citeproc --bibliography ~/laas/references.bib -o $@
 TEX_OPTS = -t beamer --latex-engine lualatex
 WEB_OPTS = -t revealjs --mathjax
 
@@ -8,7 +8,7 @@ all: web pdf
 tex: $(SOURCES:slides/%.md=documents/%.tex)
 pdf: $(SOURCES:slides/%.md=documents/%.pdf)
 web: $(SOURCES:slides/%.md=documents/%.html)
-tikz: $(TIKZ:tikz/%.tex=tikz/%.pdf)
+tikz: $(TIKZ:tikz/%_t.tex=tikz/%_t.pdf)
 
 documents/%.tex: slides/%.md
 	$(PANDOC) $(TEX_OPTS)

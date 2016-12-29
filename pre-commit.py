@@ -30,8 +30,6 @@ def hook(lazy=False, strict=False):
     :rtype:
         int
     """
-    # NOTE(sigmavirus24): Delay import of application until we need it.
-    app = application.Application()
     with git.make_temporary_directory() as tempdir:
         filepaths = []
         for filepath in git.copy_indexed_files_to(tempdir, lazy):
@@ -40,6 +38,9 @@ def hook(lazy=False, strict=False):
                     if 'python' not in f.readline().lower():
                         continue
             filepaths.append(filepath)
+        if not filepaths:
+            return 0
+        app = application.Application()
         app.initialize(['.'])
         app.options.exclude = git.update_excludes(app.options.exclude, tempdir)
         app.run_checks(filepaths)

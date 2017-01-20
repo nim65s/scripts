@@ -16,7 +16,7 @@ FORMATS = {
 TEMPLATES = {
         'latex': r"""\begin{figure}[htbp]
         \centering
-        \movie[width=8cm,height=4.5cm]{}{%s}
+        \movie[width=10cm,height=5.625cm,autostart]{}{%s}
         \caption{%s}
         \end{figure}""",
         'html': r"""<figure>
@@ -40,6 +40,7 @@ def media(key, value, format, meta):
         for fmt_name, fmt_values in FORMATS.items():
             if format in fmt_values:
                 return [RawBlock(fmt_name, TEMPLATES[fmt_name] % (src, title))]
+
 
 if __name__ == "__main__":
     toJSONFilter(media)

@@ -4,31 +4,29 @@
 # Fish sur Jessie:
 # echo 'deb http://download.opensuse.org/repositories/shells:/fish:/release:/2/Debian_8.0/ /' >> /etc/apt/sources.list.d/fish.list
 
-# TODO: dectect ssh & ssh forward agent
-
 cd
 
 mkdir -p .config .virtualenvs .ssh .virtualenvs
 touch .gitrepos .ssh/authorized_keys
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc
-which apt-get 2> /dev/null && sudo apt-get install git fish vim-gnome tinc
+which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
-RM_ID=false
+echo enable-ssh-support > .gnupg/gpg-agent.conf
+echo use-agent > .gnupg/gpg.conf
+echo default-key 4653CF28 >> .gnupg/gpg.conf
+echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
+echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
+echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed > .gnupg/gpg.conf
 
-if [[ ! -d .ssh || (! -f .ssh/id_rsa  && ! -f .ssh/id_ed25519) ]]
-then
-    scp saurelg@ssh.inpt.fr:.ssh/id_rsa .ssh
-    ssh-agent -s > .ssh/tmpagent
-    . .ssh/tmpagent
-    ssh-add
-    RM_ID=true
-fi
+killall gpg-agent
+gpg-agent --daemon --enable-ssh-support --write-env-file ~/.gpg-agent-info
+source ~/.gpg-agent-info
 
-NAUSICAA_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDO1DwbWEyl9W9+VxqaIUH4XPVoKMpoxcyh2X9/1NcpTtMmkEwxAfQDONp0R8n4HGc7YpUUFQ0PgjIqhXaOz5zvWwr2wIf+1tPdV3lpxxNawZ8iAwwApaPqLdR0o0NAM8hKTbxB3ObVuzN5T5VJO/r4j1G4kH0wEiOrPnph5LPvkwGlMyIV8B7948v/CAe/YsTQA7jq6oijOAU/MTpjWjXANcDj688IgrDobx9L0T1oAhVrs11SqofrWuWTbgofLIR4mQhbm7t2DXha4kzD82lB9ia6TAXG9mysGsBYkIl2RZ9BA8Ax5ftou1zbtpYyO1SN5hytBi07BsYep/tHCSKn nim@Nausicaa'
+gpg2 --card-status || exit 1
 
-grep -q $NAUSICAA_KEY .ssh/authorized_keys || echo $NAUSICAA_KEY >> .ssh/authorized_keys
+grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
 for repo in dotfiles scripts VPNim
 do
@@ -41,8 +39,6 @@ do
     grep -q $repo ~/.gitrepos || pwd >> ~/.gitrepos
     popd
 done
-
-$RM_ID && rm .ssh/{id_rsa,tmpagent}
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter
 do

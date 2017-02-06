@@ -31,7 +31,7 @@ while read repo ; do
             sed -i "/Current branch [[:alnum:]_]\{1,\} is up to date./d;/^Entering '/d;/Submodule '/d" $TEMP
             sed -i "/# On branch [[:alnum:]_]\{1,\}/d;/nothing to commit (working directory clean)/d" $TEMP
             sed -i "/On branch [[:alnum:]_]\{1,\}/d;/nothing to commit, working directory clean/d" $TEMP
-            sed -i "/Votre branche est à jour avec /d" $TEMP
+            sed -i "/Votre branche est à jour avec /d;/Déjà à jour./d" $TEMP
             sed -i "/Your branch is up-to-date with /d" $TEMP
             sed -i "/nothing to commit, working tree clean/d" $TEMP
             sed -i "/^$/d" $TEMP

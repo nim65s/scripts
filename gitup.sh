@@ -25,12 +25,12 @@ while read repo ; do
                 git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' >> $TEMP 2> /dev/null
             fi
             git status >> $TEMP
-            sed -i "/Sur la branche master/d;/Votre branche est à jour avec 'origin\/master'./d" $TEMP
+            sed -i "/Sur la branche [[:alnum:]_]\{1,\}/d;/Votre branche est à jour avec 'origin\/[[:alnum:]_]\{1,\}'./d" $TEMP
             sed -i "/rien à valider, la copie de travail est propre/d;/^Entrée dans '/d" $TEMP
-            sed -i "/La branche courante master est à jour./d;/^Chemin de sous-module '/d" $TEMP
-            sed -i "/Current branch master is up to date./d;/^Entering '/d;/Submodule '/d" $TEMP
-            sed -i "/# On branch master/d;/nothing to commit (working directory clean)/d" $TEMP
-            sed -i "/On branch master/d;/nothing to commit, working directory clean/d" $TEMP
+            sed -i "/La branche courante [[:alnum:]_]\{1,\} est à jour./d;/^Chemin de sous-module '/d" $TEMP
+            sed -i "/Current branch [[:alnum:]_]\{1,\} is up to date./d;/^Entering '/d;/Submodule '/d" $TEMP
+            sed -i "/# On branch [[:alnum:]_]\{1,\}/d;/nothing to commit (working directory clean)/d" $TEMP
+            sed -i "/On branch [[:alnum:]_]\{1,\}/d;/nothing to commit, working directory clean/d" $TEMP
             sed -i "/Votre branche est à jour avec /d" $TEMP
             sed -i "/Your branch is up-to-date with /d" $TEMP
             sed -i "/nothing to commit, working tree clean/d" $TEMP

@@ -14,6 +14,7 @@ nothing = 0
 knew = 0
 new = 0
 other = 0
+quoted = 0
 
 detector = UniversalDetector()
 
@@ -49,6 +50,10 @@ for root, _, filenames in tqdm(walk(mails), total=len(list(walk(mails)))):
                 nothing += 1
             elif b'non modifi' in ret.stderr:
                 knew += 1
+            elif b'Quoted-Printable' in ret.stderr:
+                quoted += 1
+            elif b'nouvelles signatures' in ret.stderr:
+                new += 1
             else:
                 other += 1
                 print(ret.stderr)

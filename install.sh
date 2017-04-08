@@ -9,7 +9,7 @@ cd
 mkdir -p .config .virtualenvs .ssh .virtualenvs
 touch .gitrepos .ssh/authorized_keys
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip
 which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
@@ -30,11 +30,9 @@ grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorize
 
 for repo in dotfiles scripts VPNim
 do
-    rm -rf $repo
-    git clone git@github.com:nim65s/$repo.git --recursive
+    test -d $repo || git clone git@github.com:nim65s/$repo.git --recursive
     pushd $repo
-    git submodule init
-    git submodule update --recursive --remote --rebase
+    git submodule update --recursive --remote --rebase --init
     git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
     grep -q $repo ~/.gitrepos || pwd >> ~/.gitrepos
     popd
@@ -54,5 +52,8 @@ done
 
 rm -f $HOME/.virtualenvs/global_requirements.txt
 ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt
+
+pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt 
+pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt 
 
 echo "chsh -s $(grep fish /etc/shells)"

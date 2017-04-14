@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# https://saurel.me/maps.me
+
 import xml.etree.ElementTree as ET
 from json import load
 

@@ -20,21 +20,21 @@ def json_to_kml(google, document):
         ET.SubElement(placemark, 'name').text = _name(place)
 
 
-def google_to_mapsme(filename):
+def google_to_mapsme(in_filename='google.json', out_filename='generated.kml'):
     kml = ET.Element('kml', xmlns='http://earth.google.com/kml/2.2')
     document = ET.SubElement(kml, 'Document')
     ET.SubElement(document, 'name').text = 'Imported from Google'
     ET.SubElement(document, 'visibility').text = '1'
 
-    with open(filename) as f:
+    with open(in_filename) as f:
         google = load(f)
 
     json_to_kml(google['features'], document)
 
     tree = ET.ElementTree(kml)
-    tree.write('generated.kml')
+    tree.write(out_filename)
 
 
 if __name__ == '__main__':
     import sys  # noqa
-    google_to_mapsme(sys.argv[1] if len(sys.argv) > 1 else 'google.json')
+    google_to_mapsme(sys.argv[1])

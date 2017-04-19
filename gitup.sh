@@ -20,8 +20,7 @@ while read repo ; do
             cd $repo || exit 1
             git pull --rebase >> $TEMP 2> /dev/null
             if [[ -f .gitmodules ]] ; then
-                git submodule init >> $TEMP 2> /dev/null
-                git submodule update --recursive --remote --rebase >> $TEMP 2> /dev/null
+                git submodule update --recursive --remote --rebase --init >> $TEMP 2> /dev/null
                 git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' >> $TEMP 2> /dev/null
             fi
             git status >> $TEMP

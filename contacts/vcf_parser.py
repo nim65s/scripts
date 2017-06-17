@@ -58,5 +58,5 @@ if __name__ == '__main__':
         vcards = import_ab(str(vcf))
         export_ab(vcards, vcf.stem + '_generated')
         print(vcf, ab_diff(str(vcf), vcf.stem + '_generated'))
-    if not ab_diff('Fusion.vcf', 'saved_Fusion.vcf'):
-        print('Fusion != saved_Fusion')
+    if ab_diff('Fusion.vcf', 'saved_Fusion.vcf'):
+        print('Fusion == saved_Fusion')

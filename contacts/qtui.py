@@ -9,14 +9,6 @@ from vcards import Vcard
 from vcf_parser import export_ab, import_ab
 
 
-class ContactInfo(QTableWidgetItem):
-    def __init__(self, infos, *args, **kwargs):
-        return super().__init__('|'.join(infos), *args, **kwargs)
-
-    def infos(self):
-        return self.text().split('|')
-
-
 class Contacts(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -61,7 +53,7 @@ class Contacts(QMainWindow):
 
         for i, vcard in enumerate(self.vcards.values()):
             for key, value in vcard.dict.items():
-                self.table.setItem(i, self.keys_idx[key], ContactInfo(value))
+                self.table.setItem(i, self.keys_idx[key], QTableWidgetItem('|'.join(value)))
                 self.table.setItem(i, len(self.keys), QTableWidgetItem(vcard.address_book))
         self.table.sortItems(self.keys_idx['FN'])
         self.setCentralWidget(self.table)
@@ -79,8 +71,9 @@ class Contacts(QMainWindow):
             infos = []
             for i in range(len(self.keys)):
                 if self.table.item(row, i):
-                    for info in self.table.item(row, i).infos():
-                        infos.append((self.table.horizontalHeaderItem(i).text(), info))
+                    for info in self.table.item(row, i).text().split('|'):
+                        if info:
+                            infos.append((self.table.horizontalHeaderItem(i).text(), info))
             v = Vcard(self.table.item(row, len(self.keys)).text(), infos)
             if v.address_book in address_books:
                 address_books[v.address_book][v.uid] = v

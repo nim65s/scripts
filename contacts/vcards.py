@@ -1,6 +1,3 @@
-from collections import OrderedDict
-
-
 def split_long_lines(lines, length=75):
     short_lines = []
     for line in lines:
@@ -14,7 +11,7 @@ def split_long_lines(lines, length=75):
 class Vcard(object):
     def __init__(self, address_book, content):
         self.address_book = address_book
-        self.dict = OrderedDict()
+        self.dict = {}
 
         for key, value in content:
             if key not in self.dict:
@@ -24,6 +21,13 @@ class Vcard(object):
 
     def __str__(self):
         return self.dict['FN'][0]
+
+    def __eq__(self, other):
+        return dict(self.dict) == dict(other.dict)
+
+    @property
+    def uid(self):
+        return self.dict['UID' if 'UID' in self.dict else 'FN'][0]
 
     def dict_items(self):
         return [(key, v) for key in self.dict for v in self.dict[key]]

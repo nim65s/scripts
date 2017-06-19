@@ -32,8 +32,8 @@ class Vcard(object):
         if self.uid == other.uid:
             return True
         sd, od = self.dict.copy(), other.dict.copy()
-        sd.update(UID='')
-        od.update(UID='')
+        sd.update(UID='', PRODID='', REV='')
+        od.update(UID='', PRODID='', REV='')
         return sd == od
 
     @property
@@ -47,7 +47,7 @@ class Vcard(object):
         d_i = [(key, v) for key in self.dict for v in self.dict[key]]
         if 'UID' not in self.dict:
             d_i.append(('UID', uuid4()))
-        return d_i
+        return sorted(d_i)
 
     def fmt_dict(self):
         return split_long_lines(['%s:%s' % item for item in self.dict_items()])

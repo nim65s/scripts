@@ -11,6 +11,8 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QFileDialog, QGridL
 from vcards import Vcard
 from vcf_parser import export_ab, import_ab
 
+MAIN = {'EMAIL': 'EMAIL;TYPE=HOME,INTERNET', 'TEL': 'TEL;TYPE=CELL', 'X-JABBER': 'X-JABBER'}
+
 
 def now():
     return datetime.now().strftime('%Y%m%dT%H%M%SZ')
@@ -34,6 +36,8 @@ class Contacts(QMainWindow):
         deldup_action.triggered.connect(self.delete_duplicates)
         fixtel_action = QAction('Fix Tel', self)
         fixtel_action.triggered.connect(self.fix_tel)
+        fixcat_action = QAction('Fix Category', self)
+        fixcat_action.triggered.connect(self.fix_category)
         exit_action = QAction('Exit', self)
         exit_action.triggered.connect(qApp.quit)
 
@@ -43,7 +47,11 @@ class Contacts(QMainWindow):
         toolbar.addAction(merge_action)
         toolbar.addAction(deldup_action)
         toolbar.addAction(fixtel_action)
+        toolbar.addAction(fixcat_action)
         toolbar.addAction(exit_action)
+
+        for path in Path('.').glob('*.vcf'):
+            self.import_ab(path)
 
         self.setWindowTitle('float')
         self.show()
@@ -82,13 +90,13 @@ class Contacts(QMainWindow):
     def get_vcard_from_row(self, row):
         if row >= self.table.rowCount():
             return
-        infos = []
+        infos = set()
         for i in range(len(self.keys)):
             if self.table.item(row, i):
                 for info in self.table.item(row, i).text().split('|'):
                     if info:
-                        infos.append((self.table.horizontalHeaderItem(i).text(), info))
-        return Vcard(self.table.item(row, len(self.keys)).text(), infos)
+                        infos.add((self.table.horizontalHeaderItem(i).text(), info))
+        return Vcard(self.table.item(row, len(self.keys)).text(), list(infos))
 
     def export_ab(self):
         address_books = {}
@@ -99,7 +107,7 @@ class Contacts(QMainWindow):
             else:
                 address_books[v.address_book] = {v.uid: v}
         for address_book, addresses in address_books.items():
-            export_ab(addresses, f'saved_{address_book}.vcf')
+            export_ab(addresses, f'{address_book}.vcf')
 
     def merge(self):
         vcards = {}
@@ -110,10 +118,11 @@ class Contacts(QMainWindow):
 
     def fix_tel(self):
         for row in range(self.table.rowCount()):
-            item = self.table.item(row, self.keys_idx['TEL;TYPE=CELL'])
+            item = self.table.item(row, self.keys_idx[MAIN['TEL']])
             if not item:
                 continue
             tels = [tel.replace(' ', '') for tel in item.text().split('|')]
+            tels = [tel.replace('00', '+', 1) if tel.startswith('00') else tel for tel in tels]
             for i in range(1, 10):
                 tels = [tel.replace(f'0{i}', f'+33{i}', 1) if tel.startswith(f'0{i}') else tel for tel in tels]
             tels = [' '.join([t[:3], t[3], t[4:6], t[6:8], t[8:10], t[10:]])
@@ -131,6 +140,20 @@ class Contacts(QMainWindow):
                 self.table.removeRow(row)
             else:
                 old = v
+
+    def fix_category(self):
+        for row in range(self.table.rowCount()):
+            for key in self.keys:
+                for kind in MAIN.keys():
+                    if kind in key and key != MAIN[kind]:
+                        item = self.table.item(row, self.keys_idx[key])
+                        if item and item.text():
+                            it = self.table.item(row, self.keys_idx[MAIN[kind]])
+                            if not it or not it.text():
+                                self.table.setItem(row, self.keys_idx[MAIN[kind]], QTableWidgetItem(item.text()))
+                            else:
+                                it.setText('|'.join(it.text().split('|') + item.text().split('|')))
+                            item.setText('')
 
 
 class MergeDialog(QDialog):

@@ -45,8 +45,8 @@ class Vcard(object):
 
     def dict_items(self):
         d_i = [(key, v) for key in self.dict for v in self.dict[key]]
-        if 'UID' not in d_i:
-            d_i['UID'] = uuid4
+        if 'UID' not in self.dict:
+            d_i.append(('UID', uuid4()))
         return d_i
 
     def fmt_dict(self):

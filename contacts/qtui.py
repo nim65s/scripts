@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QFileDialog, QGridLayout, QLabel,
                              QLineEdit, QMainWindow, QPushButton, QTableWidget, QTableWidgetItem, qApp)
 
@@ -79,6 +80,8 @@ class Contacts(QMainWindow):
         self.keys_idx = {key: idx for idx, key in enumerate(self.keys)}
 
     def get_vcard_from_row(self, row):
+        if row >= self.table.rowCount():
+            return
         infos = []
         for i in range(len(self.keys)):
             if self.table.item(row, i):
@@ -118,18 +121,16 @@ class Contacts(QMainWindow):
             self.table.item(row, self.keys_idx['TEL;TYPE=CELL']).setText('|'.join(tels))
 
     def delete_duplicates(self):
-        end = False
-        while not end:
-            old = Vcard('pipo', {})
-            for row in range(self.table.rowCount()):
-                v = self.get_vcard_from_row(row)
-                if v == old:
-                    print(f'delete row {row} for vcard {v}')
-                    self.table.removeRow(row)
-                    break
-                old = v
+        old = Vcard('pipo', {})
+        for row in range(self.table.rowCount()):
+            v = self.get_vcard_from_row(row)
+            if v is None:
+                break
+            if v == old:
+                print(f'delete row {row} for vcard {v}')
+                self.table.removeRow(row)
             else:
-                end = True
+                old = v
 
 
 class MergeDialog(QDialog):
@@ -166,6 +167,9 @@ class MergeDialog(QDialog):
             for key in self.keys:
                 self.parent().table.setItem(row, self.parent().keys_idx[key], QTableWidgetItem(edits[key]))
         self.accept()
+
+    def sizeHint(self):
+        return QSize(1900, 400)
 
 
 if __name__ == '__main__':

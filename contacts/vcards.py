@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+
 def split_long_lines(lines, length=75):
     short_lines = []
     for line in lines:
@@ -22,6 +25,9 @@ class Vcard(object):
     def __str__(self):
         return self.dict['FN'][0]
 
+    def __repr__(self):
+        return f'<Vcard for {self}>'
+
     def __eq__(self, other):
         return dict(self.dict) == dict(other.dict)
 
@@ -30,7 +36,10 @@ class Vcard(object):
         return self.dict['UID' if 'UID' in self.dict else 'FN'][0]
 
     def dict_items(self):
-        return [(key, v) for key in self.dict for v in self.dict[key]]
+        d_i = [(key, v) for key in self.dict for v in self.dict[key]]
+        if 'UID' not in d_i:
+            d_i['UID'] = uuid4
+        return d_i
 
     def fmt_dict(self):
         return split_long_lines(['%s:%s' % item for item in self.dict_items()])

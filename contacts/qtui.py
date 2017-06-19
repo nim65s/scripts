@@ -45,7 +45,7 @@ class Contacts(QMainWindow):
         self.show()
 
     def import_abs(self):
-        for filename in QFileDialog.getOpenFileNames(self, 'Charge des carnets d’adresse')[0]:
+        for filename in QFileDialog.getOpenFileNames(self, 'Charge des carnets d’adresse', '.', '*.vcf')[0]:
             path = Path(filename).name  # TODO .name added for easier relative use
             self.import_ab(path)
 

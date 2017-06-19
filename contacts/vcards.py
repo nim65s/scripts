@@ -23,17 +23,25 @@ class Vcard(object):
                 self.dict[key].append(value)
 
     def __str__(self):
-        return self.dict['FN'][0]
+        return self.dict['FN'][0] if 'FN' in self.dict else '???'
 
     def __repr__(self):
         return f'<Vcard for {self}>'
 
     def __eq__(self, other):
-        return dict(self.dict) == dict(other.dict)
+        if self.uid == other.uid:
+            return True
+        sd, od = self.dict.copy(), other.dict.copy()
+        sd.update(UID='')
+        od.update(UID='')
+        return sd == od
 
     @property
     def uid(self):
-        return self.dict['UID' if 'UID' in self.dict else 'FN'][0]
+        for id in ['UID', 'FN']:
+            if id in self.dict:
+                return self.dict[id][0]
+        return uuid4()
 
     def dict_items(self):
         d_i = [(key, v) for key in self.dict for v in self.dict[key]]

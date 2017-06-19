@@ -29,6 +29,8 @@ class Contacts(QMainWindow):
         export_action.triggered.connect(self.export_ab)
         merge_action = QAction('Merge', self)
         merge_action.triggered.connect(self.merge)
+        deldup_action = QAction('Delete Duplicates', self)
+        deldup_action.triggered.connect(self.delete_duplicates)
         fixtel_action = QAction('Fix Tel', self)
         fixtel_action.triggered.connect(self.fix_tel)
         exit_action = QAction('Exit', self)
@@ -38,6 +40,7 @@ class Contacts(QMainWindow):
         toolbar.addAction(import_action)
         toolbar.addAction(export_action)
         toolbar.addAction(merge_action)
+        toolbar.addAction(deldup_action)
         toolbar.addAction(fixtel_action)
         toolbar.addAction(exit_action)
 
@@ -103,7 +106,7 @@ class Contacts(QMainWindow):
         MergeDialog(vcards, self.keys, parent=self).show()
 
     def fix_tel(self):
-        for row in range(len(self.vcards)):
+        for row in range(self.table.rowCount()):
             item = self.table.item(row, self.keys_idx['TEL;TYPE=CELL'])
             if not item:
                 continue
@@ -113,6 +116,20 @@ class Contacts(QMainWindow):
             tels = [' '.join([t[:3], t[3], t[4:6], t[6:8], t[8:10], t[10:]])
                     if t.startswith('+33') else t for t in tels]
             self.table.item(row, self.keys_idx['TEL;TYPE=CELL']).setText('|'.join(tels))
+
+    def delete_duplicates(self):
+        end = False
+        while not end:
+            old = Vcard('pipo', {})
+            for row in range(self.table.rowCount()):
+                v = self.get_vcard_from_row(row)
+                if v == old:
+                    print(f'delete row {row} for vcard {v}')
+                    self.table.removeRow(row)
+                    break
+                old = v
+            else:
+                end = True
 
 
 class MergeDialog(QDialog):

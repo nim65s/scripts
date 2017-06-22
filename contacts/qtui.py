@@ -32,6 +32,8 @@ class Contacts(QMainWindow):
         export_action.triggered.connect(self.export_ab)
         merge_action = QAction('Merge', self)
         merge_action.triggered.connect(self.merge)
+        automerge_action = QAction('Auto-Merge', self)
+        automerge_action.triggered.connect(self.automerge)
         deldup_action = QAction('Delete Duplicates', self)
         deldup_action.triggered.connect(self.delete_duplicates)
         fixtel_action = QAction('Fix Tel', self)
@@ -45,6 +47,7 @@ class Contacts(QMainWindow):
         toolbar.addAction(import_action)
         toolbar.addAction(export_action)
         toolbar.addAction(merge_action)
+        toolbar.addAction(automerge_action)
         toolbar.addAction(deldup_action)
         toolbar.addAction(fixtel_action)
         toolbar.addAction(fixcat_action)
@@ -115,6 +118,17 @@ class Contacts(QMainWindow):
             for row in range(sr.topRow(), 1 + sr.bottomRow()):
                 vcards[row] = self.get_vcard_from_row(row)
         MergeDialog(vcards, self.keys, parent=self).show()
+
+    def automerge(self):
+        self.delete_duplicates()
+        old = 'nothing'
+        for row in range(self.table.rowCount()):
+            new = self.table.item(row, self.keys_idx['FN']).text()
+            if old == new:
+                MergeDialog({row: self.get_vcard_from_row(row), row - 1: self.get_vcard_from_row(row - 1)}, self.keys,
+                            parent=self).show()
+                break
+            old = new
 
     def fix_tel(self):
         for row in range(self.table.rowCount()):

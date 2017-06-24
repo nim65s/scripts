@@ -35,7 +35,10 @@ def hook(lazy=False, strict=False):
         for filepath in git.copy_indexed_files_to(tempdir, lazy):
             if not filepath.endswith('.py'):
                 with open(filepath) as f:
-                    if any(s not in f.readline().lower() for s in ('#', 'python')):
+                    try:
+                        if any(s not in f.readline().lower() for s in ('#', 'python')):
+                            continue
+                    except:
                         continue
             filepaths.append(filepath)
         if not filepaths:

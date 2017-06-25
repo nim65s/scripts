@@ -123,12 +123,15 @@ class Contacts(QMainWindow):
         self.delete_duplicates()
         old = 'nothing'
         for row in range(self.table.rowCount()):
-            new = self.table.item(row, self.keys_idx['FN']).text()
-            if old == new:
-                MergeDialog({row: self.get_vcard_from_row(row), row - 1: self.get_vcard_from_row(row - 1)}, self.keys,
-                            parent=self).show()
+            try:
+                new = self.table.item(row, self.keys_idx['FN']).text()
+                if old == new:
+                    MergeDialog({row: self.get_vcard_from_row(row), row - 1: self.get_vcard_from_row(row - 1)},
+                                self.keys, parent=self).show()
+                    break
+                old = new
+            except:
                 break
-            old = new
 
     def fix_tel(self):
         for row in range(self.table.rowCount()):
@@ -180,19 +183,23 @@ class MergeDialog(QDialog):
 
         self.edits = {}
         layout = QGridLayout()
-        for i, key in enumerate(self.keys):
+        layout.addWidget(done, 0, 1)
+        i = 1
+        for key in self.keys:
             if key not in ['REV', 'UID', 'VERSION', 'PRODID']:
-                edit = QLineEdit(self)
 
                 items = set()
                 for v in self.vcards.values():
                     if key in v.dict and v.dict[key]:
                         for item in v.dict[key]:
                             items.add(item)
-                edit.setText('|'.join(items))
-                layout.addWidget(QLabel(key), i, 0)
-                layout.addWidget(edit, i, 1)
-                self.edits[key] = edit
+                if items:
+                    edit = QLineEdit(self)
+                    edit.setText('|'.join(items))
+                    layout.addWidget(QLabel(key), i, 0)
+                    layout.addWidget(edit, i, 1)
+                    self.edits[key] = edit
+                    i += 1
 
         self.setLayout(layout)
 
@@ -201,7 +208,7 @@ class MergeDialog(QDialog):
         edits.update(REV=now(), PRODID='Nim', VERSION='3.0')
         for row, vcard in self.vcards.items():
             edits.update(UID=vcard.uid)
-            for key in self.keys:
+            for key in edits:
                 self.parent().table.setItem(row, self.parent().keys_idx[key], QTableWidgetItem(edits[key]))
         self.accept()
 

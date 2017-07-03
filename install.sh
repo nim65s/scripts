@@ -53,7 +53,7 @@ done
 rm -f $HOME/.virtualenvs/global_requirements.txt
 ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt
 
-pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt 
-pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt 
+pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
+pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
 
 echo "chsh -s $(grep fish /etc/shells)"

@@ -38,15 +38,16 @@ do
     popd
 done
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config
 do
-    rm -rf $file
+    [[ -f $file ]] && rm $file
     ln -s $HOME/dotfiles/$file
 done
 
 for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal vdirsyncer todoman offlineimap mutt i3 i3status
 do
-    rm -rf .config/$files
+    [[ -d $files ]] && rm -rf .config/$files
+    [[ -f $files ]] && rm $files
     ln -s $HOME/dotfiles/.config/$files $HOME/.config/
 done
 

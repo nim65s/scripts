@@ -44,7 +44,7 @@ do
     ln -s $HOME/dotfiles/$file
 done
 
-for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal vdirsyncer todoman offlineimap mutt i3 i3status
+for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status
 do
     [[ -d $files ]] && rm -rf .config/$files
     [[ -f $files ]] && rm $files
@@ -55,6 +55,6 @@ rm -f $HOME/.virtualenvs/global_requirements.txt
 ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt
 
 pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
-pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
+pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish khal khard vdirsyncer todoman
 
 echo "chsh -s $(grep fish /etc/shells)"

@@ -9,7 +9,7 @@ cd
 mkdir -p .config .virtualenvs .ssh .virtualenvs
 touch .gitrepos .ssh/authorized_keys
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass
 which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
@@ -44,7 +44,7 @@ do
     ln -s $HOME/dotfiles/$file
 done
 
-for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status
+for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi
 do
     [[ -d $files ]] && rm -rf .config/$files
     [[ -f $files ]] && rm $files

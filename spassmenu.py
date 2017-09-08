@@ -27,11 +27,11 @@ for filename in PASSWORD_STORE_DIR.glob('**/*.gpg'):
 out = run(['dmenu'] + sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universal_newlines=True).stdout.strip()
 
 if out:
+    run(['pass', '-c', out])
+
     while out in pwds:
         pwds.remove(out)
     pwds = [out] + pwds
 
     with shelve.open(SHELF) as shelf:
         shelf['pwds'] = pwds
-
-    run(['pass', '-c', out])

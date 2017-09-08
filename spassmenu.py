@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 # sorted version of passmenu from password-store
+# Can be used like this with dmenu, or if you have rofi:
+# ./spassmenu.py -matching fuzzy -no-lazy-grab
+
 # TODO: use XDG_CACHE_DIR & PASSWORD_STORE_DIR
 
 import shelve

@@ -9,7 +9,7 @@ cd
 mkdir -p .config .virtualenvs .ssh .virtualenvs
 touch .gitrepos .ssh/authorized_keys
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass pcsc-tools ccid libusb-compat
 which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
@@ -20,9 +20,11 @@ echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
 echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
 echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed > .gnupg/gpg.conf
 
+sudo systemctl start pcscd
+sudo systemctl enable pcscd
+
 killall gpg-agent
-gpg-agent --daemon --enable-ssh-support --write-env-file ~/.gpg-agent-info
-source ~/.gpg-agent-info
+gpg-agent --daemon
 
 gpg2 --card-status || exit 1
 
@@ -32,6 +34,7 @@ for repo in dotfiles scripts VPNim
 do
     test -d $repo || git clone git@github.com:nim65s/$repo.git --recursive
     pushd $repo
+    git pull --rebase
     git submodule update --recursive --remote --rebase --init
     git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
     grep -q $repo ~/.gitrepos || pwd >> ~/.gitrepos

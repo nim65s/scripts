@@ -18,6 +18,11 @@ PyPI = 'https://pypi.python.org/pypi/%s/json'
 REQUIREMENTS = 'https://raw.githubusercontent.com/%s/master/requirements.txt'
 REPOS = 'https://api.github.com/user/repos'
 
+FIX_NAMES = [
+    ('asgi_redis', 'asgi-redis'),
+    ('service_identity', 'service-identity'),
+]
+
 repos = {}
 pypi = {}
 all_packages = set()
@@ -60,7 +65,7 @@ for r in dl(REQUIREMENTS, all_repos, 'repositories'):
                         if line and not line.startswith('#') and not line.startswith('-e')]
             repos[full_name] = {package.lower(): version for package, version in packages}
             for package in packages:
-                all_packages.add(package[0].lower())
+                all_packages.add(package[0].lower().split('[')[0])
         except Exception as e:
             print(f'Error on {full_name}: {e}')
 
@@ -71,6 +76,9 @@ all_repos = sorted(repos.keys())
 for r in dl(PyPI, all_packages, 'packages'):
     info = r.json()['info']
     pypi[info['name'].lower()] = info['version']
+
+for old, new in FIX_NAMES:
+    pypi[new] = pypi[old]
 
 # Print a everything in a table
 table = [["", ""] + [repo.split('/')[0] for repo in all_repos]]

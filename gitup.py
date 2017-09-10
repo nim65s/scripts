@@ -42,7 +42,9 @@ def gitup(repo):
                      ['git', 'submodule', 'foreach', '-q',
                       'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'],
                      ['git', 'submodule', 'foreach', '-q', 'git', 'pull', '--rebase']]:
-            ret += run(cmds, repo)
+            c = run(cmds, repo)
+            print(cmds, ' ===> ', c)
+            ret += c
     return ret + run(['git', 'status'], repo)
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import sys
 from os.path import expanduser
 
@@ -17,11 +18,6 @@ HEADERS = {'Authorization': f'token {TOKEN}'}
 PyPI = 'https://pypi.python.org/pypi/%s/json'
 REQUIREMENTS = 'https://raw.githubusercontent.com/%s/master/requirements.txt'
 REPOS = 'https://api.github.com/user/repos'
-
-FIX_NAMES = [
-    ('asgi_redis', 'asgi-redis'),
-    ('service_identity', 'service-identity'),
-]
 
 repos = {}
 pypi = {}
@@ -46,6 +42,10 @@ def dl(url_template, url_arguments, desc=''):
     yield from tqdm(grequests.imap(all_requests), desc=desc, total=len(url_arguments))
 
 
+def package_name(name):
+    return re.sub('[^A-Za-z0-9.]+', '-', name.split('[')[0].lower())
+
+
 if __name__ == '__main__':
     # Get the list of {all_repos} to consider.
     if len(sys.argv) > 1:
@@ -64,9 +64,9 @@ if __name__ == '__main__':
             try:
                 packages = [line.split()[0].split('==') for line in r.content.decode().split('\n')
                             if line and not line.startswith('#') and not line.startswith('-e')]
-                repos[full_name] = {package.lower(): version for package, version in packages}
+                repos[full_name] = {package: version for package, version in packages}
                 for package in packages:
-                    all_packages.add(package[0].lower().split('[')[0])
+                    all_packages.add(package[0].split('[')[0])
             except Exception as e:
                 print(f'Error on {full_name}: {e}')
 
@@ -75,16 +75,13 @@ if __name__ == '__main__':
 
     # Get the Pypi version of {all_packages}
     for r in dl(PyPI, all_packages, 'packages'):
-        info = r.json()['info']
-        pypi[info['name'].lower()] = info['version']
-
-    for old, new in FIX_NAMES:
-        pypi[new] = pypi[old]
+        pypi[package_name(r.url.split('/')[4])] = r.json()['info']['version']
 
     # Print a everything in a table
     table = [["", ""] + [repo.split('/')[0] for repo in all_repos]]
     table += [["Package", "PyPI"] + [repo.split('/')[1] for repo in all_repos]]
     for package in all_packages:
-        table += [[package, pypi[package]] + [show(package, repo, pypi[package]) for repo in all_repos]]
+        name = package_name(package)
+        table += [[package, pypi[name]] + [show(name, repo, pypi[name]) for repo in all_repos]]
 
     print(tabulate(table))

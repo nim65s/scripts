@@ -4,7 +4,7 @@
 # Can be used like this with dmenu, or if you have rofi:
 # ./spassmenu.py -matching fuzzy -no-lazy-grab
 
-# TODO: use XDG_CACHE_DIR & PASSWORD_STORE_DIR
+# TODO: use XDG_CACHE_DIR & PASSWORD_STORE_DIR & PASSWORD_STORE_CLIP_TIME
 
 import shelve
 import sys
@@ -28,6 +28,7 @@ out = run(['dmenu'] + sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universa
 
 if out:
     run(['pass', '-c', out])
+    run(['notify-send', '-t', '45000', out])
 
     while out in pwds:
         pwds.remove(out)

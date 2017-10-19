@@ -47,7 +47,7 @@ do
     ln -s $HOME/dotfiles/$file
 done
 
-for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi
+for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst
 do
     [[ -d $files ]] && rm -rf .config/$files
     [[ -f $files ]] && rm $files

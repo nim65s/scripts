@@ -22,7 +22,6 @@ REPOS = 'https://api.github.com/user/repos'
 repos = {}
 pypi = {}
 all_packages = set()
-all_repos = []
 
 
 def show(package, repo, pypi):
@@ -46,16 +45,18 @@ def package_name(name):
     return re.sub('[^A-Za-z0-9.]+', '-', name.split('[')[0].lower())
 
 
+def get_all_repos():
+    all_repos = []
+    for page in range(1000):
+        user_repos = requests.get(REPOS, {'per_page': 100, 'page': page}, headers=HEADERS).json()
+        if not user_repos:
+            return all_repos
+        all_repos += [repo['full_name'] for repo in user_repos if repo['full_name'] not in IGNORE]
+
+
 if __name__ == '__main__':
     # Get the list of {all_repos} to consider.
-    if len(sys.argv) > 1:
-        all_repos = sys.argv[1:]
-    else:
-        for page in range(1000):
-            user_repos = requests.get(REPOS, {'per_page': 100, 'page': page}, headers=HEADERS).json()
-            if not user_repos:
-                break
-            all_repos += [repo['full_name'] for repo in user_repos if repo['full_name'] not in IGNORE]
+    all_repos = sys.argv[1:] if len(sys.argv) > 1 else get_all_repos()
 
     # Parse the requirements.txt file from each repo from {all_repos}
     for r in dl(REQUIREMENTS, all_repos, 'repositories'):

@@ -11,6 +11,7 @@ REMOVE = [
     'Déjà à jour.',
     'rien à valider, la copie de travail est propre',
     'Premièrement, rembobinons head pour rejouer votre travail par-dessus...',
+    "Rembobinage préalable de head pour pouvoir rejouer votre travail par-dessus...",
     'Sur la branche master',
     "Votre branche est à jour avec 'origin/master'.",
     'La branche courante master est à jour.',

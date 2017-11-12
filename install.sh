@@ -9,7 +9,7 @@ cd
 mkdir -p .config .virtualenvs .ssh .virtualenvs
 touch .gitrepos .ssh/authorized_keys
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass pcsc-tools ccid libusb-compat
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass pcsc-tools ccid libusb-compat dunst
 which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 

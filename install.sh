@@ -1,16 +1,13 @@
 #!/bin/bash
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
-# Fish sur Jessie:
-# echo 'deb http://download.opensuse.org/repositories/shells:/fish:/release:/2/Debian_8.0/ /' >> /etc/apt/sources.list.d/fish.list
-
 cd
 
-mkdir -p .config .virtualenvs .ssh .virtualenvs
+mkdir -p .config .virtualenvs .ssh .virtualenvs .gnupg
 touch .gitrepos .ssh/authorized_keys
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass pcsc-tools ccid libusb-compat dunst
-which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon
+which apt 2> /dev/null && sudo apt install gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
 echo enable-ssh-support > .gnupg/gpg-agent.conf
@@ -47,12 +44,14 @@ do
     ln -s $HOME/dotfiles/$file
 done
 
+cd ~/.config
 for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst
 do
-    [[ -d $files ]] && rm -rf .config/$files
+    [[ -d $files ]] && rm -rf $files
     [[ -f $files ]] && rm $files
-    ln -s $HOME/dotfiles/.config/$files $HOME/.config/
+    ln -s $HOME/dotfiles/.config/$files
 done
+cd
 
 rm -f $HOME/.virtualenvs/global_requirements.txt
 ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt

@@ -45,15 +45,14 @@ done
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc
 do
-    [[ -f $file ]] && rm $file
+    [[ -L $file ]] && rm $file
     ln -s $HOME/dotfiles/$file
 done
 
 cd ~/.config
 for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst
 do
-    [[ -d $files ]] && rm -rf $files
-    [[ -f $files ]] && rm $files
+    [[ -L $files ]] && rm $files
     ln -s $HOME/dotfiles/.config/$files
 done
 cd

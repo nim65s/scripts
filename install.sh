@@ -23,7 +23,12 @@ sudo systemctl enable pcscd
 killall gpg-agent
 gpg-agent --daemon
 
+# Check Key
 gpg2 --card-status || exit 1
+rm /tmp/secret{,.gpg}
+echo 'IT WORKS \o/' > /tmp/secret
+gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 4653CF28 /tmp/secret
+gpg --decrypt /tmp/secret.gpg || exit 1
 
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
@@ -59,4 +64,4 @@ ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requireme
 pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
 pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish khal khard vdirsyncer todoman
 
-echo "chsh -s $(grep fish /etc/shells)"
+grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

@@ -1,23 +1,38 @@
 #!/bin/bash
 
 set -e
-set -x
+#set -x
 
-SIGNER=${2:-7D2ACDAF4653CF28}
+SIGNER=${2:-9B1A79065D2F2B806C8A5A1C7D2ACDAF4653CF28}
+SIGNER=$(gpg --list-keys --with-colon $SIGNER|grep '^pub'|cut -d ':' -f5)
 SIGNERPUBFILE=/tmp/baff_signer_pub_${SIGNER}.gpg
 SIGNERSECFILE=/tmp/baff_signer_sec_${SIGNER}.gpg
 
 gpg --export $SIGNER > $SIGNERPUBFILE
 gpg --export-secret-keys $SIGNER > $SIGNERSECFILE
 
-KEY=${1:-381A7594}
+KEY=${1:-FD86488777B1D56DFCF167BDF0FEAEF0093AA2CB}
+KEY=$(gpg --list-keys --with-colon $KEY|grep '^pub'|cut -d ':' -f5)
 KEYFILE=/tmp/baff_keyfile_${KEY}.gpg
 KEYRING=/tmp/baff_keyring_${KEY}.gpg
 
+
+echo
+echo "===== Signing $KEY ====="
+echo
+
 gpg --export $KEY > $KEYFILE
 gpg --no-default-keyring --keyring $KEYRING --import $KEYFILE $SIGNERPUBFILE $SIGNERSECFILE
-gpg --no-default-keyring --keyring $KEYRING --trusted-key $SIGNER -u $SIGNER --sign-key $KEY
-gpg --no-default-keyring --keyring $KEYRING --export --armor $KEY > ${KEYFILE}.asc
-gpg --no-default-keyring --keyring $KEYRING -r $KEY --encrypt ${KEYFILE}.asc
+gpg --no-default-keyring --keyring $KEYRING --trusted-key $SIGNER -u $SIGNER --edit-key $KEY minimize save
+
+NUID=0
+while read uid
+do
+    ((NUID++)) || true
+    echo "----- uid $NUID: $uid -----"
+    gpg --no-default-keyring --keyring $KEYRING --trusted-key $SIGNER -u $SIGNER --edit-key $KEY "uid $NUID" sign save
+    gpg --no-default-keyring --keyring $KEYRING --export --armor $KEY > ${KEYFILE}.${NUID}.signed_by.${SIGNER}.asc
+    #gpg --no-default-keyring --keyring $KEYRING -r $KEY --encrypt ${KEYFILE}.${NUID}.signed_by.${SIGNER}.asc
+done <<< $(gpg --with-colons --fingerprint $KEY|grep '^uid'|grep -v '^uid:r:'|cut -d':' -f10)
 
 rm $SIGNERPUBFILE $SIGNERSECFILE $KEYFILE $KEYRING

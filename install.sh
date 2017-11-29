@@ -12,7 +12,7 @@ which yum 2> /dev/null && sudo yum install git fish vim tinc
 
 echo enable-ssh-support > .gnupg/gpg-agent.conf
 echo use-agent > .gnupg/gpg.conf
-echo default-key 4653CF28 >> .gnupg/gpg.conf
+echo default-key 7D2ACDAF4653CF28 >> .gnupg/gpg.conf
 echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
 echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
 echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed > .gnupg/gpg.conf
@@ -27,7 +27,7 @@ gpg-agent --daemon
 gpg2 --card-status || exit 1
 rm /tmp/secret{,.gpg}
 echo 'IT WORKS \o/' > /tmp/secret
-gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 4653CF28 /tmp/secret
+gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 7D2ACDAF4653CF28 /tmp/secret
 gpg --decrypt /tmp/secret.gpg || exit 1
 
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys

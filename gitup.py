@@ -57,10 +57,9 @@ def clean(output):
 
 if __name__ == '__main__':
     with open(CONFIG) as f:
-        REPOS = map(str.strip, f.readlines())
+        REPOS = [line.strip() for line in f.readlines() if line.startswith('/')]
 
     with ThreadPoolExecutor() as executor:
         futures = {executor.submit(gitup, repo): repo for repo in REPOS}
         for future in as_completed(futures):
-            repo = futures[future]
             clean(future.result())

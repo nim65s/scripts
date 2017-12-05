@@ -64,7 +64,7 @@ if __name__ == '__main__':
             full_name = '/'.join(r.url.split('/')[3:5])
             try:
                 packages = [line.split()[0].split('==') for line in r.content.decode().split('\n')
-                            if line and not line.startswith('#') and not line.startswith('-e')]
+                            if line and not line.startswith('#') and '#egg=' not in line]
                 repos[full_name] = {package: version for package, version in packages}
                 for package in packages:
                     all_packages.add(package[0].split('[')[0])

@@ -23,15 +23,16 @@ echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5
 sudo systemctl start pcscd
 sudo systemctl enable pcscd
 
-killall gpg-agent
+sudo killall gpg-agent
 gpg-agent --daemon
 
 # Check Key
-gpg2 --card-status || exit 1
-rm /tmp/secret{,.gpg}
+gpg2 --card-status
+curl $(gpg2 --card-status|grep key.asc|cut -d: -f2-) | gpg --import
+rm -f /tmp/secret{,.gpg}
 echo 'IT WORKS \o/' > /tmp/secret
 gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 7D2ACDAF4653CF28 /tmp/secret
-gpg --decrypt /tmp/secret.gpg || exit 1
+gpg --decrypt /tmp/secret.gpg
 
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
@@ -48,7 +49,7 @@ done
 
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc
 do
-    [[ -L $file ]] && rm $file
+    [[ -L $file || -f $file ]] && rm $file
     ln -s $HOME/dotfiles/$file
 done
 

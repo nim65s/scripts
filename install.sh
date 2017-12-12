@@ -1,6 +1,9 @@
 #!/bin/bash
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
+set -e
+set -x
+
 cd
 
 mkdir -p .config .virtualenvs .ssh .virtualenvs .gnupg

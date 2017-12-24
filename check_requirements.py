@@ -20,8 +20,6 @@ REQUIREMENTS = 'https://raw.githubusercontent.com/%s/master/requirements.txt'
 REPOS = 'https://api.github.com/user/repos'
 
 repos = {}
-pypi = {}
-all_packages = set()
 
 
 def show(package, repo, pypi):
@@ -54,8 +52,9 @@ def get_all_repos():
         all_repos += [repo['full_name'] for repo in user_repos if repo['full_name'] not in IGNORE]
 
 
-if __name__ == '__main__':
+def get_all():
     # Get the list of {all_repos} to consider.
+    all_packages = set()
     all_repos = sys.argv[1:] if len(sys.argv) > 1 else get_all_repos()
 
     # Parse the requirements.txt file from each repo from {all_repos}
@@ -71,18 +70,55 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'Error on {full_name}: {e}')
 
-    all_packages = sorted(all_packages)
-    all_repos = sorted(repos.keys())
+    return sorted(all_packages), sorted(repos.keys())
 
+
+def get_pypi(all_packages):
     # Get the Pypi version of {all_packages}
+    pypi = {}
     for r in dl(PyPI, all_packages, 'packages'):
         pypi[package_name(r.url.split('/')[4])] = r.json()['info']['version']
+    return pypi
 
-    # Print a everything in a table
-    table = [["", ""] + [repo.split('/')[0] for repo in all_repos]]
-    table += [["Package", "PyPI"] + [repo.split('/')[1] for repo in all_repos]]
-    for package in all_packages:
-        name = package_name(package)
-        table += [[package, pypi[name]] + [show(name, repo, pypi[name]) for repo in all_repos]]
 
-    print(tabulate(table))
+def print_tables(all_packages, all_repos, pypi):
+    # separate up-to-date repos and to-update repos, and ther packages
+    up_to_date_packages = set()
+    to_update_packages = set()
+    up_to_date_repos = set()
+    to_update_repos = set()
+
+    for repo in all_repos:
+        if all(version == pypi[package_name(package)] for package, version in repos[repo].items()):
+            up_to_date_repos.add(repo)
+            up_to_date_packages |= set(package_name(p) for p in repos[repo].keys())
+        else:
+            to_update_repos.add(repo)
+            to_update_packages |= set(package_name(p) for p in repos[repo].keys())
+
+    up_to_date_packages = sorted(up_to_date_packages)
+    to_update_packages = sorted(to_update_packages)
+    up_to_date_repos = sorted(up_to_date_repos)
+    to_update_repos = sorted(to_update_repos)
+
+    # Print a everything in tables
+    to_update_table = [["", ""] + [repo.split('/')[0] for repo in to_update_repos]]
+    to_update_table += [["Package", "PyPI"] + [repo.split('/')[1][:10] for repo in to_update_repos]]
+    for package in to_update_packages:
+        to_update_table += [[package, pypi[package]] +
+                            [show(package, repo, pypi[package]) for repo in to_update_repos]]
+
+    up_to_date_table = [["", ""] + [repo.split('/')[0] for repo in up_to_date_repos]]
+    up_to_date_table += [["Package", "PyPI"] + [repo.split('/')[1][:10] for repo in up_to_date_repos]]
+    for package in up_to_date_packages:
+        up_to_date_table += [[package, pypi[package]] +
+                             [show(package, repo, pypi[package]) for repo in up_to_date_repos]]
+
+    print(tabulate(up_to_date_table))
+    print(tabulate(to_update_table))
+
+
+if __name__ == '__main__':
+    all_packages, all_repos = get_all()
+    pypi = get_pypi(all_packages)
+    print_tables(all_packages, all_repos, pypi)

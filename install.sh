@@ -1,4 +1,5 @@
 #!/bin/bash
+# vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
 set -e
@@ -9,7 +10,7 @@ cd
 mkdir -p .config .virtualenvs .ssh .virtualenvs .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip python2-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta
+which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta
 which apt 2> /dev/null && sudo apt install -qqy gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip msmtp-mta
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
@@ -23,8 +24,7 @@ echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5
 sudo systemctl start pcscd
 sudo systemctl enable pcscd
 
-sudo killall gpg-agent
-gpg-agent --daemon
+gpg-connect-agent reloadagent /bye
 
 # Check Key
 gpg2 --card-status
@@ -54,17 +54,23 @@ do
 done
 
 cd ~/.config
-for files in awesome dfc fish ipython pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst
+for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst
 do
     [[ -L $files ]] && rm $files
     ln -s $HOME/dotfiles/.config/$files
 done
 cd
 
-rm -f $HOME/.virtualenvs/global_requirements.txt
-ln -s $HOME/dotfiles/global_requirements.txt $HOME/.virtualenvs/global_requirements.txt
+export PYENV_ROOT=$HOME/dotfiles/pyenv
+export PATH=$PYENV_ROOT/bin:$PATH
+eval "$(pyenv init -)"
 
-pip2 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish
-pip3 install -U --user -r $HOME/dotfiles/global_requirements.txt virtualfish khal khard vdirsyncer todoman
+pyenv install -s pypy3.5-5.9.0
+pyenv install -s pypy2.7-5.9.0
+pyenv virtualenv-delete -f tools
+pyenv virtualenv pypy3.5-5.9.0 tools
+pyenv activate tools
+pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests
+pyenv global tools pypy2.7-5.9.0 system
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

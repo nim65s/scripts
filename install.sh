@@ -70,7 +70,7 @@ pyenv install -s pypy2.7-5.9.0
 pyenv virtualenv-delete -f tools
 pyenv virtualenv pypy3.5-5.9.0 tools
 pyenv activate tools
-pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests
+pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters
 pyenv global tools pypy2.7-5.9.0 system
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

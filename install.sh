@@ -64,7 +64,9 @@ cd
 export PYENV_ROOT=$HOME/dotfiles/pyenv
 export PATH=$PYENV_ROOT/bin:$PATH
 eval "$(pyenv init -)"
-
+cd $PYENV_ROOT/plugins
+rm -f pyenv-virtualenv
+ln -s ../../pyenv-virtualenv
 pyenv install -s pypy3.5-5.9.0
 pyenv install -s pypy2.7-5.9.0
 pyenv virtualenv-delete -f tools

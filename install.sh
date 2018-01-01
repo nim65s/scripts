@@ -70,9 +70,13 @@ ln -s ../../pyenv-virtualenv
 pyenv install -s pypy3.5-5.9.0
 pyenv install -s pypy2.7-5.9.0
 pyenv virtualenv-delete -f tools
+pyenv virtualenv-delete -f tools2
 pyenv virtualenv pypy3.5-5.9.0 tools
+pyenv virtualenv pypy2.7-5.9.0 tools2
 pyenv activate tools
 pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters
-pyenv global tools pypy2.7-5.9.0 system
+pyenv activate tools2
+pip install -U IPython rename
+pyenv global tools tools2 system
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

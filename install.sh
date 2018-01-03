@@ -21,9 +21,6 @@ echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
 echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
 echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed >> .gnupg/gpg.conf
 
-sudo systemctl start pcscd
-sudo systemctl enable pcscd
-
 gpg-connect-agent reloadagent /bye
 
 # Check Key

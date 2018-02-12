@@ -73,7 +73,7 @@ pyenv virtualenv pypy2.7-5.9.0 twols
 pyenv activate tools
 pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters
 pyenv activate twols
-pip install -U IPython rename
+pip install -U IPython pygments_zenburn rename
 pyenv global tools twols system
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

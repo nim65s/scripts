@@ -71,7 +71,7 @@ pyenv virtualenvs | grep -q twols && pyenv virtualenv-delete -f twols
 pyenv virtualenv pypy3.5-5.9.0 tools
 pyenv virtualenv pypy2.7-5.9.0 twols
 pyenv activate tools
-pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters
+pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters wheel twine
 pyenv activate twols
 pip install -U IPython pygments_zenburn rename
 pyenv global tools twols system

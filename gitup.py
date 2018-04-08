@@ -18,6 +18,7 @@ REMOVE = [
     'master mise à jour en avance rapide sur refs/remotes/origin/master.',
     "Déjà sur 'master'",
     'Already up-to-date.',
+    'warning: agent returned different signature type ssh-rsa (expected rsa-sha2-512)',
 ]
 
 

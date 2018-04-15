@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+# ~/.lbc_queries.json:
+# {"c4-5k-2011-man": "https://www.leboncoin.fr/voitures/offres/midi_pyrenees/bonnes_affaires/?th=1&q=picasso…
+#
+# crontab:
+# ./scripts/lbc.py && jq . .lbc_results.json > .lbc_new && diff -u .lbc_old .lbc_new && mv .lbc_new .lbc_old
+
+
 import json
 from os.path import expanduser
 from pathlib import Path
@@ -11,8 +18,8 @@ from html2text import html2text
 # from datetime import datetime
 
 
-RESULTS_FILE = Path(expanduser('~/lbc_results.json'))
-QUERY_FILE = Path(expanduser('~/lbc_queries.json'))
+RESULTS_FILE = Path(expanduser('~/.lbc_results.json'))
+QUERY_FILE = Path(expanduser('~/.lbc_queries.json'))
 
 if __name__ == '__main__':
     with QUERY_FILE.open() as f:

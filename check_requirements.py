@@ -9,7 +9,7 @@ import requests
 from tabulate import tabulate
 from tqdm import tqdm
 
-IGNORE = ['nim65s/cdl-blog', 'nim65s/rhetoriquerobotique']
+IGNORE = ['nim65s/cdl-blog']
 
 with open(expanduser('~/.githubtoken')) as f:
     TOKEN = f.read().strip()
@@ -49,7 +49,8 @@ def get_all_repos():
         user_repos = requests.get(REPOS, {'per_page': 100, 'page': page}, headers=HEADERS).json()
         if not user_repos:
             return all_repos
-        all_repos += [repo['full_name'] for repo in user_repos if repo['full_name'] not in IGNORE]
+        all_repos += [repo['full_name'] for repo in user_repos
+                      if not repo['archived'] and repo['full_name'] not in IGNORE]
 
 
 def get_all():

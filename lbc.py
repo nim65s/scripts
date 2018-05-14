@@ -44,11 +44,11 @@ if __name__ == '__main__':
         for url, data in results[key].items():
             sousoup = BeautifulSoup(requests.get(url).content, 'html.parser')
             results[key][url] = {
-                'titre': sousoup.find('h1').text,
-                'prix': sousoup.find('span', class_='_1F5u3').text,
+                'titre': sousoup.find('h1').text.strip(),
+                'prix': sousoup.find('span', class_='_1F5u3').text.strip(),
                 # 'date': datetime.strptime(sousoup.find('div', class_='_3Pad-').text, '%d/%m/%Y à %Hh%M'),
-                'date': sousoup.find('div', class_='_3Pad-').text,
-                'critères': [s.text for s in sousoup.find_all(class_='_3Jxf3')],
+                'date': sousoup.find('div', class_='_3Pad-').text.strip(),
+                'critères': [s.text.strip() for s in sousoup.find_all(class_='_3Jxf3')],
                 'description': [l.strip() for l in html2text(str(sousoup.find(class_='_2wB1z'))).split('\n') if l],
             }
 

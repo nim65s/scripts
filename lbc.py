@@ -42,7 +42,10 @@ if __name__ == '__main__':
                 print(f'Nouveau résultat pour {key}: {href}')
                 results[key][href] = {}
         for url, data in results[key].items():
-            sousoup = BeautifulSoup(requests.get(url).content, 'html.parser')
+            r = requests.get(url)
+            if r.status_code != 200:
+                continue
+            sousoup = BeautifulSoup(r.content, 'html.parser')
             results[key][url] = {
                 'titre': sousoup.find('h1').text.strip(),
                 'prix': sousoup.find('span', class_='_1F5u3').text.strip(),

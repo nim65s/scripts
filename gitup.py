@@ -41,8 +41,7 @@ def gitup(repo):
         ret += run(cmds, repo)
     if isfile('.gitmodules'):
         for cmds in [['git', 'submodule', 'update', '--recursive', '--remote', '--rebase', '--init'],
-                     ['git', 'submodule', 'foreach', '-q',
-                      'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'],
+                     ['git', 'submodule', 'foreach', '-q', 'git checkout master'],
                      ['git', 'submodule', 'foreach', '-q', 'git', 'pull', '--rebase']]:
             ret += run(cmds, repo)
     return ret + run(['git', 'status'], repo)

@@ -58,22 +58,7 @@ do
 done
 cd
 
-export PYENV_ROOT=$HOME/dotfiles/pyenv
-export PATH=$PYENV_ROOT/bin:$PATH
-eval "$(pyenv init -)"
-cd $PYENV_ROOT/plugins
-rm -f pyenv-virtualenv
-ln -s ../../pyenv-virtualenv
-pyenv install -s pypy3.5-5.9.0
-pyenv install -s pypy2.7-5.9.0
-pyenv virtualenvs | grep -q tools && pyenv virtualenv-delete -f tools
-pyenv virtualenvs | grep -q twols && pyenv virtualenv-delete -f twols
-pyenv virtualenv pypy3.5-5.9.0 tools
-pyenv virtualenv pypy2.7-5.9.0 twols
-pyenv activate tools
-pip install -U flake8 IPython isort pep8-naming pip-tools pygments_zenburn khal khard vdirsyncer todoman youtube-dl thefuck tqdm tabulate grequests pandocfilters wheel twine
-pyenv activate twols
-pip install -U IPython pygments_zenburn rename
-pyenv global tools twols system
+pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming khal khard vdirsyncer todoman youtube-dl thefuck pandocfilters wheel twine rename
+pip2 install -U --user IPython pygments_zenburn
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

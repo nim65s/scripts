@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from os.path import expanduser, isdir, isfile

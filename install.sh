@@ -60,7 +60,7 @@ cd
 
 pip2 install -U --user pip
 pip3 install -U --user pip
-pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming khal khard vdirsyncer todoman youtube-dl thefuck pandocfilters wheel twine pipenv
+pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming khal khard vdirsyncer todoman youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose
 pip2 install -U --user IPython pygments_zenburn rename
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

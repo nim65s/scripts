@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.6
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from os.path import expanduser, isdir, isfile
+from os.path import expanduser, isdir, isfile, join
 from subprocess import PIPE, STDOUT, Popen
 
 CONFIG = expanduser('~/.gitrepos')
@@ -39,9 +39,8 @@ def gitup(repo):
     ret = [title(repo)]
     for cmds in [['git', 'fetch'], ['git', 'rebase']]:
         ret += run(cmds, repo)
-    if isfile('.gitmodules'):
-        for cmds in [['git', 'submodule', 'update', '--recursive', '--remote', '--rebase', '--init'],
-                     ['git', 'submodule', 'foreach', '-q', 'git checkout master'],
+    if isfile(join(repo, '.gitmodules')):
+        for cmds in [['git', 'submodule', 'update', '--remote', '--rebase', '--init'],
                      ['git', 'submodule', 'foreach', '-q', 'git', 'pull', '--rebase']]:
             ret += run(cmds, repo)
     return ret + run(['git', 'status'], repo)

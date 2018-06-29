@@ -14,22 +14,25 @@ which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh 
 which apt 2> /dev/null && sudo apt install -qqy gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip msmtp-mta
 which yum 2> /dev/null && sudo yum install git fish vim tinc
 
-echo enable-ssh-support > .gnupg/gpg-agent.conf
-echo use-agent > .gnupg/gpg.conf
-echo default-key 7D2ACDAF4653CF28 >> .gnupg/gpg.conf
-echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
-echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
-echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed >> .gnupg/gpg.conf
+if [[ -z "$SSH_CLIENT" ]]
+then
+    echo enable-ssh-support > .gnupg/gpg-agent.conf
+    echo use-agent > .gnupg/gpg.conf
+    echo default-key 7D2ACDAF4653CF28 >> .gnupg/gpg.conf
+    echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
+    echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
+    echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed >> .gnupg/gpg.conf
 
-gpg-connect-agent reloadagent /bye
+    gpg-connect-agent reloadagent /bye
 
-# Check Key
-gpg2 --card-status
-curl $(gpg2 --card-status|grep key.asc|cut -d: -f2-) | gpg --import
-rm -f /tmp/secret{,.gpg}
-echo 'IT WORKS \o/' > /tmp/secret
-gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 7D2ACDAF4653CF28 /tmp/secret
-gpg --decrypt /tmp/secret.gpg
+    # Check Key
+    gpg2 --card-status
+    curl $(gpg2 --card-status|grep key.asc|cut -d: -f2-) | gpg --import
+    rm -f /tmp/secret{,.gpg}
+    echo 'IT WORKS \o/' > /tmp/secret
+    gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 7D2ACDAF4653CF28 /tmp/secret
+    gpg --decrypt /tmp/secret.gpg
+fi
 
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 

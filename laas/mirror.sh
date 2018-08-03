@@ -27,26 +27,34 @@ git fetch main   &
 
 wait
 
+
 git checkout devel
+git submodule update
 git pull --rebase main devel
+git branch --set-upstream-to=origin/devel devel
+
 git checkout master
+git submodule update
 git pull --rebase main master
+git branch --set-upstream-to=origin/master master
 
 tput bold
 echo "master / devel: -$(git rev-list master..devel | wc -l)|+$(git rev-list devel..master | wc -l)"
 tput sgr0
 
 git checkout devel
+git submodule update
 git push origin devel
 git checkout master
+git submodule update
 git push origin master
 
 [[ $(git diff devel..main/devel | wc -l) == 0 ]]
 [[ $(git diff master..main/master | wc -l) == 0 ]]
 
 git checkout devel
+git submodule update
 git push maingl devel
 git checkout master
+git submodule update
 git push maingl master
-
-

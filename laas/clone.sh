@@ -8,7 +8,7 @@ GH=github.com
 
 ML=gsaurel
 MH=nim65s
-set -x
+set -e
 
 for url in $GL/$ML $GH/$MH $GL/$ORG $GH/$ORG
 do

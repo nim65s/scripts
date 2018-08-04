@@ -2,21 +2,23 @@
 
 import re
 import sys
-from os.path import expanduser
+from json import loads
+from subprocess import check_output
 
 import grequests
 import requests
 from tabulate import tabulate
 from tqdm import tqdm
 
-IGNORE = ['nim65s/cdl-blog']
+IGNORE = ['nim65s/cdl-blog', 'nim65s/PonyConf', 'nim65s/dashboard']
+TOKEN_PASS_PATH = 'web/github_token'
 
-with open(expanduser('~/.githubtoken')) as f:
-    TOKEN = f.read().strip()
+TOKEN = check_output(['pass', TOKEN_PASS_PATH]).decode().split()[0]
 HEADERS = {'Authorization': f'token {TOKEN}'}
 
 PyPI = 'https://pypi.python.org/pypi/%s/json'
 REQUIREMENTS = 'https://raw.githubusercontent.com/%s/master/requirements.txt'
+PIPFILE_LOCK = 'https://raw.githubusercontent.com/%s/master/Pipfile.lock'
 REPOS = 'https://api.github.com/user/repos'
 
 repos = {}
@@ -59,7 +61,7 @@ def get_all():
     all_repos = sys.argv[1:] if len(sys.argv) > 1 else get_all_repos()
 
     # Parse the requirements.txt file from each repo from {all_repos}
-    for r in dl(REQUIREMENTS, all_repos, 'repositories'):
+    for r in dl(REQUIREMENTS, all_repos, 'requirements.txt'):
         if r.status_code == 200:
             full_name = '/'.join(r.url.split('/')[3:5])
             try:
@@ -68,6 +70,18 @@ def get_all():
                 repos[full_name] = {package: version for package, version in packages}
                 for package in packages:
                     all_packages.add(package[0].split('[')[0])
+            except Exception as e:
+                print(f'Error on {full_name}: {e}')
+
+    # Parse the Pipfile.lock file from each repo from {all_repos}, overrides older data from requirements.txt
+    for r in dl(PIPFILE_LOCK, all_repos, 'Pipfile.lock'):
+        if r.status_code == 200:
+            full_name = '/'.join(r.url.split('/')[3:5])
+            try:
+                content = loads(r.content)['default']
+                repos[full_name] = {package: data['version'].replace('==', '') for package, data in content.items()}
+                for package in content.keys():
+                    all_packages.add(package.split('[')[0])
             except Exception as e:
                 print(f'Error on {full_name}: {e}')
 

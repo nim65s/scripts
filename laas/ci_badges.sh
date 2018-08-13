@@ -23,6 +23,7 @@ cd $ORG/$PRJ
 
 git checkout devel
 git pull --rebase main devel
+git submodule update
 
 hostname -f | grep -q laas.fr || export ALL_PROXY="socks5h://localhost:1445"
 curl -s http://rainboard.laas.fr/project/$PRJ/.gitlab-ci.yml > .gitlab-ci.yml

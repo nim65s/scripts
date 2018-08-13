@@ -24,6 +24,10 @@ cd $ORG
 
 git clone --recursive git@$GL:$ML/$PRJ.git
 cd $PRJ
+
+git checkout devel
+git checkout master
+
 git remote add github git@$GH:$MH/$PRJ.git
 git remote add maingl git@$GL:$ORG/$PRJ.git
 git remote add main   git@$GH:$ORG/$PRJ.git
@@ -32,6 +36,3 @@ git fetch maingl &
 git fetch main   &
 
 wait
-
-git checkout devel
-git checkout master

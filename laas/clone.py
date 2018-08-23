@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 
-from subprocess import check_output
+from subprocess import CalledProcessError, check_call
 
 import requests
 
@@ -8,7 +8,6 @@ GL = 'gepgitlab.laas.fr'
 GH = 'github.com'
 ML = 'gsaurel'
 MH = 'nim65s'
-BRANCHES = ['master', 'devel']
 
 API = 'http://rainboard.laas.fr/api/%s/'
 ORG = {i['id']: i['slug'] for i in requests.get(API % 'namespace').json()}
@@ -24,13 +23,22 @@ for org, prj in ORG_PRJ:
 
 for org, prj in ORG_PRJ:
     print('{:=^80}'.format(f' {org} / {prj} '))
-    check_output(['git', 'clone', '--recursive', f'git@{GL}:{ML}/{prj}.git'], cwd=org)
+    check_call(['git', 'clone', '--recursive', f'git@{GL}:{ML}/{prj}.git'], cwd=org)
     cwd = f'{org}/{prj}'
-    for branch in BRANCHES:
-        check_output(['git', 'checkout', branch], cwd=cwd)
-    check_output(['git', 'remote', 'add', 'maingl', f'git@{GL}:{org}/{prj}.git'], cwd=cwd)
-    check_output(['git', 'remote', 'add', 'github', f'git@{GH}:{MH}/{prj}.git'], cwd=cwd)
-    check_output(['git', 'remote', 'add', 'main', f'git@{GH}:{org}/{prj}.git'], cwd=cwd)
-    check_output(['git', 'fetch', 'maingl'], cwd=cwd)
-    check_output(['git', 'fetch', 'github'], cwd=cwd)
-    check_output(['git', 'fetch', 'main'], cwd=cwd)
+    devel_from_main = False
+    try:
+        check_call(['git', 'checkout', 'devel'], cwd=cwd)
+    except CalledProcessError:
+        if requests.get(f'https://{GH}/{org}/{prj}/tree/devel').status_code == 200:
+            devel_from_main = True
+        else:
+            check_call(['git', 'checkout', '-b', 'devel'], cwd=cwd)
+    check_call(['git', 'remote', 'add', 'main', f'git@{GH}:{org}/{prj}.git'], cwd=cwd)
+    check_call(['git', 'fetch', 'main'], cwd=cwd)
+    if devel_from_main:
+        check_call(['git', 'checkout', 'devel'], cwd=cwd)
+    check_call(['git', 'remote', 'add', 'maingl', f'git@{GL}:{org}/{prj}.git'], cwd=cwd)
+    check_call(['git', 'fetch', 'maingl'], cwd=cwd)
+    check_call(['git', 'remote', 'add', 'github', f'git@{GH}:{MH}/{prj}.git'], cwd=cwd)
+    check_call(['git', 'fetch', 'github'], cwd=cwd)
+    check_call(['git', 'checkout', 'master'], cwd=cwd)

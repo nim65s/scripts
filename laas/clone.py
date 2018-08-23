@@ -4,8 +4,8 @@ from subprocess import check_output
 
 import requests
 
-GL = 'https://gepgitlab.laas.fr'
-GH = 'https://github.com'
+GL = 'gepgitlab.laas.fr'
+GH = 'github.com'
 ML = 'gsaurel'
 MH = 'nim65s'
 BRANCHES = ['master', 'devel']
@@ -20,7 +20,7 @@ ORG_PRJ = sorted((ORG[i['main_namespace']], i['slug']) for i in PRJ if i['slug']
 
 for org, prj in ORG_PRJ:
     for url in [f'{GL}/{ML}', f'{GH}/{MH}', f'{GL}/{org}', f'{GH}/{org}']:
-        requests.get(f'{url}/{prj}').raise_for_status()
+        requests.get(f'https://{url}/{prj}').raise_for_status()
 
 for org, prj in ORG_PRJ:
     print('{:=^80}'.format(f' {org} / {prj} '))

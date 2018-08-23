@@ -48,6 +48,7 @@ git push origin devel
 git checkout master
 git submodule update
 git push origin master
+git push --tags origin master
 
 [[ $(git diff devel..main/devel | wc -l) == 0 ]]
 [[ $(git diff master..main/master | wc -l) == 0 ]]
@@ -58,3 +59,4 @@ git push maingl devel
 git checkout master
 git submodule update
 git push maingl master
+git push --tags maingl master

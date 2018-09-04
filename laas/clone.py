@@ -19,7 +19,7 @@ ORG_PRJ = sorted((ORG[i['main_namespace']], i['slug']) for i in PRJ if i['slug']
 
 for org, prj in ORG_PRJ:
     for url in [f'{GL}/{ML}', f'{GH}/{MH}', f'{GL}/{org}', f'{GH}/{org}']:
-        r = requests.get(f'https://{url}/{prj}').raise_for_status()
+        r = requests.get(f'https://{url}/{prj}')
         r.raise_for_status()
         if 'You need to sign in or sign up before continuing.' in r.content.decode():
             raise FileNotFoundError(f'https://{url}/{prj} does not exist')

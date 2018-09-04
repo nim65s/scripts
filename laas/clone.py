@@ -25,20 +25,26 @@ for org, prj in ORG_PRJ:
     print('{:=^80}'.format(f' {org} / {prj} '))
     check_call(['git', 'clone', '--recursive', f'git@{GL}:{ML}/{prj}.git'], cwd=org)
     cwd = f'{org}/{prj}'
+
+    def call(cmd):
+        check_call(cmd.split(), cwd=cwd)
+
     devel_from_main = False
     try:
-        check_call(['git', 'checkout', 'devel'], cwd=cwd)
+        call('git checkout devel')
     except CalledProcessError:
         if requests.get(f'https://{GH}/{org}/{prj}/tree/devel').status_code == 200:
             devel_from_main = True
         else:
-            check_call(['git', 'checkout', '-b', 'devel'], cwd=cwd)
-    check_call(['git', 'remote', 'add', 'main', f'git@{GH}:{org}/{prj}.git'], cwd=cwd)
-    check_call(['git', 'fetch', 'main'], cwd=cwd)
+            call('git checkout -b devel')
+            call('git push origin devel')
+            call('git branch --set-upstream-to=origin/devel devel')
+    call(f'git remote add main git@{GH}:{org}/{prj}.git')
+    call('git fetch main')
     if devel_from_main:
-        check_call(['git', 'checkout', 'devel'], cwd=cwd)
-    check_call(['git', 'remote', 'add', 'maingl', f'git@{GL}:{org}/{prj}.git'], cwd=cwd)
-    check_call(['git', 'fetch', 'maingl'], cwd=cwd)
-    check_call(['git', 'remote', 'add', 'github', f'git@{GH}:{MH}/{prj}.git'], cwd=cwd)
-    check_call(['git', 'fetch', 'github'], cwd=cwd)
-    check_call(['git', 'checkout', 'master'], cwd=cwd)
+        call('git checkout devel')
+    call(f'git remote add maingl git@{GL}:{org}/{prj}.git')
+    call('git fetch maingl')
+    call(f'git remote add github git@{GH}:{MH}/{prj}.git')
+    call('git fetch github')
+    call('git checkout master')

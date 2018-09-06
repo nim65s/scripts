@@ -13,11 +13,14 @@ API = 'http://rainboard.laas.fr/api/%s/'
 ORG = {i['id']: i['slug'] for i in requests.get(API % 'namespace').json()}
 PRJ = requests.get(API % 'project', {'from_gepetto': True}).json()
 
-IGNORE = ['sot-hpp', 'stack-of-tasksgithubcom']
+IGNORE = ['stack-of-tasksgithubcom']
+PRIVATE = ['sot-talos']
 
 ORG_PRJ = sorted((ORG[i['main_namespace']], i['slug']) for i in PRJ if i['slug'] not in IGNORE)
 
 for org, prj in ORG_PRJ:
+    if prj in PRIVATE:
+        continue
     for url in [f'{GL}/{ML}', f'{GH}/{MH}', f'{GL}/{org}', f'{GH}/{org}']:
         r = requests.get(f'https://{url}/{prj}')
         r.raise_for_status()

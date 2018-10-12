@@ -6,7 +6,8 @@ LIMIT=3
 SORT="newest-first"
 SEARCH="tag:unread \
     and not folder:gandi/n7.net7.root \
-    and not folder:gandi/ToTheWeb.Admin"
+    and not folder:gandi/ToTheWeb.Admin \
+    and not folder:gandi/Junk"
 
 notmuch new
 

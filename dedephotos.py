@@ -126,7 +126,7 @@ class DedePhotos(QMainWindow):
 
     def update_photos(self):
         """
-        update img_no & images in photos
+        update img_no & images in ImgChooser
         """
         key = self.db_keys[self.current]
         self.photos.set_images(self.current, self.database[key], self.removed[key])
@@ -162,7 +162,7 @@ class DedePhotos(QMainWindow):
 
     def done(self):
         """
-        move self.removed stuff into "removed" dir
+        move self.removed stuff into "./removed" dir
         """
         for imgs in self.removed.values():
             for img in imgs:
@@ -171,18 +171,24 @@ class DedePhotos(QMainWindow):
 
 def read_database(dirs):
     """
-    get all images and order them by hash
+    get all images and regroup them by hash
+    return only doublons
     """
     database = {}
+    fails = []
     for argv in dirs:
         for img in tqdm(list(Path(argv).glob(f'**/*.jpg')), desc=argv):
-            image = Image.open(img)
-            img_hash = str(imagehash.dhash(image))
-            database[img_hash] = database.get(img_hash, []) + [img]
-    return database
+            try:
+                image = Image.open(img)
+                img_hash = str(imagehash.dhash(image))
+                database[img_hash] = database.get(img_hash, []) + [img]
+            except OSError:
+                fails.append(str(img))
+    print('FAIL on:', '\n'.join(fails))
+    return {key: values for key, values in database.items() if len(values) > 1}
 
 
 if __name__ == '__main__':
     app = QApplication([])
-    ex = DedePhotos({k: v for k, v in read_database(sys.argv[1:]).items() if len(v) > 1})
+    ex = DedePhotos(read_database(sys.argv[1:]))
     sys.exit(app.exec_())

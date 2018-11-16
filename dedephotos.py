@@ -115,11 +115,14 @@ class DedePhotos(QMainWindow):
         _done.setStatusTip('Done')
         _done.triggered.connect(self.done)
 
+        self.count = QAction(f'{self.current} / {len(self.db_keys)}', self)
+
         toolbar = self.addToolBar('Toolbar')
         toolbar.addAction(_next)
         toolbar.addAction(_prev)
         toolbar.addAction(_done)
         toolbar.addAction(_exit)
+        toolbar.addAction(self.count)
 
         self.setWindowTitle(u'DédéPhotos')
         self.show()
@@ -128,6 +131,7 @@ class DedePhotos(QMainWindow):
         """
         update img_no & images in ImgChooser
         """
+        self.count.setText(f'{self.current} / {len(self.db_keys)}')
         key = self.db_keys[self.current]
         self.photos.set_images(self.current, self.database[key], self.removed[key])
 

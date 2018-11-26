@@ -19,6 +19,7 @@ HEADERS = {'Authorization': f'token {TOKEN}'}
 PyPI = 'https://pypi.python.org/pypi/%s/json'
 PIPFILE_LOCK = 'https://raw.githubusercontent.com/%s/master/Pipfile.lock'
 REPOS = 'https://api.github.com/user/repos'
+PINNED = {'olefile': '0.43', 'pillow': '4.3.0'}
 
 repos = {}
 
@@ -28,6 +29,8 @@ def show(package, repo, pypi):
     if package in repos[repo]:
         if repos[repo][package] == pypi:
             return "✔"
+        elif package in PINNED and repos[repo][package] == PINNED[package]:
+            return "P"
         else:
             return repos[repo][package]
     else:
@@ -50,8 +53,9 @@ def get_all_repos():
         user_repos = requests.get(REPOS, {'per_page': 100, 'page': page}, headers=HEADERS).json()
         if not user_repos:
             return all_repos
-        all_repos += [repo['full_name'] for repo in user_repos
-                      if not repo['archived'] and repo['full_name'] not in IGNORE]
+        all_repos += [
+            repo['full_name'] for repo in user_repos if not repo['archived'] and repo['full_name'] not in IGNORE
+        ]
 
 
 def get_all():
@@ -90,7 +94,8 @@ def print_tables(all_packages, all_repos, pypi):
     to_update_repos = set()
 
     for repo in all_repos:
-        if all(version == pypi[package_name(package)] for package, version in repos[repo].items()):
+        if all(version == pypi[package_name(package)] or package in PINNED and version == PINNED[package]
+               for package, version in repos[repo].items()):
             up_to_date_repos.add(repo)
             up_to_date_packages |= set(package_name(p) for p in repos[repo].keys())
         else:
@@ -106,14 +111,16 @@ def print_tables(all_packages, all_repos, pypi):
     to_update_table = [["", ""] + [repo.split('/')[0] for repo in to_update_repos]]
     to_update_table += [["Package", "PyPI"] + [repo.split('/')[1][:10] for repo in to_update_repos]]
     for package in to_update_packages:
-        to_update_table += [[package, pypi[package]] +
-                            [show(package, repo, pypi[package]) for repo in to_update_repos]]
+        to_update_table += [
+            [package, pypi[package]] + [show(package, repo, pypi[package]) for repo in to_update_repos]
+        ]
 
     up_to_date_table = [["", ""] + [repo.split('/')[0] for repo in up_to_date_repos]]
     up_to_date_table += [["Package", "PyPI"] + [repo.split('/')[1][:10] for repo in up_to_date_repos]]
     for package in up_to_date_packages:
-        up_to_date_table += [[package, pypi[package]] +
-                             [show(package, repo, pypi[package]) for repo in up_to_date_repos]]
+        up_to_date_table += [
+            [package, pypi[package]] + [show(package, repo, pypi[package]) for repo in up_to_date_repos]
+        ]
 
     print(tabulate(up_to_date_table))
     print(tabulate(to_update_table))

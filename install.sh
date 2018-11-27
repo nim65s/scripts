@@ -7,7 +7,7 @@ set -x
 
 cd
 
-mkdir -p .config .virtualenvs .ssh .virtualenvs .gnupg
+mkdir -p .config .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
 which pacman 2> /dev/null && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta

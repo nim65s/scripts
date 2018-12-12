@@ -21,6 +21,7 @@ REMOVE = [
     'La branche courante master est à jour.',
     'Current branch master is up to date.',
     'master mise à jour en avance rapide sur refs/remotes/origin/master.',
+    'Avance rapide de master sur refs/remotes/origin/master.',
     'Fast-forwarded master to refs/remotes/origin/master.',
     "Déjà sur 'master'",
     'Already up-to-date.',

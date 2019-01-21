@@ -10,8 +10,8 @@ cd
 mkdir -p .config .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-command -v pacman && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta
-command -v apt && sudo apt install -qqy gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip msmtp-mta
+command -v pacman && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck
+command -v apt && sudo apt install -qqy gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip msmtp-mta shellcheck
 command -v yum && sudo yum install git fish vim tinc python2-pip python3-pip gcc
 
 if [[ -z "$SSH_CLIENT" ]]

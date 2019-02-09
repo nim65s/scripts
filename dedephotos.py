@@ -184,7 +184,7 @@ def read_database(dirs):
         for img in tqdm(list(Path(argv).glob(f'**/*.jpg')), desc=argv):
             try:
                 image = Image.open(img)
-                img_hash = str(imagehash.dhash(image))
+                img_hash = str(imagehash.phash(image))
                 database[img_hash] = database.get(img_hash, []) + [img]
             except OSError:
                 fails.append(str(img))

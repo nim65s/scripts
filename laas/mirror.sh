@@ -20,13 +20,7 @@ wait
 [[ -d $ORG/$PRJ ]]
 
 cd $ORG/$PRJ
-git fetch origin &
-git fetch github &
-git fetch maingl &
-git fetch main   &
-
-wait
-
+git fetch --all --prune
 
 git checkout devel
 git submodule update
@@ -49,6 +43,11 @@ git checkout master
 git submodule update
 git push origin master
 git push --tags origin master
+
+tput bold
+echo "devel / main/devel: -$(git rev-list devel..main/devel | wc -l)|+$(git rev-list main/devel..devel | wc -l)"
+echo "master / main/master: -$(git rev-list master..main/master | wc -l)|+$(git rev-list main/master..master | wc -l)"
+tput sgr0
 
 [[ $(git diff devel..main/devel | wc -l) == 0 ]]
 [[ $(git diff master..main/master | wc -l) == 0 ]]

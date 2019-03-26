@@ -12,14 +12,14 @@ set -e
 
 for url in $GL/$ML $GH/$MH $GL/$ORG $GH/$ORG
 do
-    curl -sI https://$url/$PRJ | head -n1 | grep -q 200 || echo "NOPE https://$url/$PRJ" >> /dev/stderr &
+    curl -sI "https://$url/$PRJ" | head -n1 | grep -q 200 || echo "NOPE https://$url/$PRJ" >> /dev/stderr &
 done
 
 wait
 
 [[ -d $ORG/$PRJ ]]
 
-cd $ORG/$PRJ
+cd "$ORG/$PRJ"
 git fetch --all --prune
 
 git checkout devel
@@ -49,13 +49,17 @@ echo "devel / main/devel: -$(git rev-list devel..main/devel | wc -l)|+$(git rev-
 echo "master / main/master: -$(git rev-list master..main/master | wc -l)|+$(git rev-list main/master..master | wc -l)"
 tput sgr0
 
-[[ $(git diff devel..main/devel | wc -l) == 0 ]]
-[[ $(git diff master..main/master | wc -l) == 0 ]]
+if [[ $(git diff devel..main/devel | wc -l) == 0 ]]
+then
+    git checkout devel
+    git submodule update
+    git push maingl devel
+fi
 
-git checkout devel
-git submodule update
-git push maingl devel
-git checkout master
-git submodule update
-git push maingl master
-git push --tags maingl master
+if [[ $(git diff master..main/master | wc -l) == 0 ]]
+then
+    git checkout master
+    git submodule update
+    git push maingl master
+    git push --tags maingl master
+fi

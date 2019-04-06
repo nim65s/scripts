@@ -19,7 +19,7 @@ HEADERS = {'Authorization': f'token {TOKEN}'}
 PyPI = 'https://pypi.python.org/pypi/%s/json'
 PIPFILE_LOCK = 'https://raw.githubusercontent.com/%s/master/Pipfile.lock'
 REPOS = 'https://api.github.com/user/repos'
-PINNED = {'olefile': '0.43', 'pillow': '4.3.0'}
+PINNED = {'olefile': '0.43', 'pillow': '5.4.1'}
 
 repos = {}
 

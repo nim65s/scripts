@@ -8,6 +8,7 @@ set -x
 cd
 
 mkdir -p .config .ssh .gnupg
+chmod 700 .ssh
 touch .gitrepos .ssh/authorized_keys
 
 command -v pacman && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck

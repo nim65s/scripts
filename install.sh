@@ -55,7 +55,7 @@ do
 done
 
 cd ~/.config
-for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc
+for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf
 do
     [[ -L $files ]] && rm $files
     ln -s $HOME/dotfiles/.config/$files

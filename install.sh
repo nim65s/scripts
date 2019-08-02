@@ -2,6 +2,10 @@
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
+FD_VERSION=7.3.0
+RG_VERSION=11.0.2
+FISH_VERSION=3.0.2
+
 set -e
 set -x
 
@@ -11,9 +15,20 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh
 touch .gitrepos .ssh/authorized_keys
 
-command -v pacman && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc
-command -v apt && sudo apt install -qqy gnupg2 terminator git fish vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python-pip python3-pip msmtp-mta shellcheck dfc
-command -v yum && sudo yum install git fish vim tinc python2-pip python3-pip gcc
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd
+[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db
+command -v yum && sudo yum install git fish vim tinc python3-pip gcc
+
+if [[ -f /etc/debian_version ]]
+then
+    FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
+    RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
+    FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~$(lsb_release -cs)_amd64.deb"
+    FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~$(lsb_release -cs)_all.deb"
+
+    wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
+    dpkg -i ./*.deb
+fi
 
 if [[ -z "$SSH_CLIENT" ]]
 then
@@ -62,9 +77,7 @@ do
 done
 cd
 
-pip2 install -U --user pip
 pip3 install -U --user pip
 pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming khal khard vdirsyncer todoman youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose
-pip2 install -U --user IPython pygments_zenburn rename
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

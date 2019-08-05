@@ -27,7 +27,7 @@ then
     FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~$(lsb_release -cs)_all.deb"
 
     wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
-    dpkg -i ./*.deb
+    sudo dpkg -i ./*.deb
 fi
 
 if [[ -z "$SSH_CLIENT" ]]

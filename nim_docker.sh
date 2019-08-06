@@ -2,6 +2,8 @@
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/nim_docker.sh | bash
 
+set -ex
+
 FD_VERSION=7.3.0
 RG_VERSION=11.0.2
 FISH_VERSION=3.0.2

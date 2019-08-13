@@ -15,8 +15,8 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh
 touch .gitrepos .ssh/authorized_keys
 
-[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd
-[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm git gvim fish openssh tinc vimpager python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman
+[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim-gnome tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
 if [[ -f /etc/debian_version ]]
@@ -78,6 +78,6 @@ done
 cd
 
 pip3 install -U --user pip
-pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming khal khard vdirsyncer todoman youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose
+pip3 install -U --user IPython pygments_zenburn flake8 isort pep8-naming youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

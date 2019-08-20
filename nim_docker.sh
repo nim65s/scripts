@@ -15,10 +15,10 @@ else
     SUDO=sudo
 fi
 
-[[ -f /etc/alpine-release ]] && $SUDO apk add                             vim htop ncdu git tig fish gnupg              fd
-[[ -f /etc/arch-release ]]   && $SUDO pacman -Syu --noconfirm             vim htop ncdu git tig fish gnupg  dfc ripgrep fd
-[[ -f /etc/fedora-release ]] && $SUDO dnf install -y                      vim htop ncdu git tig fish gnupg      ripgrep
-[[ -f /etc/debian_version ]] && $SUDO apt update -qqy && apt install -qqy vim htop ncdu git tig      gnupg2 dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db
+[[ -f /etc/alpine-release ]] && $SUDO apk add                             vim htop ncdu git tig gnupg  fish fd
+[[ -f /etc/arch-release ]]   && $SUDO pacman -Syu --noconfirm             vim htop ncdu git tig gnupg  fish fd dfc ripgrep
+[[ -f /etc/fedora-release ]] && $SUDO dnf install -y                      vim htop ncdu git tig gnupg  fish        ripgrep
+[[ -f /etc/debian_version ]] && $SUDO apt update -qqy && apt install -qqy vim htop ncdu git tig gnupg2         dfc         wget libpcre2-8-0 lsb-release bc gettext-base man-db
 if [[ -f /etc/debian_version ]]
 then
     FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"

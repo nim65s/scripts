@@ -1,6 +1,6 @@
 #!/bin/bash
 # vim: tw=0
-# curl https://raw.githubusercontent.com/nim65s/scripts/master/nim_docker.sh | bash
+# curl https://raw.githubusercontent.com/nim65s/scripts/master/nim_docker.sh | bash && fish
 
 set -ex
 
@@ -28,6 +28,7 @@ then
 
     wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
     dpkg -i ./*.deb
+    rm ./*.deb
 fi
 
 cd

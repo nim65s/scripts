@@ -21,13 +21,18 @@ command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
 if [[ -f /etc/debian_version ]]
 then
-    FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
-    RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
-    FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~$(lsb_release -cs)_amd64.deb"
-    FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~$(lsb_release -cs)_all.deb"
+    if grep -q raspberry /etc/apt/sources.list
+    then
+        sudo apt install -qqy fd-find ripgrep fish
+    else
+        FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
+        RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
+        FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~$(lsb_release -cs)_amd64.deb"
+        FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~$(lsb_release -cs)_all.deb"
 
-    wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
-    sudo dpkg -i ./*.deb
+        wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
+        sudo dpkg -i ./*.deb
+    fi
 fi
 
 if [[ -z "$SSH_CLIENT" ]]

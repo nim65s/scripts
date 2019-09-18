@@ -25,7 +25,7 @@ then
     RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
     wget "$FD" "$RG"
 
-    DEBIAN_VERSION=$(lsb_release-cs)
+    DEBIAN_VERSION=$(lsb_release -cs)
     if [[ ${DEBIAN_VERSION} == buster ]]
     then
         apt install -qqy fish

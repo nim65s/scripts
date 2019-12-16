@@ -20,6 +20,7 @@ wait
 [[ -d $ORG/$PRJ ]]
 
 cd "$ORG/$PRJ"
+git status
 git fetch --all --prune
 
 git checkout devel

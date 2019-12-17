@@ -1,6 +1,7 @@
 #!/bin/bash
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/nim_docker.sh | bash && fish
+# NB: vipe is in moreutils
 
 set -ex
 

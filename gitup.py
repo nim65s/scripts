@@ -27,6 +27,7 @@ REMOVE = [
     'Already up-to-date.',
     'warning: agent returned different signature type ssh-rsa (expected rsa-sha2-512)',
     'sign_and_send_pubkey: signing failed: agent refused operation',
+    'agent key RSA SHA256:ZECgLRvHMXHlPa8g5DaV6LoJTcz7v59WltrnLzsW9tg returned incorrect signature type',
 ]
 
 

@@ -27,7 +27,7 @@ def forward_gpg_sockets(remote_host, down=False):
         gpg = f'{here_gpg}:{there_gpg}'
         ssh = f'{here_ssh}:{there_ssh}'
     else:
-        check_call(['ssh', remote_host[0], 'rm', there_gpg, there_ssh], stdin=sys.stdin)
+        # check_call(['ssh', remote_host[0], 'rm', there_gpg, there_ssh], stdin=sys.stdin)
         gpg = f'{there_gpg}:{here_gpg}'
         ssh = f'{there_ssh}:{here_ssh}'
 

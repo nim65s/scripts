@@ -37,7 +37,9 @@ then
         wget "$FISH" "$FISH_COMMON"
     fi
 
-    dpkg -i ./*.deb
+    dpkg -i ./{fd,fish}*.deb
+    dpkg-divert --add --divert /usr/share/fish/completions/rg.fish.0 --rename --package ripgrep /usr/share/fish/completions/rg.fish
+    dpkg -i ./ripgrep*.deb
     rm ./*.deb
 fi
 

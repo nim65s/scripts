@@ -6,7 +6,7 @@
 set -ex
 
 FD_VERSION=8.0.0
-RG_VERSION=12.0.1
+RG_VERSION=12.1.0
 FISH_VERSION=3.1.2
 
 if [[ $(id -u) == 0 ]]

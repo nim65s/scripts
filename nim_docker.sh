@@ -27,7 +27,7 @@ then
     wget "$FD" "$RG"
 
     DEBIAN_VERSION=$(lsb_release -cs)
-    if [[ ${DEBIAN_VERSION} == buster ]]
+    if [[ ${DEBIAN_VERSION} == buster || ${DEBIAN_VERSION} == focal ]]
     then
         apt install -qqy fish
     elif [[ ${DEBIAN_VERSION} != stretch ]]

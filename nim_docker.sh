@@ -8,6 +8,7 @@ set -ex
 FD_VERSION=8.1.0
 RG_VERSION=12.1.0
 FISH_VERSION=3.1.2
+BAT_VERSION=0.15.1
 
 if [[ $(id -u) == 0 ]]
 then
@@ -17,14 +18,15 @@ else
 fi
 
 [[ -f /etc/alpine-release ]] && $SUDO apk add                             vim htop ncdu git tig gnupg  fish fd
-[[ -f /etc/arch-release ]]   && $SUDO pacman -Syu --noconfirm             vim htop ncdu git tig gnupg  fish fd dfc ripgrep
+[[ -f /etc/arch-release ]]   && $SUDO pacman -Syu --noconfirm             vim htop ncdu git tig gnupg  fish fd dfc ripgrep bat
 [[ -f /etc/fedora-release ]] && $SUDO dnf install -y                      vim htop ncdu git tig gnupg  fish        ripgrep
 [[ -f /etc/debian_version ]] && $SUDO apt update -qqy && apt install -qqy vim htop ncdu git tig gnupg2         dfc         wget libpcre2-8-0 lsb-release bc gettext-base man-db
 if [[ -f /etc/debian_version ]]
 then
     FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
     RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
-    wget "$FD" "$RG"
+    BAT="https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat_${BAT_VERSION}_amd64.deb"
+    wget "$FD" "$RG" "$BAT"
 
     DEBIAN_VERSION=$(lsb_release -cs)
     if [[ ${DEBIAN_VERSION} == buster || ${DEBIAN_VERSION} == focal ]]
@@ -37,7 +39,7 @@ then
         wget "$FISH" "$FISH_COMMON"
     fi
 
-    dpkg -i ./{fd,fish}*.deb
+    dpkg -i ./{fd,fish,bat}*.deb
     dpkg-divert --add --divert /usr/share/fish/completions/rg.fish.0 --rename --package ripgrep /usr/share/fish/completions/rg.fish
     dpkg -i ./ripgrep*.deb
     rm ./*.deb

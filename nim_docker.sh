@@ -7,8 +7,9 @@ set -ex
 
 FD_VERSION=8.1.0
 RG_VERSION=12.1.0
-FISH_VERSION=3.1.2
 BAT_VERSION=0.15.1
+DELTA_VERSION=0.1.1
+FISH_VERSION=3.1.2
 
 if [[ $(id -u) == 0 ]]
 then
@@ -26,7 +27,8 @@ then
     FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
     RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
     BAT="https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/bat_${BAT_VERSION}_amd64.deb"
-    wget "$FD" "$RG" "$BAT"
+    DELTA="https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_amd64.deb"
+    wget "$FD" "$RG" "$BAT" "$DELTA"
 
     DEBIAN_VERSION=$(lsb_release -cs)
     if [[ ${DEBIAN_VERSION} == buster || ${DEBIAN_VERSION} == focal ]]
@@ -39,7 +41,7 @@ then
         wget "$FISH" "$FISH_COMMON"
     fi
 
-    dpkg -i ./{fd,fish,bat}*.deb
+    dpkg -i ./{fd,bat,delta,fish}*.deb
     dpkg-divert --add --divert /usr/share/fish/completions/rg.fish.0 --rename --package ripgrep /usr/share/fish/completions/rg.fish
     dpkg -i ./ripgrep*.deb
     rm ./*.deb

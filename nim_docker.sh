@@ -53,7 +53,7 @@ cd dotfiles
 git submodule update --init Zenburn vim-plug submodules/docker-fish-completion
 
 cd
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc
 do
     [[ -L $file || -f $file ]] && rm $file
     ln -s "$HOME/dotfiles/$file" .

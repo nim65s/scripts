@@ -3,7 +3,7 @@
 ORG=${1}
 PRJ=${2}
 
-GL=gepgitlab.laas.fr
+GL=gitlab.laas.fr
 GH=github.com
 
 ML=gsaurel

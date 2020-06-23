@@ -3,7 +3,7 @@
 ORG=${1}
 PRJ=${2}
 
-GL=gepgitlab.laas.fr
+GL=gitlab.laas.fr
 GH=github.com
 
 ML=gsaurel
@@ -30,8 +30,8 @@ echo "include: http://rainboard.laas.fr/project/$PRJ/.gitlab-ci.yml" > .gitlab-c
 
 cat >> README.md << EOF
 
-[![Pipeline status](https://gepgitlab.laas.fr/$ORG/$PRJ/badges/master/pipeline.svg)](https://gepgitlab.laas.fr/$ORG/$PRJ/commits/master)
-[![Coverage report](https://gepgitlab.laas.fr/$ORG/$PRJ/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/$ORG/$PRJ/master/coverage/)
+[![Pipeline status](https://gitlab.laas.fr/$ORG/$PRJ/badges/master/pipeline.svg)](https://gitlab.laas.fr/$ORG/$PRJ/commits/master)
+[![Coverage report](https://gitlab.laas.fr/$ORG/$PRJ/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/$ORG/$PRJ/master/coverage/)
 
 EOF
 

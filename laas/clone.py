@@ -4,7 +4,7 @@ from subprocess import CalledProcessError, check_call
 
 import requests
 
-GL = 'gepgitlab.laas.fr'
+GL = 'gitlab.laas.fr'
 GH = 'github.com'
 ML = 'gsaurel'
 MH = 'nim65s'

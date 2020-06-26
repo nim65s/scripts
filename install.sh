@@ -83,6 +83,6 @@ done
 cd
 
 python3 -m pip install -U --user pip
-python3 -m pip install -U --user IPython pygments_zenburn flake8 isort pep8-naming youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose
+python3 -m pip install -U --user IPython pygments_zenburn flake8 isort pep8-naming youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose i3ipc
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

@@ -19,7 +19,7 @@ import i3ipc
 def log(name: str, done: bool = False):
     """Append task name / status to a log file"""
     done = ' :: done' if done else ''
-    with open(expanduser('~/.local/stack-of-tasks.log'), 'a') as f:
+    with open(expanduser('~/.local/task-in-a-stack.log'), 'a') as f:
         print(f'{datetime.now()} | {name}{done}', file=f)
 
 

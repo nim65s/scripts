@@ -12,16 +12,19 @@ https://fr.wikipedia.org/wiki/R%C3%A9duction_du_temps_de_travail_en_France
 """
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from dataclasses import dataclass
 from datetime import datetime as dt
+from datetime import timedelta
 from json import JSONEncoder, dump, dumps, load, loads
 from os.path import expanduser
 from pathlib import Path
+from typing import List
 
 parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('-t', '--test', action='store_true', help='run self tests')
 parser.add_argument('-p', '--path', type=Path, default=expanduser('~/.local/rtt.json'), help='path to the database')
 
-# First we need to serialize datetime in JSON. Big deal.
+# First we need some utils to serialize datetime in JSON. Big deal.
 # Let's hijack floats. What could possibly go wrong ?
 
 
@@ -53,25 +56,65 @@ def ftodt(timestamp: str):
     return dt.fromtimestamp(float(timestamp))
 
 
-# Next, we need a database of tasks, periods and last occurences
+# Next, we need a to define what is a recurrent task
 
 
-def write_database(data, path: Path):
-    """Write the data to the database."""
-    with path.open('w') as database:
-        dump(data, database, cls=DateTimeEncoder)
+@dataclass
+class RecurrentTask:
+    name: str
+    description: str
+    period: int  # in days
+    last: dt
+
+    def __str__(self):
+        return f'{self.remaining():.3f}: {self.name:20} - {self.description}'
+
+    def remaining(self, now=dt.now):
+        """Relative remaining time left to do the task
+
+        >>> task = RecurrentTask('wake-up', 'every morning', 1, dt(2020, 9, 13, 14, 26, 40))
+        >>> task.remaining(dt(2020, 9, 13, 14, 26, 40))  # The instant you've done it
+        1.0
+        >>> task.remaining(dt(2020, 9, 14, 14, 26, 40))  # the due date
+        0.0
+        >>> task.remaining(dt(2020, 9, 15, 14, 26, 40))  # the due date + 1 period
+        -1.0
+        >>> task = RecurrentTask('week-end', 'once a week', 7, dt(2020, 9, 13, 14, 26, 40))
+        >>> task.remaining(dt(2020, 9, 17, 2, 26, 40))  # half a week before the due date
+        0.5
+        >>> task.remaining(dt(2020, 9, 20, 14, 26, 40))  # the due date
+        0.0
+        >>> task.remaining(dt(2020, 9, 24, 2, 26, 40))  # half a week after the due date
+        -0.5
+        """
+
+        if callable(now):
+            now = now()
+
+        due = self.last + timedelta(days=self.period)
+        return (due - now).total_seconds() / (self.period * 86400)
 
 
-def read_database(path: Path):
-    """Write the data from the database.
+# Also, we need to save a list of those somewhere
 
-    >>> data = [{'test': dt(2020, 9, 13, 14, 26, 40)}]
-    >>> write_database(data, Path('/tmp/rtt_test.json'))
-    >>> read_database(Path('/tmp/rtt_test.json'))
-    [{'test': datetime.datetime(2020, 9, 13, 14, 26, 40)}]
+
+def write_database(tasks: List[RecurrentTask], path: Path):
+    """Write the tasks to the database."""
+    with Path(path).open('w') as database:
+        dump([task.__dict__ for task in tasks], database, cls=DateTimeEncoder)
+
+
+def read_database(path: Path) -> List[RecurrentTask]:
+    """Read the tasks from the database.
+
+    >>> tasks = [RecurrentTask('test', 'CI', 1, dt(2020, 9, 13, 14, 26, 40))]
+    >>> write_database(tasks, '/tmp/rtt_test.json')
+    >>> read_database('/tmp/rtt_test.json')
+    [RecurrentTask(name='test', description='CI', period=1, last=datetime.datetime(2020, 9, 13, 14, 26, 40))]
     """
-    with path.open('r') as database:
-        return load(database, parse_float=ftodt)
+    with Path(path).open('r') as database:
+        tasks = load(database, parse_float=ftodt)
+    return sorted((RecurrentTask(**task) for task in tasks), key=lambda task: task.remaining)
 
 
 if __name__ == "__main__":

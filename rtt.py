@@ -23,6 +23,13 @@ from typing import List
 parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('-t', '--test', action='store_true', help='run self tests')
 parser.add_argument('-p', '--path', type=Path, default=expanduser('~/.local/rtt.json'), help='path to the database')
+subparsers = parser.add_subparsers(title='commands')
+parser_add = subparsers.add_parser('add', help='add a recurrent task to track')
+parser_add.add_argument('name', type=str, help='name of the task')
+parser_add.add_argument('period', type=int, help='period of the task in days')
+parser_add.add_argument('description', type=str, nargs='*', help='description')
+parser_done = subparsers.add_parser('done', help='a task was done')
+parser_done.add_argument('done', type=str, help='name of the task')
 
 # First we need some utils to serialize datetime in JSON. Big deal.
 # Let's hijack floats. What could possibly go wrong ?
@@ -67,7 +74,7 @@ class RecurrentTask:
     last: dt
 
     def __str__(self):
-        return f'{self.remaining():.3f}: {self.name:20} - {self.description}'
+        return f'{self.remaining(): >7.3f}: {self.name:20} - {self.description}'
 
     def remaining(self, now=dt.now):
         """Relative remaining time left to do the task
@@ -101,7 +108,7 @@ class RecurrentTask:
 def write_database(tasks: List[RecurrentTask], path: Path):
     """Write the tasks to the database."""
     with Path(path).open('w') as database:
-        dump([task.__dict__ for task in tasks], database, cls=DateTimeEncoder)
+        dump([task.__dict__ for task in tasks], database, cls=DateTimeEncoder, indent=2)
 
 
 def read_database(path: Path) -> List[RecurrentTask]:
@@ -113,8 +120,7 @@ def read_database(path: Path) -> List[RecurrentTask]:
     [RecurrentTask(name='test', description='CI', period=1, last=datetime.datetime(2020, 9, 13, 14, 26, 40))]
     """
     with Path(path).open('r') as database:
-        tasks = load(database, parse_float=ftodt)
-    return sorted((RecurrentTask(**task) for task in tasks), key=lambda task: task.remaining)
+        return [RecurrentTask(**task) for task in load(database, parse_float=ftodt)]
 
 
 if __name__ == "__main__":
@@ -122,3 +128,18 @@ if __name__ == "__main__":
     if args.test:
         import doctest
         doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)
+    else:
+        try:
+            tasks = read_database(args.path)
+        except FileNotFoundError:
+            tasks = []
+        if hasattr(args, 'name'):
+            tasks.append(RecurrentTask(args.name, ' '.join(args.description), args.period, dt.now()))
+            write_database(tasks, args.path)
+        elif hasattr(args, 'done'):
+            task = next(task for task in tasks if task.name == args.done)
+            task.last = dt.now()
+            write_database(tasks, args.path)
+        else:
+            for task in sorted(tasks, key=lambda task: task.remaining()):
+                print(task)

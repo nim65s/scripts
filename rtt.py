@@ -143,5 +143,5 @@ if __name__ == "__main__":
             task.last = dt.now()
             write_database(tasks, args.path)
         else:
-            for task in sorted(tasks, key=lambda task: task.remaining()):
+            for task in sorted(tasks, key=lambda task: task.remaining(), reverse=True):
                 print(task)

@@ -11,44 +11,67 @@ obviously not related to
 https://fr.wikipedia.org/wiki/R%C3%A9duction_du_temps_de_travail_en_France
 """
 
-import argparse
-import datetime
-import json
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from datetime import datetime as dt
+from json import JSONEncoder, dump, dumps, load, loads
+from os.path import expanduser
+from pathlib import Path
 
-parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('-t', '--test', action='store_true', help='run self tests')
+parser.add_argument('-p', '--path', type=Path, default=expanduser('~/.local/rtt.json'), help='path to the database')
 
 # First we need to serialize datetime in JSON. Big deal.
+# Let's hijack floats. What could possibly go wrong ?
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    """An encoder for datetime.
+class DateTimeEncoder(JSONEncoder):
+    """A JSON encoder for datetime as timestamp floats.
 
-    >>> json.dumps({'dt': datetime.datetime(2020, 9, 14, 18, 46, 40)})
+    >>> dumps({'dt': dt(2020, 9, 13, 14, 26, 40)})
     Traceback (most recent call last):
         ...
     TypeError: Object of type 'datetime' is not JSON serializable
 
-    >>> json.dumps({'dt': datetime.datetime(2020, 9, 14, 18, 46, 40)}, cls=DateTimeEncoder)
-    '{"dt": 1600102000.0}'
+    >>> dumps({'dt': dt(2020, 9, 13, 14, 26, 40)}, cls=DateTimeEncoder)
+    '{"dt": 1600000000.0}'
     """
     def default(self, o):
         """Main method to overwrite."""
-        if isinstance(o, datetime.datetime):
-            return o.timestamp()
-        return json.JSONEncoder.default(self, o)
+        return o.timestamp() if isinstance(o, dt) else JSONEncoder.default(self, o)
 
 
-def stodt(timestamp: str):
-    """A decoder for float to datetime
+def ftodt(timestamp: str):
+    """A JSON decoder from timestamp floats to datetimes
 
-    >>> json.loads('{"dt": 1600102000.0}')
-    {'dt': 1600102000.0}
+    >>> loads('{"dt": 1600000000.0}')
+    {'dt': 1600000000.0}
 
-    >>> json.loads('{"dt": 1600102000.0}', parse_float=stodt)
-    {'dt': datetime.datetime(2020, 9, 14, 18, 46, 40)}
+    >>> loads('{"dt": 1600000000.0}', parse_float=ftodt)
+    {'dt': datetime.datetime(2020, 9, 13, 14, 26, 40)}
     """
-    return datetime.datetime.fromtimestamp(float(timestamp))
+    return dt.fromtimestamp(float(timestamp))
+
+
+# Next, we need a database of tasks, periods and last occurences
+
+
+def write_database(data, path: Path):
+    """Write the data to the database."""
+    with path.open('w') as database:
+        dump(data, database, cls=DateTimeEncoder)
+
+
+def read_database(path: Path):
+    """Write the data from the database.
+
+    >>> data = [{'test': dt(2020, 9, 13, 14, 26, 40)}]
+    >>> write_database(data, Path('/tmp/rtt_test.json'))
+    >>> read_database(Path('/tmp/rtt_test.json'))
+    [{'test': datetime.datetime(2020, 9, 13, 14, 26, 40)}]
+    """
+    with path.open('r') as database:
+        return load(database, parse_float=ftodt)
 
 
 if __name__ == "__main__":
@@ -56,5 +79,3 @@ if __name__ == "__main__":
     if args.test:
         import doctest
         doctest.testmod()
-    else:
-        print('fail')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Recurrent Task Tracker
+Recurrent Task Tracker.
 
 Keep track of recurrent tasks:
 - configure tasks with their period
@@ -15,7 +15,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from dataclasses import dataclass
 from datetime import datetime as dt
 from datetime import timedelta
-from json import JSONEncoder, dump, dumps, load, loads
+from json import JSONEncoder, dump, dumps, load, loads  # noqa - flake8 doesn't find doctests
 from os.path import expanduser
 from pathlib import Path
 from typing import List
@@ -47,12 +47,12 @@ class DateTimeEncoder(JSONEncoder):
     '{"dt": 1600000000.0}'
     """
     def default(self, o):
-        """Main method to overwrite."""
+        """Add a dattime serialization."""
         return o.timestamp() if isinstance(o, dt) else JSONEncoder.default(self, o)
 
 
 def ftodt(timestamp: str):
-    """A JSON decoder from timestamp floats to datetimes
+    """Decode JSON from timestamp floats to datetimes.
 
     >>> loads('{"dt": 1600000000.0}')
     {'dt': 1600000000.0}
@@ -68,16 +68,18 @@ def ftodt(timestamp: str):
 
 @dataclass
 class RecurrentTask:
+    """Model a Recurrent Task."""
     name: str
     description: str
     period: int  # in days
     last: dt
 
     def __str__(self):
+        """Pretty print this task."""
         return f'{self.remaining(): >7.3f}: {self.name:20} - {self.description}'
 
     def remaining(self, now=dt.now):
-        """Relative remaining time left to do the task
+        """Relative remaining time left to do the task.
 
         >>> task = RecurrentTask('wake-up', 'every morning', 1, dt(2020, 9, 13, 14, 26, 40))
         >>> task.remaining(dt(2020, 9, 13, 14, 26, 40))  # The instant you've done it
@@ -94,7 +96,6 @@ class RecurrentTask:
         >>> task.remaining(dt(2020, 9, 24, 2, 26, 40))  # half a week after the due date
         -0.5
         """
-
         if callable(now):
             now = now()
 

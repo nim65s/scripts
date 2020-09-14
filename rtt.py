@@ -3,9 +3,9 @@
 Recurrent Task Tracker.
 
 Keep track of recurrent tasks:
-- configure tasks with their period
-- track when one was last done
-- show which ones are late
+- configure tasks with their period: "add" command
+- track when one was last done: "done" command
+- show which ones are late: "show" command (default)
 
 obviously not related to
 https://fr.wikipedia.org/wiki/R%C3%A9duction_du_temps_de_travail_en_France
@@ -28,8 +28,9 @@ parser_add = subparsers.add_parser('add', help='add a recurrent task to track')
 parser_add.add_argument('name', type=str, help='name of the task')
 parser_add.add_argument('period', type=int, help='period of the task in days')
 parser_add.add_argument('description', type=str, nargs='*', help='description')
-parser_done = subparsers.add_parser('done', help='a task was done')
+parser_done = subparsers.add_parser('done', help='when a task was done')
 parser_done.add_argument('done', type=str, help='name of the task')
+parser_show = subparsers.add_parser('show', help='show sorted tasks')
 
 # First we need some utils to serialize datetime in JSON. Big deal.
 # Let's hijack floats. What could possibly go wrong ?

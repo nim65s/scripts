@@ -78,4 +78,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.test:
         import doctest
-        doctest.testmod()
+        doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)

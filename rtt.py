@@ -139,9 +139,12 @@ if __name__ == "__main__":
             tasks.append(RecurrentTask(args.name, ' '.join(args.description), args.period, dt.now()))
             write_database(tasks, args.path)
         elif hasattr(args, 'done'):
-            task = next(task for task in tasks if task.name == args.done)
-            task.last = dt.now()
-            write_database(tasks, args.path)
+            try:
+                task = next(task for task in tasks if task.name == args.done)
+                task.last = dt.now()
+                write_database(tasks, args.path)
+            except StopIteration:
+                print(f'error: {args.done} is not a known task')
         else:
             for task in sorted(tasks, key=lambda task: task.remaining(), reverse=True):
                 print(task)

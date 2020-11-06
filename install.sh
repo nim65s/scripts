@@ -12,7 +12,7 @@ set -x
 cd
 
 mkdir -p .config .ssh .gnupg
-chmod 700 .ssh
+chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
 [[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig
@@ -55,6 +55,7 @@ then
     gpg --decrypt /tmp/secret.gpg
 fi
 
+export SSH_AUTH_SOCK=$(gpgconf --list-dir | grep agent-ssh-socket | cut -d: -f2)
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
 for repo in dotfiles scripts VPNim

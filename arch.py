@@ -14,7 +14,7 @@ import archinstall
 PACKAGES = [
     'git', 'gvim', 'fish', 'openssh', 'tinc', 'python-pip', 'rofi', 'pass', 'pcsc-tools', 'ccid', 'libusb-compat',
     'dunst', 'msmtp-mta', 'shellcheck', 'dfc', 'ripgrep', 'fd', 'khal', 'khard', 'vdirsyncer', 'todoman', 'ncdu',
-    'bat', 'htop', 'tig', 'i3'
+    'bat', 'htop', 'tig', 'i3', 'usbutils', 'wget'
 ]
 
 # Select a harddrive and a disk password
@@ -27,7 +27,6 @@ archinstall.filter_mirrors_by_region('FR')
 archinstall.re_rank_mirrors(5)
 
 with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:
-    # use_entire_disk() is a helper to not have to format manually
     fs.use_entire_disk('luks2')
 
     harddrive.partition[0].format('fat32')
@@ -43,3 +42,5 @@ with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:
                 installation.add_bootloader()
                 installation.user_create('nim', nim_password, sudo=True)
                 installation.add_additional_packages(PACKAGES)
+                installation.enable_service('pcscd')
+                installation.enable_service('systemd-networkd')

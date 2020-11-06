@@ -14,14 +14,16 @@ import archinstall
 PACKAGES = [
     'git', 'gvim', 'fish', 'openssh', 'tinc', 'python-pip', 'rofi', 'pass', 'pcsc-tools', 'ccid', 'libusb-compat',
     'dunst', 'msmtp-mta', 'shellcheck', 'dfc', 'ripgrep', 'fd', 'khal', 'khard', 'vdirsyncer', 'todoman', 'ncdu',
-    'bat', 'htop', 'tig', 'i3', 'usbutils', 'wget'
+    'bat', 'htop', 'tig', 'usbutils', 'wget', 'xorg-server', 'xorg-xinit', 'i3'
 ]
+INSTALL = "https://raw.githubusercontent.com/nim65s/scripts/install.sh"
 
-# Select a harddrive and a disk password
 harddrive = archinstall.select_disk(archinstall.all_disks())
 hostname = input('Hostname: ')
 disk_password = getpass.getpass(prompt='Disk password (won\'t echo): ')
 nim_password = getpass.getpass(prompt='Nim password (won\'t echo): ')
+print('available network interfaces:', archinstall.list_interfaces())
+netif = input('enable DHCP on (leave blank for none): ')
 
 archinstall.filter_mirrors_by_region('FR')
 archinstall.re_rank_mirrors(5)
@@ -44,3 +46,8 @@ with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:
                 installation.add_additional_packages(PACKAGES)
                 installation.enable_service('pcscd')
                 installation.enable_service('systemd-networkd')
+
+                if netif:
+                    with open(f'{installation.mountpoint}/etc/systemd/network/20-wired.network', 'w') as net:
+                        net.write('[Match]\nName={netif}\n\n[Network]\nDHCP=yes\n')
+                archinstall.sys_command(f"/usr/bin/wget {INSTALL} -O {installation.mountpoint}/home/nim/install.sh")

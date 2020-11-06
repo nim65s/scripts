@@ -58,6 +58,8 @@ fi
 export SSH_AUTH_SOCK=$(gpgconf --list-dir | grep agent-ssh-socket | cut -d: -f2)
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
+ssh-keyscan github.com | ssh-keygen -lf - >> .ssh/known_hosts
+
 for repo in dotfiles scripts VPNim
 do
     test -d $repo || git clone git@github.com:nim65s/$repo.git --recursive

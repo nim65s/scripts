@@ -2,8 +2,9 @@
 """
 My https://github.com/Torxed/archinstall scripts.
 
+pacman -Sy python-pip wget
 pip install archinstall
-curl https://raw.githubusercontent.com/nim65s/scripts/master/arch.py | python
+wget https://raw.githubusercontent.com/nim65s/scripts/master/arch.py
 """
 
 import getpass
@@ -22,7 +23,7 @@ hostname = input('Hostname: ')
 disk_password = getpass.getpass(prompt='Disk password (won\'t echo): ')
 nim_password = getpass.getpass(prompt='Nim password (won\'t echo): ')
 
-archinstall.filter_mirrors_by_region('France')
+archinstall.filter_mirrors_by_region('FR')
 archinstall.re_rank_mirrors(5)
 
 with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:

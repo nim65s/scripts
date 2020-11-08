@@ -6,6 +6,7 @@ Keep track of recurrent tasks:
 - configure tasks with their period: "add" command
 - track when one was last done: "done" command
 - show which ones are late: "show" command (default)
+- send notifications if you're late
 
 obviously not related to
 https://fr.wikipedia.org/wiki/R%C3%A9duction_du_temps_de_travail_en_France
@@ -18,10 +19,12 @@ from datetime import timedelta
 from json import JSONEncoder, dump, dumps, load, loads  # noqa - flake8 doesn't find doctests
 from os.path import expanduser
 from pathlib import Path
+from subprocess import run
 from typing import List
 
 parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('-t', '--test', action='store_true', help='run self tests')
+parser.add_argument('-n', '--notify', action='store_true', help='send notifications if you are late')
 parser.add_argument('-p', '--path', type=Path, default=expanduser('~/.local/rtt.json'), help='path to the database')
 subparsers = parser.add_subparsers(title='commands')
 parser_add = subparsers.add_parser('add', help='add a recurrent task to track')
@@ -145,6 +148,14 @@ if __name__ == "__main__":
                 write_database(tasks, args.path)
             except StopIteration:
                 print(f'error: {args.done} is not a known task')
+        elif args.notify:
+            for task in tasks:
+                if task.remaining() < 0:
+                    cmd = ['notify-send']
+                    if task.remaining() < -1:
+                        cmd += ['-u', 'critical']
+                    cmd += [f'RTT: {task.name}', task.description]
+                    run(cmd)
         else:
             for task in sorted(tasks, key=lambda task: task.remaining(), reverse=True):
                 print(task)

@@ -39,9 +39,10 @@ then
         FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~${DEBIAN_VERSION}_amd64.deb"
         FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~${DEBIAN_VERSION}_all.deb"
         wget "$FISH" "$FISH_COMMON"
+        dpkg -i ./fish*.deb
     fi
 
-    dpkg -i ./{fd,bat,git-delta,fish}*.deb
+    dpkg -i ./{fd,bat,git-delta}*.deb
     dpkg-divert --add --divert /usr/share/fish/completions/rg.fish.0 --rename --package ripgrep /usr/share/fish/completions/rg.fish
     dpkg -i ./ripgrep*.deb
     rm ./*.deb

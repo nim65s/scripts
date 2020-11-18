@@ -14,7 +14,7 @@ import archinstall
 PACKAGES = [
     'git', 'gvim', 'fish', 'openssh', 'tinc', 'python-pip', 'rofi', 'pass', 'pcsc-tools', 'ccid', 'libusb-compat',
     'dunst', 'msmtp-mta', 'shellcheck', 'dfc', 'ripgrep', 'fd', 'khal', 'khard', 'vdirsyncer', 'todoman', 'ncdu',
-    'bat', 'htop', 'tig', 'usbutils', 'wget', 'xorg-server', 'xorg-xinit', 'i3'
+    'bat', 'htop', 'tig', 'usbutils', 'wget', 'xorg-server', 'xorg-xinit', 'i3', 'inetutils', 'kitty', 'iwd'
 ]
 INSTALL = "https://raw.githubusercontent.com/nim65s/scripts/install.sh"
 MIRRORS = "https://www.archlinux.org/mirrorlist/?country=FR&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"

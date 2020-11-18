@@ -26,7 +26,11 @@ nim_password = getpass.getpass(prompt='Nim password (won\'t echo): ')
 print('available network interfaces:', archinstall.list_interfaces())
 netif = input('enable DHCP on (leave blank for none): ')
 
-archinstall.sys_command(f"/usr/bin/wget {MIRRORS} -O /etc/pacman.d/mirrorlist")
+archinstall.sys_command(f"/usr/bin/wget {MIRRORS} -O /etc/pacman.d/mirrorlist.new")
+with open('/etc/pacman.d/mirrorlist.new') as in_f, open('/etc/pacman.d/mirrorlist', 'w') as out_f:
+    for line in in_f:
+        print(line[1:], file=out_f)
+
 
 def install(installation):
     if installation.minimal_installation():

@@ -17,6 +17,7 @@ PACKAGES = [
     'bat', 'htop', 'tig', 'usbutils', 'wget', 'xorg-server', 'xorg-xinit', 'i3'
 ]
 INSTALL = "https://raw.githubusercontent.com/nim65s/scripts/install.sh"
+MIRRORS = "https://www.archlinux.org/mirrorlist/?country=FR&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
 
 harddrive = archinstall.select_disk(archinstall.all_disks())
 hostname = input('Hostname: ')
@@ -25,9 +26,7 @@ nim_password = getpass.getpass(prompt='Nim password (won\'t echo): ')
 print('available network interfaces:', archinstall.list_interfaces())
 netif = input('enable DHCP on (leave blank for none): ')
 
-archinstall.filter_mirrors_by_region('FR')
-archinstall.re_rank_mirrors(5)
-
+archinstall.sys_command(f"/usr/bin/wget {MIRRORS} -O /etc/pacman.d/mirrorlist")
 
 def install(installation):
     if installation.minimal_installation():

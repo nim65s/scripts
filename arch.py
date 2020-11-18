@@ -43,11 +43,11 @@ def install(installation):
         installation.add_additional_packages(PACKAGES)
         installation.enable_service('pcscd')
         installation.enable_service('systemd-networkd')
+        installation.enable_service('sshd')
 
         if netif:
             with open(f'{installation.mountpoint}/etc/systemd/network/20-wired.network', 'w') as net:
-                net.write('[Match]\nName={netif}\n\n[Network]\nDHCP=yes\n')
-        archinstall.sys_command(f"/usr/bin/wget {INSTALL} -O {installation.mountpoint}/home/nim/install.sh")
+                net.write(f'[Match]\nName={netif}\n\n[Network]\nDHCP=yes\n')
 
 
 with archinstall.Filesystem(harddrive, archinstall.GPT) as fs:

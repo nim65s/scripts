@@ -16,7 +16,7 @@ chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
 [[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd
-[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman
+[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
 if [[ -f /etc/debian_version ]]

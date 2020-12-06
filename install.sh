@@ -2,7 +2,7 @@
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
-FD_VERSION=7.3.0
+FD_VERSION=8.2.0
 RG_VERSION=11.0.2
 FISH_VERSION=3.0.2
 

@@ -29,6 +29,7 @@ REMOVE = [
     'sign_and_send_pubkey: signing failed: agent refused operation',
     'agent key RSA SHA256:ZECgLRvHMXHlPa8g5DaV6LoJTcz7v59WltrnLzsW9tg returned incorrect signature type',
     'sign_and_send_pubkey: signing failed for RSA "/home/nim/.ssh/id_rsa" from agent: agent refused operation',
+    'sign_and_send_pubkey: signing failed for ED25519 "/home/nim/.ssh/id_ed25519" from agent: agent refused operation',
 ]
 
 

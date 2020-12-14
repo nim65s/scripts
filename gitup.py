@@ -13,7 +13,7 @@ REMOVE = [
     'nothing to commit, working tree clean',
     'Premièrement, rembobinons head pour rejouer votre travail par-dessus...',
     'First, rewinding head to replay your work on top of it...',
-    "Rembobinage préalable de head pour pouvoir rejouer votre travail par-dessus...",
+    'Rembobinage préalable de head pour pouvoir rejouer votre travail par-dessus...',
     'Sur la branche master',
     'On branch master',
     "Votre branche est à jour avec 'origin/master'.",
@@ -28,6 +28,7 @@ REMOVE = [
     'warning: agent returned different signature type ssh-rsa (expected rsa-sha2-512)',
     'sign_and_send_pubkey: signing failed: agent refused operation',
     'agent key RSA SHA256:ZECgLRvHMXHlPa8g5DaV6LoJTcz7v59WltrnLzsW9tg returned incorrect signature type',
+    'sign_and_send_pubkey: signing failed for RSA "/home/nim/.ssh/id_rsa" from agent: agent refused operation',
 ]
 
 

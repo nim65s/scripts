@@ -88,4 +88,9 @@ cd
 python3 -m pip install -U --user pip
 python3 -m pip install -U --user IPython pygments_zenburn flake8 isort pep8-naming youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose i3ipc
 
+if which cargo > /dev/null
+then
+    cargo install fd-find ripgrep git-delta
+fi
+
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

@@ -90,7 +90,7 @@ python3 -m pip install -U --user IPython pygments_zenburn flake8 isort pep8-nami
 
 if which cargo > /dev/null
 then
-    cargo install fd-find ripgrep git-delta
+    cargo install fd-find ripgrep git-delta watchexec-cli
 fi
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

@@ -47,6 +47,7 @@ then
     $SUDO dpkg -i ./ripgrep*.deb
     rm ./*.deb
 elif [[ -f /etc/fedora-release ]]
+then
     echo -e '#!/bin/sh\ncat /etc/hostname' > /usr/local/bin/hostname
     chmod +x /usr/local/bin/hostname
 fi

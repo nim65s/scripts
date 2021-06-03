@@ -46,6 +46,9 @@ then
     $SUDO dpkg-divert --add --divert /usr/share/fish/completions/rg.fish.0 --rename --package ripgrep /usr/share/fish/completions/rg.fish
     $SUDO dpkg -i ./ripgrep*.deb
     rm ./*.deb
+elif [[ -f /etc/fedora-release ]]
+    echo -e '#!/bin/sh\ncat /etc/hostname' > /usr/local/bin/hostname
+    chmod +x /usr/local/bin/hostname
 fi
 
 cd

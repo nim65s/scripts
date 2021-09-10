@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import os
+import shelve
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
 from subprocess import check_call, check_output
+
+SHELF = Path(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache'))) / 'forward-gpg-agent'
 
 parser = ArgumentParser(description='forward gpg agent sockets')
 parser.add_argument('remote_host', nargs=1)
@@ -15,7 +19,12 @@ def forward_gpg_sockets(remote_host, down=False):
     here_gpg = Path(next(l.split(':')[1] for l in here if l.startswith('agent-socket:')))
     here_ssh = Path(next(l.split(':')[1] for l in here if l.startswith('agent-ssh-socket:')))
 
-    there = check_output(['ssh', remote_host[0], 'gpgconf', '--list-dir'], stdin=sys.stdin).decode().split()
+    with shelve.open(str(SHELF)) as shelf:
+        if remote_host[0] in shelf:
+            there = shelf[remote_host[0]]
+        else:
+            there = check_output(['ssh', remote_host[0], 'gpgconf', '--list-dir'], stdin=sys.stdin).decode().split()
+            shelf[remote_host[0]] = there
     there_gpg = next(l.split(':')[1] for l in there if l.startswith('agent-socket:'))
     there_ssh = next(l.split(':')[1] for l in there if l.startswith('agent-ssh-socket:'))
 

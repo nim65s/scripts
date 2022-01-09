@@ -15,7 +15,7 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd rustup git-delta watchexec docker-compose python-wheel python-i3ipc python-pandocfilters ipython
 [[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
@@ -48,7 +48,7 @@ then
 
     # Check Key
     gpg2 --card-status
-    curl $(gpg2 --card-status|grep key.asc|cut -d: -f2-) | gpg --import
+    curl https://github.com/nim65s.gpg | gpg --import
     rm -f /tmp/secret{,.gpg}
     echo 'IT WORKS \o/' > /tmp/secret
     gpg --encrypt --trusted-key 7D2ACDAF4653CF28 -r 7D2ACDAF4653CF28 /tmp/secret
@@ -62,7 +62,7 @@ ssh-keyscan github.com | ssh-keygen -lf - >> .ssh/known_hosts
 
 for repo in dotfiles scripts VPNim
 do
-    test -d $repo || git clone git@github.com:nim65s/$repo.git --recursive
+    test -d $repo || git clone --recursive git@github.com:nim65s/$repo.git
     pushd $repo
     git pull --rebase
     git submodule update --recursive --remote --rebase --init
@@ -86,11 +86,11 @@ done
 cd
 
 python3 -m pip install -U --user pip
-python3 -m pip install -U --user IPython pygments_zenburn flake8 isort pep8-naming youtube-dl thefuck pandocfilters wheel twine pipenv docker-compose i3ipc
+python3 -m pip install -U --user pygments_zenburn
 
-if which cargo > /dev/null
+if which rustup > /dev/null
 then
-    cargo install fd-find ripgrep git-delta watchexec-cli bat
+    rustup default || rustup default stable
 fi
 
 grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

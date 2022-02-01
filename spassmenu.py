@@ -24,7 +24,7 @@ for filename in PASSWORD_STORE_DIR.glob('**/*.gpg'):
     if pwd not in pwds:
         pwds.append(pwd)
 
-out = run(['dmenu'] + sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universal_newlines=True).stdout.strip()
+out = run(['rofi', '-dmenu', '-show'] + sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universal_newlines=True).stdout.strip()
 
 if out:
     run(['pass', '-c', out])

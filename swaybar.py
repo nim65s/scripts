@@ -37,11 +37,14 @@ def single():
     if 'yes' in cmd("pactl get-sink-mute @DEFAULT_SINK@"):
         vol = red('mute')
     else:
-        vol = cmd("pactl get-sink-volume @DEFAULT_SINK@").split()[4].strip()
+        try:
+            vol = cmd("pactl get-sink-volume @DEFAULT_SINK@").split()[4].strip()
+        except IndexError:
+            vol = ''
     bri = cmd("light")
     avg = cmd("uptime").split(':')[-1].strip()
     mem = cmd("free -h --si").split()[9]
-    mem = red(mem) if float(mem[:-1]) < 2 else mem
+    mem = red(mem) if float(mem[:-1].replace(',', '.')) < 2 else mem
     ips = ' '.join(ips)
     dfs = ' '.join(dfs)
     rfk = red('RFKill') if 'yes' in cmd("rfkill list") else ''

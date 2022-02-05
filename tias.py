@@ -57,5 +57,5 @@ if __name__ == '__main__':
     else:
         name = ' '.join(args.name)
         i3.command(f'workspace {name}')
-        i3.command('exec i3-sensible-terminal')
+        i3.command('exec kitty')
         log(name)

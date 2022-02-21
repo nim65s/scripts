@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-# sorted version of passmenu from password-store
-# Can be used like this with dmenu, or if you have rofi:
-# ./spassmenu.py -matching fuzzy -no-lazy-grab
+# sorted version of passmenu from password-store, eg:
+# ./spassmenu.py dmenu
+# ./spassmenu.py rofi -dmenu -show
+# ./spassmenu.py yofi dialog
 
 # TODO: use XDG_CACHE_DIR & PASSWORD_STORE_DIR & PASSWORD_STORE_CLIP_TIME
 
@@ -24,7 +25,7 @@ for filename in PASSWORD_STORE_DIR.glob('**/*.gpg'):
     if pwd not in pwds:
         pwds.append(pwd)
 
-out = run(['rofi', '-dmenu', '-show'] + sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universal_newlines=True).stdout.strip()
+out = run(sys.argv[1:], input='\n'.join(pwds), stdout=PIPE, universal_newlines=True).stdout.strip()
 
 if out:
     run(['pass', '-c', out])

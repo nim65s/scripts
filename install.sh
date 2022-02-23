@@ -78,7 +78,7 @@ do
 done
 
 cd ~/.config
-for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf picom bat kitty sway
+for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf picom bat kitty sway gtk-3.0
 do
     [[ -L $files ]] && rm $files
     ln -s $HOME/dotfiles/.config/$files

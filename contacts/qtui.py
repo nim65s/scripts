@@ -5,17 +5,33 @@ from datetime import datetime
 from pathlib import Path
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QFileDialog, QGridLayout, QLabel,
-                             QLineEdit, QMainWindow, QPushButton, QTableWidget, QTableWidgetItem, qApp)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    qApp,
+)
 
 from vcards import Vcard
 from vcf_parser import export_ab, import_ab
 
-MAIN = {'EMAIL': 'EMAIL;TYPE=HOME,INTERNET', 'TEL': 'TEL;TYPE=CELL', 'X-JABBER': 'X-JABBER'}
+MAIN = {
+    "EMAIL": "EMAIL;TYPE=HOME,INTERNET",
+    "TEL": "TEL;TYPE=CELL",
+    "X-JABBER": "X-JABBER",
+}
 
 
 def now():
-    return datetime.now().strftime('%Y%m%dT%H%M%SZ')
+    return datetime.now().strftime("%Y%m%dT%H%M%SZ")
 
 
 class Contacts(QMainWindow):
@@ -26,24 +42,24 @@ class Contacts(QMainWindow):
 
         self.statusBar()
 
-        import_action = QAction('Import Addresse Books', self)
+        import_action = QAction("Import Addresse Books", self)
         import_action.triggered.connect(self.import_abs)
-        export_action = QAction('Export Addresse Books', self)
+        export_action = QAction("Export Addresse Books", self)
         export_action.triggered.connect(self.export_ab)
-        merge_action = QAction('Merge', self)
+        merge_action = QAction("Merge", self)
         merge_action.triggered.connect(self.merge)
-        automerge_action = QAction('Auto-Merge', self)
+        automerge_action = QAction("Auto-Merge", self)
         automerge_action.triggered.connect(self.automerge)
-        deldup_action = QAction('Delete Duplicates', self)
+        deldup_action = QAction("Delete Duplicates", self)
         deldup_action.triggered.connect(self.delete_duplicates)
-        fixtel_action = QAction('Fix Tel', self)
+        fixtel_action = QAction("Fix Tel", self)
         fixtel_action.triggered.connect(self.fix_tel)
-        fixcat_action = QAction('Fix Category', self)
+        fixcat_action = QAction("Fix Category", self)
         fixcat_action.triggered.connect(self.fix_category)
-        exit_action = QAction('Exit', self)
+        exit_action = QAction("Exit", self)
         exit_action.triggered.connect(qApp.quit)
 
-        toolbar = self.addToolBar('Toolbar')
+        toolbar = self.addToolBar("Toolbar")
         toolbar.addAction(import_action)
         toolbar.addAction(export_action)
         toolbar.addAction(merge_action)
@@ -53,14 +69,16 @@ class Contacts(QMainWindow):
         toolbar.addAction(fixcat_action)
         toolbar.addAction(exit_action)
 
-        for path in Path('.').glob('*.vcf'):
+        for path in Path(".").glob("*.vcf"):
             self.import_ab(path)
 
-        self.setWindowTitle('float')
+        self.setWindowTitle("float")
         self.show()
 
     def import_abs(self):
-        for filename in QFileDialog.getOpenFileNames(self, 'Charge des carnets d’adresse', '.', '*.vcf')[0]:
+        for filename in QFileDialog.getOpenFileNames(
+            self, "Charge des carnets d’adresse", ".", "*.vcf"
+        )[0]:
             path = Path(filename).name  # TODO .name added for easier relative use
             self.import_ab(path)
 
@@ -74,13 +92,17 @@ class Contacts(QMainWindow):
 
         for i, key in enumerate(self.keys):
             self.table.setHorizontalHeaderItem(i, QTableWidgetItem(key))
-        self.table.setHorizontalHeaderItem(len(self.keys), QTableWidgetItem('Carnet'))
+        self.table.setHorizontalHeaderItem(len(self.keys), QTableWidgetItem("Carnet"))
 
         for i, vcard in enumerate(self.vcards.values()):
             for key, value in vcard.dict.items():
-                self.table.setItem(i, self.keys_idx[key], QTableWidgetItem('|'.join(value)))
-                self.table.setItem(i, len(self.keys), QTableWidgetItem(vcard.address_book))
-        self.table.sortItems(self.keys_idx['FN'])
+                self.table.setItem(
+                    i, self.keys_idx[key], QTableWidgetItem("|".join(value))
+                )
+                self.table.setItem(
+                    i, len(self.keys), QTableWidgetItem(vcard.address_book)
+                )
+        self.table.sortItems(self.keys_idx["FN"])
         self.setCentralWidget(self.table)
 
     def update_keys(self):
@@ -96,7 +118,7 @@ class Contacts(QMainWindow):
         infos = set()
         for i in range(len(self.keys)):
             if self.table.item(row, i):
-                for info in self.table.item(row, i).text().split('|'):
+                for info in self.table.item(row, i).text().split("|"):
                     if info:
                         infos.add((self.table.horizontalHeaderItem(i).text(), info))
         return Vcard(self.table.item(row, len(self.keys)).text(), list(infos))
@@ -110,7 +132,7 @@ class Contacts(QMainWindow):
             else:
                 address_books[v.address_book] = {v.uid: v}
         for address_book, addresses in address_books.items():
-            export_ab(addresses, f'{address_book}.vcf')
+            export_ab(addresses, f"{address_book}.vcf")
 
     def merge(self):
         vcards = {}
@@ -121,13 +143,19 @@ class Contacts(QMainWindow):
 
     def automerge(self):
         self.delete_duplicates()
-        old = 'nothing'
+        old = "nothing"
         for row in range(self.table.rowCount()):
             try:
-                new = self.table.item(row, self.keys_idx['FN']).text()
+                new = self.table.item(row, self.keys_idx["FN"]).text()
                 if old == new:
-                    MergeDialog({row: self.get_vcard_from_row(row), row - 1: self.get_vcard_from_row(row - 1)},
-                                self.keys, parent=self).show()
+                    MergeDialog(
+                        {
+                            row: self.get_vcard_from_row(row),
+                            row - 1: self.get_vcard_from_row(row - 1),
+                        },
+                        self.keys,
+                        parent=self,
+                    ).show()
                     break
                 old = new
             except:
@@ -135,25 +163,37 @@ class Contacts(QMainWindow):
 
     def fix_tel(self):
         for row in range(self.table.rowCount()):
-            item = self.table.item(row, self.keys_idx[MAIN['TEL']])
+            item = self.table.item(row, self.keys_idx[MAIN["TEL"]])
             if not item:
                 continue
-            tels = [tel.replace(' ', '') for tel in item.text().split('|')]
-            tels = [tel.replace('00', '+', 1) if tel.startswith('00') else tel for tel in tels]
+            tels = [tel.replace(" ", "") for tel in item.text().split("|")]
+            tels = [
+                tel.replace("00", "+", 1) if tel.startswith("00") else tel
+                for tel in tels
+            ]
             for i in range(1, 10):
-                tels = [tel.replace(f'0{i}', f'+33{i}', 1) if tel.startswith(f'0{i}') else tel for tel in tels]
-            tels = [' '.join([t[:3], t[3], t[4:6], t[6:8], t[8:10], t[10:]])
-                    if t.startswith('+33') else t for t in tels]
-            self.table.item(row, self.keys_idx['TEL;TYPE=CELL']).setText('|'.join(tels))
+                tels = [
+                    tel.replace(f"0{i}", f"+33{i}", 1)
+                    if tel.startswith(f"0{i}")
+                    else tel
+                    for tel in tels
+                ]
+            tels = [
+                " ".join([t[:3], t[3], t[4:6], t[6:8], t[8:10], t[10:]])
+                if t.startswith("+33")
+                else t
+                for t in tels
+            ]
+            self.table.item(row, self.keys_idx["TEL;TYPE=CELL"]).setText("|".join(tels))
 
     def delete_duplicates(self):
-        old = Vcard('pipo', {})
+        old = Vcard("pipo", {})
         for row in range(self.table.rowCount()):
             v = self.get_vcard_from_row(row)
             if v is None:
                 break
             if v == old:
-                print(f'delete row {row} for vcard {v}')
+                print(f"delete row {row} for vcard {v}")
                 self.table.removeRow(row)
             else:
                 old = v
@@ -167,10 +207,18 @@ class Contacts(QMainWindow):
                         if item and item.text():
                             it = self.table.item(row, self.keys_idx[MAIN[kind]])
                             if not it or not it.text():
-                                self.table.setItem(row, self.keys_idx[MAIN[kind]], QTableWidgetItem(item.text()))
+                                self.table.setItem(
+                                    row,
+                                    self.keys_idx[MAIN[kind]],
+                                    QTableWidgetItem(item.text()),
+                                )
                             else:
-                                it.setText('|'.join(it.text().split('|') + item.text().split('|')))
-                            item.setText('')
+                                it.setText(
+                                    "|".join(
+                                        it.text().split("|") + item.text().split("|")
+                                    )
+                                )
+                            item.setText("")
 
 
 class MergeDialog(QDialog):
@@ -186,7 +234,7 @@ class MergeDialog(QDialog):
         layout.addWidget(done, 0, 1)
         i = 1
         for key in self.keys:
-            if key not in ['REV', 'UID', 'VERSION', 'PRODID']:
+            if key not in ["REV", "UID", "VERSION", "PRODID"]:
 
                 items = set()
                 for v in self.vcards.values():
@@ -195,7 +243,7 @@ class MergeDialog(QDialog):
                             items.add(item)
                 if items:
                     edit = QLineEdit(self)
-                    edit.setText('|'.join(items))
+                    edit.setText("|".join(items))
                     layout.addWidget(QLabel(key), i, 0)
                     layout.addWidget(edit, i, 1)
                     self.edits[key] = edit
@@ -205,18 +253,20 @@ class MergeDialog(QDialog):
 
     def merge_done(self, *args):
         edits = {key: value.text() for key, value in self.edits.items()}
-        edits.update(REV=now(), PRODID='Nim', VERSION='3.0')
+        edits.update(REV=now(), PRODID="Nim", VERSION="3.0")
         for row, vcard in self.vcards.items():
             edits.update(UID=vcard.uid)
             for key in edits:
-                self.parent().table.setItem(row, self.parent().keys_idx[key], QTableWidgetItem(edits[key]))
+                self.parent().table.setItem(
+                    row, self.parent().keys_idx[key], QTableWidgetItem(edits[key])
+                )
         self.accept()
 
     def sizeHint(self):
         return QSize(1900, 400)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = Contacts()
     sys.exit(app.exec_())

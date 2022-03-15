@@ -38,7 +38,7 @@ def get(year, month):
         name = "%s-%i.jpg" % (date.strftime("%Y-%m"), i)
         path = destdir / name
         if not path.exists():
-            with path.open('wb') as f:
+            with path.open("wb") as f:
                 for chunk in r:
                     f.write(chunk)
             print("  New wallpaper:", path)
@@ -59,6 +59,8 @@ if __name__ == "__main__":
         destdir.mkdir()
 
     parser = argparse.ArgumentParser(description="Download wallpapers from NG")
-    parser.add_argument('year', type=int, nargs=1, choices=range(9, datetime.today().year - 2000))
-    parser.add_argument('month', type=int, nargs='?', choices=range(13), default=0)
+    parser.add_argument(
+        "year", type=int, nargs=1, choices=range(9, datetime.today().year - 2000)
+    )
+    parser.add_argument("month", type=int, nargs="?", choices=range(13), default=0)
     main(**vars(parser.parse_args()))

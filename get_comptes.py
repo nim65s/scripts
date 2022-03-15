@@ -20,9 +20,9 @@ class HTMLMailParser(HTMLParser):
         self.key = False
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'dt':
+        if tag == "dt":
             self.key = True
-        elif tag != 'dd':
+        elif tag != "dd":
             self.key = False
 
     def handle_data(self, data):
@@ -30,19 +30,21 @@ class HTMLMailParser(HTMLParser):
             self.mail_data[self.key] += data.strip()
         elif self.key:
             self.key = data
-            self.mail_data[self.key] = ''
+            self.mail_data[self.key] = ""
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     MAIL_PARSER = Parser()
 
     for filename in sys.argv[1:]:
         with open(filename) as fp:
             msg = MAIL_PARSER.parse(fp)
-        if 'majo@saurel.me' not in msg['From']:
+        if "majo@saurel.me" not in msg["From"]:
             continue
 
         html_parser = HTMLMailParser()
-        html_part = next(part for part in msg.walk() if part.get_content_type() == 'text/html')
+        html_part = next(
+            part for part in msg.walk() if part.get_content_type() == "text/html"
+        )
         html_parser.feed(html_part.get_payload())
         print(html_parser.mail_data)

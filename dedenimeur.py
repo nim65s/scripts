@@ -8,10 +8,31 @@ import random
 import sys
 
 from PyQt5.QtCore import QBasicTimer, QElapsedTimer, Qt
-from PyQt5.QtWidgets import (QAction, QApplication, QGridLayout, QInputDialog, QLCDNumber,
-                             QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, qApp)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QGridLayout,
+    QInputDialog,
+    QLCDNumber,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+    qApp,
+)
 
-COLORS = ["rgba(0, 0, 0, 0)", "blue", "green", "red", "DarkBlue", "black", "DeepPink", "violet", "brown"]
+COLORS = [
+    "rgba(0, 0, 0, 0)",
+    "blue",
+    "green",
+    "red",
+    "DarkBlue",
+    "black",
+    "DeepPink",
+    "violet",
+    "brown",
+]
 
 
 class Board(QWidget):
@@ -31,7 +52,7 @@ class Board(QWidget):
         self.buttons = {}
         for x in range(self.width):
             for y in range(self.height):
-                btn = QPushButton(' ')
+                btn = QPushButton(" ")
                 btn.position = (x, y)
                 btn.bomb = False
                 btn.setFixedSize(self.size, self.size)
@@ -58,7 +79,7 @@ class Board(QWidget):
     def right_click(self):
         btn = self.sender()
         if not btn.isFlat():
-            btn.setText('!' if btn.text() == ' ' else ' ')
+            btn.setText("!" if btn.text() == " " else " ")
 
     def around(self, x, y):
         for i in [-1, 0, 1]:
@@ -68,7 +89,7 @@ class Board(QWidget):
                         yield x + i, y + j
 
     def demine(self, btn, force=False):
-        if not force and btn.isFlat() or btn.text() == '!':
+        if not force and btn.isFlat() or btn.text() == "!":
             return True
         if force and btn.isFlat():
             n = 0
@@ -77,7 +98,7 @@ class Board(QWidget):
                     continue
                 if self.buttons[(x, y)].bomb:
                     n += 1
-                if self.buttons[(x, y)].text() == '!':
+                if self.buttons[(x, y)].text() == "!":
                     n -= 1
             if n != 0:
                 return False
@@ -105,17 +126,22 @@ class Board(QWidget):
         for x in range(self.width):
             for y in range(self.height):
                 if self.buttons[(x, y)].bomb:
-                    self.buttons[(x, y)].setText('\\o/')
-        QMessageBox.question(self, 'Fin', "Gagné en %ims!" % self.parent().parent().stop_timers(), QMessageBox.Ok)
+                    self.buttons[(x, y)].setText("\\o/")
+        QMessageBox.question(
+            self,
+            "Fin",
+            "Gagné en %ims!" % self.parent().parent().stop_timers(),
+            QMessageBox.Ok,
+        )
         self.init()
 
     def end(self):
         for x in range(self.width):
             for y in range(self.height):
                 if self.buttons[(x, y)].bomb:
-                    self.buttons[(x, y)].setText('/o\\')
+                    self.buttons[(x, y)].setText("/o\\")
         self.parent().parent().stop_timers()
-        QMessageBox.question(self, 'Fin', "Perdu !", QMessageBox.Ok)
+        QMessageBox.question(self, "Fin", "Perdu !", QMessageBox.Ok)
         self.init()
 
 
@@ -139,30 +165,30 @@ class DedeNimeur(QMainWindow):
         central.setLayout(vbox)
         self.setCentralWidget(central)
 
-        start = QAction('Start', self)
-        start.setStatusTip('Start')
-        start.setShortcut('Ctrl+N')
+        start = QAction("Start", self)
+        start.setStatusTip("Start")
+        start.setShortcut("Ctrl+N")
         start.triggered.connect(self.init)
 
-        exit = QAction('Exit', self)
-        exit.setStatusTip('Exit')
-        exit.setShortcut('Ctrl+Q')
+        exit = QAction("Exit", self)
+        exit.setStatusTip("Exit")
+        exit.setShortcut("Ctrl+Q")
         exit.triggered.connect(qApp.quit)
 
-        height = QAction('Height', self)
-        height.setStatusTip('Set board width')
+        height = QAction("Height", self)
+        height.setStatusTip("Set board width")
         height.triggered.connect(self.set_height)
-        width = QAction('Width', self)
-        width.setStatusTip('Set board height')
+        width = QAction("Width", self)
+        width.setStatusTip("Set board height")
         width.triggered.connect(self.set_width)
-        mines = QAction('Mines', self)
-        mines.setStatusTip('Set board mines')
+        mines = QAction("Mines", self)
+        mines.setStatusTip("Set board mines")
         mines.triggered.connect(self.set_mines)
-        size = QAction('Size', self)
-        size.setStatusTip('Set button size')
+        size = QAction("Size", self)
+        size.setStatusTip("Set button size")
         size.triggered.connect(self.set_size)
 
-        toolbar = self.addToolBar('Toolbar')
+        toolbar = self.addToolBar("Toolbar")
         toolbar.addAction(start)
         toolbar.addAction(width)
         toolbar.addAction(height)
@@ -170,7 +196,7 @@ class DedeNimeur(QMainWindow):
         toolbar.addAction(size)
         toolbar.addAction(exit)
 
-        self.setWindowTitle(u'DédéNimeur')
+        self.setWindowTitle("DédéNimeur")
         self.show()
 
     def init(self):
@@ -181,28 +207,30 @@ class DedeNimeur(QMainWindow):
             self.board.size = self.size
             self.board.init()
         else:
-            QMessageBox.question(self, 'NOPE', u"Va falloir spécifier un truc cohérent…", QMessageBox.Ok)
+            QMessageBox.question(
+                self, "NOPE", "Va falloir spécifier un truc cohérent…", QMessageBox.Ok
+            )
 
     def set_height(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'height')
+        text, ok = QInputDialog.getText(self, "Settings", "height")
         if ok:
             self.height = int(text)
             self.init()
 
     def set_width(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'width')
+        text, ok = QInputDialog.getText(self, "Settings", "width")
         if ok:
             self.width = int(text)
             self.init()
 
     def set_mines(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'mines')
+        text, ok = QInputDialog.getText(self, "Settings", "mines")
         if ok:
             self.mines = int(text)
             self.init()
 
     def set_size(self):
-        text, ok = QInputDialog.getText(self, 'Settings', 'size')
+        text, ok = QInputDialog.getText(self, "Settings", "size")
         if ok:
             self.size = int(text)
             self.init()
@@ -220,7 +248,7 @@ class DedeNimeur(QMainWindow):
         self.lcd.display(int(self.real_timer.elapsed() / 1000))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = DedeNimeur()
     sys.exit(app.exec_())

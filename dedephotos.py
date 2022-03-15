@@ -13,8 +13,17 @@ import imagehash
 from PIL import Image
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QGridLayout,
-                             QLabel, QMainWindow, QVBoxLayout, QWidget, qApp)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QCheckBox,
+    QGridLayout,
+    QLabel,
+    QMainWindow,
+    QVBoxLayout,
+    QWidget,
+    qApp,
+)
 from tqdm import tqdm
 
 
@@ -62,8 +71,12 @@ class ImgChooser(QWidget):
                     checkbox.stateChanged.disconnect()
                 except TypeError:
                     pass
-                checkbox.setCheckState(Qt.Checked if img in self.removed else Qt.Unchecked)
-                checkbox.stateChanged.connect(partial(self.ddp.updt_rm, img_no=self.img_no, img=img))
+                checkbox.setCheckState(
+                    Qt.Checked if img in self.removed else Qt.Unchecked
+                )
+                checkbox.stateChanged.connect(
+                    partial(self.ddp.updt_rm, img_no=self.img_no, img=img)
+                )
                 pix = QPixmap(str(self.images[col]))
                 pix.setDevicePixelRatio(2)
                 label.setPixmap(pix)
@@ -88,7 +101,9 @@ class DedePhotos(QMainWindow):
 
         self.imgs = max(len(v) for v in database.values())
 
-        self.photos = ImgChooser(self.current, self.database[self.db_keys[self.current]], self)
+        self.photos = ImgChooser(
+            self.current, self.database[self.db_keys[self.current]], self
+        )
         self.removed = {key: [] for key in self.db_keys}
 
         vbox = QVBoxLayout()
@@ -98,40 +113,40 @@ class DedePhotos(QMainWindow):
         central.setLayout(vbox)
         self.setCentralWidget(central)
 
-        _exit = QAction('Exit', self)
-        _exit.setStatusTip('Exit')
-        _exit.setShortcut('Ctrl+Q')
+        _exit = QAction("Exit", self)
+        _exit.setStatusTip("Exit")
+        _exit.setShortcut("Ctrl+Q")
         _exit.triggered.connect(qApp.quit)
 
-        _next = QAction('Next', self)
-        _next.setStatusTip('Next')
+        _next = QAction("Next", self)
+        _next.setStatusTip("Next")
         _next.triggered.connect(self.next)
 
-        _prev = QAction('Prev', self)
-        _prev.setStatusTip('Prev')
+        _prev = QAction("Prev", self)
+        _prev.setStatusTip("Prev")
         _prev.triggered.connect(self.prev)
 
-        _done = QAction('Done', self)
-        _done.setStatusTip('Done')
+        _done = QAction("Done", self)
+        _done.setStatusTip("Done")
         _done.triggered.connect(self.done)
 
-        self.count = QAction(f'{self.current} / {len(self.db_keys)}', self)
+        self.count = QAction(f"{self.current} / {len(self.db_keys)}", self)
 
-        toolbar = self.addToolBar('Toolbar')
+        toolbar = self.addToolBar("Toolbar")
         toolbar.addAction(_next)
         toolbar.addAction(_prev)
         toolbar.addAction(_done)
         toolbar.addAction(_exit)
         toolbar.addAction(self.count)
 
-        self.setWindowTitle(u'DédéPhotos')
+        self.setWindowTitle("DédéPhotos")
         self.show()
 
     def update_photos(self):
         """
         update img_no & images in ImgChooser
         """
-        self.count.setText(f'{self.current} / {len(self.db_keys)}')
+        self.count.setText(f"{self.current} / {len(self.db_keys)}")
         key = self.db_keys[self.current]
         self.photos.set_images(self.current, self.database[key], self.removed[key])
 
@@ -157,11 +172,11 @@ class DedePhotos(QMainWindow):
         """
         if img in self.removed[self.db_keys[img_no]]:
             if state != Qt.Unchecked:
-                print('not unchecked', img_no, img, state)
+                print("not unchecked", img_no, img, state)
             self.removed[self.db_keys[img_no]].remove(img)
         else:
             if state != Qt.Checked:
-                print('not checked', img_no, img, state)
+                print("not checked", img_no, img, state)
             self.removed[self.db_keys[img_no]].append(img)
 
     def done(self):
@@ -170,7 +185,7 @@ class DedePhotos(QMainWindow):
         """
         for imgs in self.removed.values():
             for img in imgs:
-                os.renames(img, Path('./removed') / img)
+                os.renames(img, Path("./removed") / img)
 
 
 def read_database(dirs):
@@ -181,18 +196,18 @@ def read_database(dirs):
     database = {}
     fails = []
     for argv in dirs:
-        for img in tqdm(list(Path(argv).glob(f'**/*.jpg')), desc=argv):
+        for img in tqdm(list(Path(argv).glob(f"**/*.jpg")), desc=argv):
             try:
                 image = Image.open(img)
                 img_hash = str(imagehash.phash(image))
                 database[img_hash] = database.get(img_hash, []) + [img]
             except OSError:
                 fails.append(str(img))
-    print('FAIL on:', '\n'.join(fails))
+    print("FAIL on:", "\n".join(fails))
     return {key: values for key, values in database.items() if len(values) > 1}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication([])
     ex = DedePhotos(read_database(sys.argv[1:]))
     sys.exit(app.exec_())

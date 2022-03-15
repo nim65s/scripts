@@ -3,7 +3,15 @@
 import sys
 
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QTextEdit, QVBoxLayout, QWidget, qApp
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QMainWindow,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+    qApp,
+)
 
 from web_spotify import SpotifyLocalHTTPClient
 
@@ -14,17 +22,17 @@ class App(QMainWindow):
 
         self.spotify = SpotifyLocalHTTPClient()
 
-        start = QAction('Get Lyrics', self)
+        start = QAction("Get Lyrics", self)
         start.triggered.connect(self.lyrics)
 
-        pause = QAction('Pause', self)
+        pause = QAction("Pause", self)
         pause.triggered.connect(self.spotify.pause)
 
-        exit = QAction('Exit', self)
-        exit.setShortcut('Ctrl+Q')
+        exit = QAction("Exit", self)
+        exit.setShortcut("Ctrl+Q")
         exit.triggered.connect(qApp.quit)
 
-        toolbar = self.addToolBar('Toolbar')
+        toolbar = self.addToolBar("Toolbar")
         toolbar.addAction(start)
         toolbar.addAction(pause)
         toolbar.addAction(exit)
@@ -52,7 +60,7 @@ class App(QMainWindow):
         self.view.setHtml(self.spotify.lyrics())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())

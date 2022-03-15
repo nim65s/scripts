@@ -44,21 +44,21 @@ def jaune(texte):
 def style(texte, style):
     """printe un «texte» formaté selon le «style»"""
     if sys.stdout.encoding == "UTF-8":
-        print("\033[%sm%s\033[0m" % (style, texte))
+        print("\033[{}m{}\033[0m".format(style, texte))
     else:
         if isinstance(texte, unicode):
             texte = unicodedata.normalize("NFKD", texte).encode("ascii", "ignore")
-        print("\033[%sm%s\033[0m" % (style, texte))
+        print("\033[{}m{}\033[0m".format(style, texte))
 
 
 def colore_256(texte, couleur):
     """printe un «texte» coloré selon la «couleur»"""
     if sys.stdout.encoding == "UTF-8":
-        print("\033[38;5;%sm%s\033[0m" % (couleur, texte))
+        print("\033[38;5;{}m{}\033[0m".format(couleur, texte))
     else:
         if isinstance(texte, unicode):
             texte = unicodedata.normalize("NFKD", texte).encode("ascii", "ignore")
-        print("\033[38;5;%sm%s\033[0m" % (couleur, texte))
+        print("\033[38;5;{}m{}\033[0m".format(couleur, texte))
 
 
 def exemple():

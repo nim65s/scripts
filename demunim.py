@@ -19,7 +19,7 @@ if not cmds:
         return f.is_file() and f.stat().st_mode & x and not f.name.startswith(".")
 
     path = (Path(d) for d in environ["PATH"].split(":"))
-    cmds = sorted([f.name for d in path for f in d.iterdir() if is_cmd(f)])
+    cmds = sorted(f.name for d in path for f in d.iterdir() if is_cmd(f))
 
 out = run(
     "dmenu", input="\n".join(cmds), stdout=PIPE, universal_newlines=True

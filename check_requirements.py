@@ -110,10 +110,10 @@ def print_tables(all_packages, all_repos, pypi):
             for package, version in repos[repo].items()
         ):
             up_to_date_repos.add(repo)
-            up_to_date_packages |= set(package_name(p) for p in repos[repo].keys())
+            up_to_date_packages |= {package_name(p) for p in repos[repo].keys()}
         else:
             to_update_repos.add(repo)
-            to_update_packages |= set(package_name(p) for p in repos[repo].keys())
+            to_update_packages |= {package_name(p) for p in repos[repo].keys()}
 
     up_to_date_packages = sorted(up_to_date_packages)
     to_update_packages = sorted(to_update_packages)

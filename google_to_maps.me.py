@@ -7,7 +7,7 @@ from json import load
 
 
 def json_to_kml(google, document):
-    assert set(g["geometry"]["type"] for g in google) == set(["Point"])
+    assert {g["geometry"]["type"] for g in google} == {"Point"}
 
     def _name(place):
         return place["properties"]["Title"]

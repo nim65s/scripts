@@ -37,7 +37,7 @@ class SpotifyLocalHTTPClient(object):
         }
 
     def get_json(self, url, **params):
-        return self.session.get("%s%s.json" % (self.url, url), params=params).json()
+        return self.session.get("{}{}.json".format(self.url, url), params=params).json()
 
     def status(self):
         return self.get_json("remote/status")
@@ -52,7 +52,7 @@ class SpotifyLocalHTTPClient(object):
 
     def lyrics(self):
         artist, song = self.track()
-        req = requests.get("%s%s:%s" % (WIKIA, artist, song.split("-")[0].title()))
+        req = requests.get("{}{}:{}".format(WIKIA, artist, song.split("-")[0].title()))
         soup = BeautifulSoup(req.content, "html.parser")
         lyrics = get_lyrics(soup)
         if not lyrics:
@@ -71,7 +71,7 @@ class SpotifyLocalHTTPClient(object):
                     + soup.find("div", id="mw-content-text").find("a").attrs["href"]
                 )
                 lyrics = get_lyrics(disambiguation.content)
-        return "<h1>%s</h1><h2>%s</h2>%s" % (
+        return "<h1>{}</h1><h2>{}</h2>{}".format(
             artist,
             song,
             str(lyrics)[1:-1] if lyrics else req.url,

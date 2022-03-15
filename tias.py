@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Task in a Stack
+Tasks in a Stack
 
-Keep track of a task in a stack:
-- create an i3 workspace for it
+Keep track of tasks in a stack:
+- create an i3 / sway workspace for it
 - log its title, its creation, and its closing
-- reopen all unfinished tasks
+- print/reopen all unfinished tasks
 
-obviously not related about https://github.com/stack-of-tasks/
+obviously not related to https://github.com/stack-of-tasks/
 """
 
 import argparse
@@ -27,7 +27,7 @@ def log(name: str, done: bool = False):
         print(f'{datetime.now()} | {name}{done_str}', file=f)
 
 
-def reopen():
+def reopen(print_only: bool = False):
     """Reopen unfinished tasks"""
     stack = set()
     with open(FILE) as f:
@@ -38,13 +38,17 @@ def reopen():
             else:
                 stack.add(task)
     for task in stack:
-        i3.command(f'workspace {task}')
-        i3.command('exec i3-sensible-terminal')
+        if print_only:
+            print(task)
+        else:
+            i3.command(f'workspace {task}')
+            i3.command('exec i3-sensible-terminal')
 
 
 parser = argparse.ArgumentParser(description='keep track of a task in a stack')
 parser.add_argument('-d', '--done', action='store_true', help='log that the task of the current workspace is done')
 parser.add_argument('-r', '--reopen', action='store_true', help='reopen unfinished tasks')
+parser.add_argument('-p', '--print_only', action='store_true', help='print unfinished tasks')
 parser.add_argument('name', nargs='*', help='name for the new task')
 
 if __name__ == '__main__':
@@ -52,8 +56,8 @@ if __name__ == '__main__':
     i3 = i3ipc.Connection()
     if args.done:
         log(i3.get_tree().find_focused().workspace().name, done=True)
-    elif args.reopen:
-        reopen()
+    elif args.reopen or args.print_only:
+        reopen(args.print_only)
     else:
         name = ' '.join(args.name)
         i3.command(f'workspace {name}')

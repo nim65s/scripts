@@ -26,9 +26,7 @@ def log(name: str, done: bool = False):
     with open(FILE, 'a') as f:
         print(f'{datetime.now()} | {name}{done_str}', file=f)
 
-
-def reopen(print_only: bool = False):
-    """Reopen unfinished tasks"""
+def get_stack():
     stack = set()
     with open(FILE) as f:
         for line in f:
@@ -37,12 +35,14 @@ def reopen(print_only: bool = False):
                 stack.discard(task[:-len(DONE)])
             else:
                 stack.add(task)
-    for task in stack:
-        if print_only:
-            print(task)
-        else:
-            i3.command(f'workspace {task}')
-            i3.command('exec i3-sensible-terminal')
+    return stack
+
+
+def reopen(i3: i3ipc.Connection):
+    """Reopen unfinished tasks"""
+    for task in get_stack():
+        i3.command(f'workspace {task}')
+        i3.command('exec i3-sensible-terminal')
 
 
 parser = argparse.ArgumentParser(description='keep track of a task in a stack')
@@ -51,15 +51,20 @@ parser.add_argument('-r', '--reopen', action='store_true', help='reopen unfinish
 parser.add_argument('-p', '--print_only', action='store_true', help='print unfinished tasks')
 parser.add_argument('name', nargs='*', help='name for the new task')
 
+
 if __name__ == '__main__':
     args = parser.parse_args()
-    i3 = i3ipc.Connection()
-    if args.done:
-        log(i3.get_tree().find_focused().workspace().name, done=True)
-    elif args.reopen or args.print_only:
-        reopen(args.print_only)
+    if args.print_only:
+        for task in get_stack():
+            print(task)
     else:
-        name = ' '.join(args.name)
-        i3.command(f'workspace {name}')
-        i3.command('exec kitty')
-        log(name)
+        i3 = i3ipc.Connection()
+        if args.done:
+            log(i3.get_tree().find_focused().workspace().name, done=True)
+        elif args.reopen:
+            reopen(i3)
+        else:
+            name = ' '.join(args.name)
+            i3.command(f'workspace {name}')
+            i3.command('exec kitty')
+            log(name)

@@ -4,14 +4,13 @@ from os import environ
 
 from gitlab import Gitlab
 
-NOW = datetime.now()
-MAX = timedelta(days=365 * 2)
+MIN = datetime.now() - timedelta(days=365 * 2)
 URL = "https://gitlab.laas.fr"
 
 gl = Gitlab(url=URL, private_token=environ["TOKEN"])
 gl.auth()
 
 for project in gl.projects.list(as_list=False):
-    dt = datetime.fromisoformat(project.last_activity_at[:-1])
-    if NOW - dt > MAX and project.namespace["kind"] == "group":
-        print(project.namespace["name"], project.name)
+    if datetime.fromisoformat(project.last_activity_at[:-1]) < MIN:
+        if project.namespace["kind"] == "group" and not project.archived:
+            print(project.namespace["name"], project.name)

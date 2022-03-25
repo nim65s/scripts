@@ -46,7 +46,7 @@ def reopen(i3: i3ipc.Connection):
         i3.command("exec i3-sensible-terminal")
 
 
-parser = argparse.ArgumentParser(description="keep track of a task in a stack")
+parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument(
     "-d",
     "--done",
@@ -59,6 +59,9 @@ parser.add_argument(
 parser.add_argument(
     "-p", "--print_only", action="store_true", help="print unfinished tasks"
 )
+parser.add_argument(
+    "-l", "--log_only", action="store_true", help="add task without i3ipc"
+)
 parser.add_argument("name", nargs="*", help="name for the new task")
 
 
@@ -67,6 +70,9 @@ if __name__ == "__main__":
     if args.print_only:
         for task in get_stack():
             print(task)
+    elif args.log_only:
+        name = " ".join(args.name)
+        log(name)
     else:
         i3 = i3ipc.Connection()
         if args.done:

@@ -31,8 +31,4 @@ git checkout master
 git remote add github git@$GH:$MH/$PRJ.git
 git remote add maingl git@$GL:$ORG/$PRJ.git
 git remote add main   git@$GH:$ORG/$PRJ.git
-git fetch github &
-git fetch maingl &
-git fetch main   &
-
-wait
+git fetch --all --prune

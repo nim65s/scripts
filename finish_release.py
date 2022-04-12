@@ -183,7 +183,7 @@ if __name__ == "__main__":
     print("Downloading files…")
     filename = download(release[1:])
     print("Getting message…")
-    message = get_message(release)
+    message = get_message(release) or ""
     print("Getting github token")
     github_token = check_output(["pass", "web/github/ghcli-token"]).decode().strip()
     print("Publishing release draft…")

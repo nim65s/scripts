@@ -30,7 +30,7 @@ git pull --rebase main devel
 git submodule update
 
 #hostname -f | grep -q laas.fr || export ALL_PROXY="socks5h://localhost:1445"
-echo "include: http://rainboard.laas.fr/project/$PRJ/.gitlab-ci.yml" > .gitlab-ci.yml
+echo "include: http://rainboard.laas.fr/project/${PRJ/_/-}/.gitlab-ci.yml" > .gitlab-ci.yml
 
 TEMPLATE=$HOME/local/template
 if fd -q -E cmake -e py
@@ -84,7 +84,7 @@ done
 
 test -n "$(git status --porcelain)" && git commit -am 'format'
 
-git log --oneline --grep 'lint\|yapf\|format' "--format=format:# %s (%an, %as)%n%H%n" >> .git-blame-ignore-revs
+git log --oneline --grep 'lint\|yapf\|format\|pre-commit' "--format=format:# %s (%an, %as)%n%H%n" >> .git-blame-ignore-revs
 $EDITOR .git-blame-ignore-revs
 
 git add .git-blame-ignore-revs

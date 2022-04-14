@@ -28,10 +28,17 @@ def single():
         for addr in inet["addr_info"]
         if addr["local"] not in ["127.0.0.1", "::1"]
     ]
+    try:
+        net = cmd("iwctl device list")
+        net = next(l.strip() for l in net.split("\n") if "station" in l).split()[0]
+        net = cmd(f"iwctl station {net} show")
+        net = next(l.strip() for l in net.split("\n") if "Connected" in l).split()[-1]
+    except StopIteration:
+        net = ""
     dfs = [
         f"{part['mountpoint']} {part['fsuse%']}"
         for part in loads(cmd("lsblk -Jo mountpoint,fsuse%"))["blockdevices"]
-        if part["mountpoint"] not in [None, "/boot/efi"]
+        if part["mountpoint"] not in [None, "[SWAP]", "/boot", "/boot/efi"]
     ]
     dat = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
@@ -53,7 +60,9 @@ def single():
     ips = " ".join(ips)
     dfs = " ".join(dfs)
     rfk = red("RFKill") if "yes" in cmd("rfkill list") else ""
-    print(" | ".join(d for d in (rfk, ips, dfs, mem, avg, bri, vol, bat, dat) if d))
+    print(
+        " | ".join(d for d in (rfk, net, ips, dfs, mem, avg, bri, vol, bat, dat) if d)
+    )
 
 
 if __name__ == "__main__":

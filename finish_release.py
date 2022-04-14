@@ -66,6 +66,17 @@ REMOTES = (
 )
 
 
+def check_call_v(cmd: str, *args, **kwargs):
+    """Verbose check_call"""
+    print(f"""+ {" ".join(f'"{arg}"' for arg in cmd)}""")
+    check_call(cmd, *args, **kwargs)
+
+
+def check_call_s(cmd: str, *args, **kwargs):
+    """simple .split() on cmd"""
+    check_call_v(cmd.split(), *args, **kwargs)
+
+
 def check_remotes():
     "Check that the project complies to the template"
     out = check_output("git remote -v".split()).decode()
@@ -102,16 +113,16 @@ def update_branches():
                 if ndiff(f"{remote}/{branch}", branch) > 0:
                     raise RuntimeError(f"{branch} and {remote}/{branch} have diverged")
                 else:
-                    check_call(f"git checkout {branch}".split())
-                    check_call(f"git pull {remote} {branch}".split())
+                    check_call_s(f"git checkout {branch}")
+                    check_call_s(f"git pull {remote} {branch}")
 
 
 def merge_release(release):
     "merge the latest release into stable, and then stable into devel"
-    check_call(f"git checkout {STABLE}".split())
-    check_call(f"git merge {release}".split())
-    check_call(f"git checkout devel".split())
-    check_call(f"git merge {STABLE}".split())
+    check_call_s(f"git checkout {STABLE}")
+    check_call_s(f"git merge {release}")
+    check_call_s("git checkout devel")
+    check_call_s(f"git merge {STABLE}")
 
 
 def download(version):
@@ -125,13 +136,13 @@ def download(version):
                 copy(RPKG / robotpkg_project / filename, "/tmp")
             else:
                 with (Path("/tmp") / filename).open("wb") as f:
-                    url = f"http://www.openrobots.org/distfiles/{robotpkg_project}/{filename}"
+                    url = f"https://www.openrobots.org/distfiles/{robotpkg_project}/{filename}"
                     with httpx.stream("GET", url) as r:
                         r.raise_for_status()
                         for chunk in r.iter_bytes():
                             f.write(chunk)
         full_filename = f"/tmp/{project}{args.suffix}-{version}.tar.gz"
-        check_call(f"gpg --verify {full_filename}.sig".split())
+        check_call_s(f"gpg --verify {full_filename}.sig")
         return full_filename
 
     try:
@@ -165,7 +176,7 @@ if __name__ == "__main__":
     release = get_release()
     print(f"=== RELEASING {args.namespace} / {args.project }, {release} ===")
     print(check_output("git status".split()).decode())
-    check_call("git fetch --all --prune".split())
+    check_call_s("git fetch --all --prune")
 
     print("Updating local branches…")
     update_branches()
@@ -178,7 +189,7 @@ if __name__ == "__main__":
     # input(f'going to push devel, stable and {release}, press Enter to continue, ^C to abort')
     print("Pushing…")
     for remote in REMOTES.keys():
-        check_call(f"git push {remote} devel {release} {STABLE}".split())
+        check_call_s(f"git push {remote} devel {release} {STABLE}")
 
     print("Downloading files…")
     filename = download(release[1:])
@@ -187,7 +198,8 @@ if __name__ == "__main__":
     print("Getting github token")
     github_token = check_output(["pass", "web/github/ghcli-token"]).decode().strip()
     print("Publishing release draft…")
-    check_call(
+
+    check_call_v(
         [
             "gh",
             "release",

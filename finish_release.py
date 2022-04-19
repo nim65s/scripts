@@ -68,7 +68,9 @@ REMOTES = (
 
 def check_call_v(cmd: str, *args, **kwargs):
     """Verbose check_call"""
-    print(f"""+ {" ".join(f'"{arg}"' for arg in cmd)}""")
+    sp = " \t\r\n"
+    cmd_v = " ".join(f'"{arg}"' if any(c in arg for c in sp) else arg for arg in cmd)
+    print(f"+ {cmd_v}")
     check_call(cmd, *args, **kwargs)
 
 

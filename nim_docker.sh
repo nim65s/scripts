@@ -5,11 +5,11 @@
 
 set -ex
 
-FD_VERSION=8.2.1
-RG_VERSION=12.1.1
-BAT_VERSION=0.18.1
-DELTA_VERSION=0.7.1
-FISH_VERSION=3.3.1
+FD_VERSION=8.3.2
+RG_VERSION=13.0.0
+BAT_VERSION=0.20.0
+DELTA_VERSION=0.12.1
+FISH_VERSION=3.4.1
 
 if [[ $(id -u) == 0 ]]
 then
@@ -55,7 +55,7 @@ fi
 cd
 git clone --depth 1 https://github.com/nim65s/dotfiles.git
 cd dotfiles
-git submodule update --init Zenburn vim-plug submodules/docker-fish-completion
+git submodule update --init Zenburn vim-plug submodules/docker-fish-completion bass
 
 cd
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc

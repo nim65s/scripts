@@ -20,9 +20,8 @@ from subprocess import check_call, check_output
 
 import httpx
 
-STABLE = (
-    "stable" if "stable" in check_output("git branch -a".split()).decode() else "master"
-)
+_branches = check_output("git branch -a".split()).decode()
+STABLE = next(b for b in ["stable", "master", "main"] if b in _branches)
 BRANCHES = ["devel", STABLE]
 RPKG = Path("/usr/local/openrobots/distfiles")
 CWD = Path(getcwd())

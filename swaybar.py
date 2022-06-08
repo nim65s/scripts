@@ -32,7 +32,11 @@ def single():
         net = cmd("iwctl device list")
         net = next(l.strip() for l in net.split("\n") if "station" in l).split()[0]
         net = cmd(f"iwctl station {net} show")
-        net = next(l.strip() for l in net.split("\n") if "Connected" in l).split()[-1]
+        net = next(
+            l.strip().removeprefix("Connected network").strip()
+            for l in net.split("\n")
+            if "Connected network" in l
+        )
     except StopIteration:
         net = ""
     dfs = [

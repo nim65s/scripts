@@ -26,7 +26,10 @@ def single():
         addr["local"]
         for inet in loads(cmd("ip -j a"))
         for addr in inet["addr_info"]
-        if addr["local"] not in ["127.0.0.1", "::1"]
+        if not any(
+            addr["local"].startswith(a)
+            for a in ["127.0.0.1", "::1", "fc80::", "fd80::", "fe80::"]
+        )
     ]
     try:
         net = cmd("iwctl device list")

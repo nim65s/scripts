@@ -15,9 +15,10 @@ SHELF = (
 parser = ArgumentParser(description="forward gpg agent sockets")
 parser.add_argument("remote_host", nargs=1)
 parser.add_argument("--down", action="store_true")
+parser.add_argument("--verbose", action="store_true")
 
 
-def forward_gpg_sockets(remote_host, down=False):
+def forward_gpg_sockets(remote_host, down=False, verbose=False):
     here = check_output(["gpgconf", "--list-dir"]).decode().split()
     here_gpg = Path(
         next(l.split(":")[1] for l in here if l.startswith("agent-socket:"))
@@ -55,6 +56,8 @@ def forward_gpg_sockets(remote_host, down=False):
         gpg = f"{there_gpg}:{here_gpg}"
         ssh = f"{there_ssh}:{here_ssh}"
 
+    if verbose:
+        print(f"ssh -L {ssh} {remote_host[0]}")
     print(f"ssh -L {gpg} {remote_host[0]}")
     check_call(["ssh", "-L", ssh, remote_host[0]], stdin=sys.stdin)
 

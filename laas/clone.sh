@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eux
 
 ORG=${1}
 PRJ=${2}
@@ -26,7 +26,6 @@ git clone --recursive git@$GL:$ML/$PRJ.git
 cd $PRJ
 
 git checkout devel
-git checkout master
 
 git remote add github git@$GH:$MH/$PRJ.git
 git remote add maingl git@$GL:$ORG/$PRJ.git

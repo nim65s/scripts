@@ -87,7 +87,7 @@ test -n "$(git status --porcelain)" && git commit -am 'format'
 git log --oneline --grep 'lint\|yapf\|format\|pre-commit' "--format=format:# %s (%an, %as)%n%H%n" >> .git-blame-ignore-revs
 $EDITOR .git-blame-ignore-revs
 
-git add .git-blame-ignore-revs
+git add -f .git-blame-ignore-revs
 test -n "$(git status --porcelain)" && git commit -m 'git blame ignore revs'
 
 git push origin devel

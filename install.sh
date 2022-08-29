@@ -3,8 +3,8 @@
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
 FD_VERSION=8.4.0
-RG_VERSION=11.0.2
-FISH_VERSION=3.0.2
+RG_VERSION=13.0.0
+FISH_VERSION=3.5.1
 
 set -e
 set -x

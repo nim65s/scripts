@@ -30,7 +30,7 @@ git pull --rebase main devel
 git submodule update
 
 #hostname -f | grep -q laas.fr || export ALL_PROXY="socks5h://localhost:1445"
-echo "include: http://rainboard.laas.fr/project/${PRJ/_/-}/.gitlab-ci.yml" > .gitlab-ci.yml
+echo "include: https://rainboard.laas.fr/project/${PRJ//_/-}/.gitlab-ci.yml" > .gitlab-ci.yml
 
 TEMPLATE=$HOME/local/template
 if fd -q -E cmake -e py

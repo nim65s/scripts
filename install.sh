@@ -21,7 +21,7 @@ command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
 if [[ -f /etc/debian_version ]]
 then
-    if grep -q buster /etc/apt/sources.list
+    if grep -q 'buster\|bullseye' /etc/apt/sources.list
     then
         sudo apt install -qqy fd-find ripgrep fish
     else

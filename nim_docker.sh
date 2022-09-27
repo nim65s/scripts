@@ -9,7 +9,7 @@ FD_VERSION=8.4.0
 RG_VERSION=13.0.0
 BAT_VERSION=0.20.0
 DELTA_VERSION=0.12.1
-FISH_VERSION=3.4.1
+FISH_VERSION=3.5.1
 
 if [[ $(id -u) == 0 ]]
 then
@@ -55,7 +55,7 @@ fi
 cd
 git clone --depth 1 https://github.com/nim65s/dotfiles.git
 cd dotfiles
-git submodule update --init Zenburn vim-plug submodules/docker-fish-completion bass
+git submodule update --init Zenburn vim-plug bass
 
 cd
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc
@@ -66,7 +66,7 @@ done
 
 mkdir -p .config
 cd .config
-for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc
+for files in dfc fish pep8 ranger zathura flake8 pylintrc
 do
     [[ -L $files ]] && rm $files
     ln -s "$HOME/dotfiles/.config/$files" .

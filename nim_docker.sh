@@ -9,7 +9,6 @@ FD_VERSION=8.4.0
 RG_VERSION=13.0.0
 BAT_VERSION=0.20.0
 DELTA_VERSION=0.12.1
-FISH_VERSION=3.5.1
 
 if [[ $(id -u) == 0 ]]
 then
@@ -36,10 +35,9 @@ then
         $SUDO apt install -qqy fish
     elif [[ ${DEBIAN_VERSION} != stretch ]]
     then
-        FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~${DEBIAN_VERSION}_amd64.deb"
-        FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~${DEBIAN_VERSION}_all.deb"
-        wget "$FISH" "$FISH_COMMON"
-        $SUDO dpkg -i ./fish*.deb
+        $SUDO apt-add-repository "ppa:fish-shell/release-3"
+        $SUDO apt update -qqy
+        $SUDO apt install fish -qqy
     fi
 
     $SUDO dpkg -i ./{fd,bat,git-delta}*.deb

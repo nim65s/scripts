@@ -40,7 +40,12 @@ def title(string):
 
 def run(cmds, repo):
     return (
-        Popen(cmds, stderr=STDOUT, stdout=PIPE, cwd=repo, universal_newlines=True)
+        Popen(
+            ["git", "-C", repo] + cmds,
+            stderr=STDOUT,
+            stdout=PIPE,
+            universal_newlines=True,
+        )
         .stdout.read()
         .split("\n")
     )
@@ -52,15 +57,15 @@ def gitup(repo):
     if not isdir(repo):
         raise ValueError(f"«{repo}» is not a directory")
     ret = [title(repo)]
-    for cmds in [["git", "fetch"], ["git", "rebase"]]:
+    for cmds in [["fetch"], ["rebase"]]:
         ret += run(cmds, repo)
     if isfile(join(repo, ".gitmodules")):
         for cmds in [
-            ["git", "submodule", "update", "--remote", "--rebase", "--init"],
-            ["git", "submodule", "foreach", "-q", "git", "pull", "--rebase"],
+            ["submodule", "update", "--remote", "--rebase", "--init"],
+            ["submodule", "foreach", "-q", "git", "pull", "--rebase"],
         ]:
             ret += run(cmds, repo)
-    return ret + run(["git", "status"], repo)
+    return ret + run(["status"], repo)
 
 
 def clean(output):

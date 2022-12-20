@@ -29,4 +29,4 @@ def apt_filter(pkgs: Set[str]) -> Set[str]:
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    print(apt_filter(args.pkgs))
+    print(" ".join(sorted(apt_filter(args.pkgs))))

@@ -12,7 +12,8 @@ def wait(
     index=0, sleep_time=0.25, symbols=["→", "↘", "↓", "↙", "←", "↖", "↑", "↗"], text=""
 ):
     width = unpack("HH", ioctl(stdout.fileno(), TIOCGWINSZ, "0000"))[1]
-    stdout.write("\r{} {}{}".format(text, symbols[index], " " * (width - len(text) - 3)))
+    space = " " * (width - len(text) - 3)
+    stdout.write(f"\r{text} {symbols[index]}{space}")
     stdout.flush()
     sleep(sleep_time)
     return (index + 1) % len(symbols)

@@ -10,7 +10,7 @@ GH=github.com
 ML=gsaurel
 MH=nim65s
 
-xdg-open "https://rainboard.laas.fr/project/$PRJ/robotpkg"
+xdg-open "https://rainboard.laas.fr/project/$PRJ/robotpkg" || true
 
 for url in $GL/$ML $GH/$MH $GL/$ORG $GH/$ORG
 do

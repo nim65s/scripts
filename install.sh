@@ -38,11 +38,13 @@ fi
 if [[ -z "$SSH_CLIENT" ]]
 then
     echo enable-ssh-support > .gnupg/gpg-agent.conf
-    echo use-agent > .gnupg/gpg.conf
-    echo default-key 7D2ACDAF4653CF28 >> .gnupg/gpg.conf
-    echo personal-digest-preferences SHA256 >> .gnupg/gpg.conf
-    echo cert-digest-algo SHA256 >> .gnupg/gpg.conf
-    echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed >> .gnupg/gpg.conf
+    {
+        echo use-agent
+        echo default-key 7D2ACDAF4653CF28
+        echo personal-digest-preferences SHA256
+        echo cert-digest-algo SHA256
+        echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
+    } >> .gnupg/gpg.conf
 
     gpg-connect-agent reloadagent /bye
 
@@ -55,7 +57,8 @@ then
     gpg --decrypt /tmp/secret.gpg
 fi
 
-export SSH_AUTH_SOCK=$(gpgconf --list-dir | grep agent-ssh-socket | cut -d: -f2)
+SSH_AUTH_SOCK=$(gpgconf --list-dir | grep agent-ssh-socket | cut -d: -f2)
+export SSH_AUTH_SOCK
 grep -q cardno:000605255506 .ssh/authorized_keys || ssh-add -L >> .ssh/authorized_keys
 
 ssh-keyscan github.com | ssh-keygen -lf - >> .ssh/known_hosts
@@ -66,6 +69,7 @@ do
     pushd $repo
     git pull --rebase
     git submodule update --recursive --remote --rebase --init
+    # shellcheck disable=SC2016
     git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
     grep -q $repo ~/.gitrepos || pwd >> ~/.gitrepos
     popd
@@ -74,14 +78,14 @@ done
 for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc .latexmk .starship.toml
 do
     [[ -L $file || -f $file ]] && rm $file
-    ln -s $HOME/dotfiles/$file
+    ln -s "$HOME/dotfiles/$file" .
 done
 
 cd ~/.config
 for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf picom bat kitty sway gtk-3.0
 do
     [[ -L $files ]] && rm $files
-    ln -s $HOME/dotfiles/.config/$files
+    ln -s "$HOME/dotfiles/.config/$files" .
 done
 cd
 
@@ -93,4 +97,4 @@ then
     rustup default || rustup default stable
 fi
 
-grep $USER /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"
+grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

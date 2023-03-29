@@ -75,14 +75,14 @@ do
     popd
 done
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc .latexmk .starship.toml
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc .latexmk .
 do
     [[ -L $file || -f $file ]] && rm $file
     ln -s "$HOME/dotfiles/$file" .
 done
 
 cd ~/.config
-for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf picom bat kitty sway gtk-3.0 zellij
+for files in awesome dfc fish pep8 ranger terminator zathura flake8 terminology fontconfig khal khard vdirsyncer todoman offlineimap mutt i3 i3status rofi dunst pylintrc yapf picom bat kitty sway gtk-3.0 zellij starship.toml
 do
     [[ -L $files ]] && rm $files
     ln -s "$HOME/dotfiles/.config/$files" .

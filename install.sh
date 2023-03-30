@@ -2,10 +2,6 @@
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 
-FD_VERSION=8.4.0
-RG_VERSION=13.0.0
-FISH_VERSION=3.5.1
-
 set -e
 set -x
 
@@ -15,25 +11,9 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd rustup git-delta watchexec docker-compose python-wheel python-i3ipc python-pandocfilters ipython
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd rustup git-delta watchexec docker-compose python-wheel python-i3ipc python-pandocfilters ipython just bacon
 [[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
-
-if [[ -f /etc/debian_version ]]
-then
-    if grep -q 'buster\|bullseye' /etc/apt/sources.list
-    then
-        sudo apt install -qqy fd-find ripgrep fish
-    else
-        FD="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb"
-        RG="https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/ripgrep_${RG_VERSION}_amd64.deb"
-        FISH="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish_${FISH_VERSION}-1~$(lsb_release -cs)_amd64.deb"
-        FISH_COMMON="https://launchpad.net/~fish-shell/+archive/ubuntu/release-3/+files/fish-common_${FISH_VERSION}-1~$(lsb_release -cs)_all.deb"
-
-        wget "$FD" "$RG" "$FISH" "$FISH_COMMON"
-        sudo dpkg -i ./*.deb
-    fi
-fi
 
 if [[ -z "$SSH_CLIENT" ]]
 then
@@ -44,7 +24,7 @@ then
         echo personal-digest-preferences SHA256
         echo cert-digest-algo SHA256
         echo default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
-    } >> .gnupg/gpg.conf
+    } > .gnupg/gpg.conf
 
     gpg-connect-agent reloadagent /bye
 
@@ -92,9 +72,11 @@ cd
 python3 -m pip install -U --user pip
 python3 -m pip install -U --user pygments_zenburn
 
-if which rustup > /dev/null
+if command -v rustup > /dev/null
 then
-    rustup default || rustup default stable
+    rustup default || rustup default nightly
+    cargo install cargo-binstall
+    [[ -f /etc/debian_version ]] && cargo binstall fd-find ripgrep zellij just bacon
 fi
 
 grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

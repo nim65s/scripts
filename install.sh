@@ -55,7 +55,7 @@ do
     popd
 done
 
-for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc .latexmk 
+for file in .bash_profile .bash_logout .tmux.conf .nanorc .vimpagerrc .vimrc .Xdefaults .gitconfig .bashrc .hgrc .zshrc .xmonad .vim .xinitrc .compton.conf .editorconfig .ipython .imapfilter .notmuch-config .msmtprc .pypirc .latexmk
 do
     [[ -L $file || -f $file ]] && rm $file
     ln -s "$HOME/dotfiles/$file" .
@@ -76,7 +76,7 @@ if command -v rustup > /dev/null
 then
     rustup default || rustup default nightly
     cargo install cargo-binstall
-    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon
+    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache
 fi
 
 grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

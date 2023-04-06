@@ -76,7 +76,7 @@ if command -v rustup > /dev/null
 then
     rustup default || rustup default nightly
     cargo install cargo-binstall
-    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli
+    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli rtx-cli
 fi
 
 grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

@@ -11,8 +11,8 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc ripgrep fd khal khard vdirsyncer todoman ncdu bat htop tig inetutils kitty iwd rustup git-delta watchexec docker-compose python-wheel python-i3ipc python-pandocfilters ipython just bacon
-[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget libpcre2-8-0 lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc khal khard vdirsyncer todoman ncdu htop tig inetutils kitty iwd rustup docker-compose python-wheel python-i3ipc python-pandocfilters ipython
+[[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
 if [[ -z "$SSH_CLIENT" ]]
@@ -76,7 +76,7 @@ if command -v rustup > /dev/null
 then
     rustup default || rustup default nightly
     cargo install cargo-binstall
-    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache
+    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli
 fi
 
 grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

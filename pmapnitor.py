@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
-from typing import List, Union
 from subprocess import Popen, check_output
-from time import sleep
 from sys import argv, exit
+from time import sleep
+from typing import List, Union
 
 
 def pmapnitor(

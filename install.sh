@@ -11,7 +11,7 @@ mkdir -p .config .ssh .gnupg
 chmod 700 .ssh .gnupg
 touch .gitrepos .ssh/authorized_keys
 
-[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc khal khard vdirsyncer todoman ncdu htop tig inetutils kitty iwd rustup docker-compose python-wheel python-i3ipc python-pandocfilters ipython fd ripgrep zellij just bacon sccache bat git-delta watchexec
+[[ -f /etc/arch-release ]]   && sudo pacman -Syu --noconfirm --needed git gvim fish openssh tinc python-pip rofi pass pcsc-tools ccid libusb-compat dunst msmtp-mta shellcheck dfc khal khard vdirsyncer todoman ncdu htop tig inetutils kitty iwd rustup docker-compose python-wheel python-i3ipc python-pandocfilters ipython fd ripgrep zellij just bacon sccache bat git-delta watchexec starship
 [[ -f /etc/debian_version ]] && sudo apt install -qqy gnupg2 terminator git vim tinc pcscd libpcsclite1 pcsc-tools scdaemon python3-pip msmtp-mta shellcheck dfc wget lsb-release bc gettext-base man-db khal khard vdirsyncer todoman tig
 command -v yum && sudo yum install git fish vim tinc python3-pip gcc
 
@@ -77,7 +77,7 @@ then
     rustup default || rustup default nightly
     cargo install cargo-binstall
     cargo binstall -y rtx-cli
-    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli
+    [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli starship
 fi
 
 grep "$USER" /etc/passwd | grep -q fish || echo "chsh -s $(grep fish /etc/shells)"

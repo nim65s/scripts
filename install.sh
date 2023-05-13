@@ -75,7 +75,7 @@ python3 -m pip install -U --user pygments_zenburn
 if command -v rustup > /dev/null
 then
     rustup default || rustup default nightly
-    cargo install cargo-binstall
+    cargo install --locked cargo-binstall
     cargo binstall -y rtx-cli
     [[ -f /etc/debian_version ]] && cargo binstall -y fd-find ripgrep zellij just bacon sccache bat git-delta watchexec-cli starship
 fi

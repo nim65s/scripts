@@ -37,6 +37,7 @@ parser.add_argument(
 )
 parser.add_argument("--wip", action="store_true")
 parser.add_argument("--private", action="store_true")
+parser.add_argument("-c", "--check-only", action="store_true")
 parser.add_argument("--suffix", default="")
 args = parser.parse_args()
 
@@ -52,15 +53,14 @@ except FileNotFoundError:
 
 REMOTES = (
     {
-        "main": f"git@gitlab.laas.fr:{args.namespace}/{args.project}.git",
-        "origin": f"git@gitlab.laas.fr:gsaurel/{args.project}.git",
+        "origin": f"gl:gsaurel/{args.project}",
+        "main": f"gl:{args.namespace}/{args.project}",
     }
     if args.private
     else {
-        "github": f"git@github.com:nim65s/{args.project}.git",
-        "main": f"git@github.com:{args.namespace}/{args.project}.git",
-        "maingl": f"git@gitlab.laas.fr:{args.namespace}/{args.project}.git",
-        "origin": f"git@gitlab.laas.fr:gsaurel/{args.project}.git",
+        "origin": f"gh:nim65s/{args.project}",
+        "main": f"gh:{args.namespace}/{args.project}",
+        "gl": f"gl:{args.namespace}/{args.project}",
     }
 )
 
@@ -81,11 +81,16 @@ def check_call_s(cmd: str, *args, **kwargs):
 def check_remotes():
     "Check that the project complies to the template"
     out = check_output("git remote -v".split()).decode()
+    wrong = []
     for remote, url in REMOTES.items():
-        if f"{remote}\t{url}" not in out:
-            raise EnvironmentError(
-                f"The current working directory does not follow the template: {remote} {url}"
-            )
+        expected = f"{remote}\t{url}"
+        if expected not in out:
+            wrong.append(expected)
+    if wrong:
+        print("Wrong remotes ! Currently got:")
+        check_call_v(["git", "remote", "-v"])
+        err = "Required remotes: \n" + "\n".join(wrong)
+        raise EnvironmentError(err)
 
 
 def get_release():
@@ -172,10 +177,13 @@ def get_message(release):
                 return "\n".join([line.strip() for line in m.split("\n")[6:]])
 
 
-if __name__ == "__main__":
+def main():
+    print(f"--- Checking remotes for {args.namespace}/{args.project } ---")
     check_remotes()
+    if args.check_only:
+        return
     release = get_release()
-    print(f"=== RELEASING {args.namespace} / {args.project }, {release} ===")
+    print(f"=== RELEASING {args.namespace}/{args.project }, {release} ===")
     print(check_output("git status".split()).decode())
     check_call_s("git fetch --all --prune")
 
@@ -187,7 +195,6 @@ if __name__ == "__main__":
     print("Merging release…")
     merge_release(release)
 
-    # input(f'going to push devel, stable and {release}, press Enter to continue, ^C to abort')
     print("Pushing…")
     for remote in REMOTES.keys():
         check_call_s(f"git push {remote} devel {release} {STABLE}")
@@ -218,3 +225,7 @@ if __name__ == "__main__":
         ],
         env={"GITHUB_TOKEN": github_token, **environ},
     )
+
+
+if __name__ == "__main__":
+    main()

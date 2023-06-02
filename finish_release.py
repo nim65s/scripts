@@ -89,7 +89,17 @@ def check_remotes():
     if wrong:
         print("Wrong remotes ! Currently got:")
         check_call_v(["git", "remote", "-v"])
-        err = "Required remotes: \n" + "\n".join(wrong)
+        err = "\n".join(
+            [
+                "Required remotes:",
+                *wrong,
+                "You can try the following:",
+                *(
+                    f"git remote add {w} || git remote set-url {w}".replace("\t", " ")
+                    for w in wrong
+                ),
+            ]
+        )
         raise EnvironmentError(err)
 
 

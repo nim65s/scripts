@@ -1,3 +1,0 @@
-[submodule "fish-django-completions"]
-	path = fish-django-completions
-	url = git@github.com:nim65s/fish-django-completions.git

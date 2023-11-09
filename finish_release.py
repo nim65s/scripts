@@ -38,6 +38,7 @@ parser.add_argument(
 parser.add_argument("--wip", action="store_true")
 parser.add_argument("--private", action="store_true")
 parser.add_argument("-c", "--check-only", action="store_true")
+parser.add_argument("-r", "--release-only", action="store_true")
 parser.add_argument("--suffix", default="")
 args = parser.parse_args()
 
@@ -194,6 +195,8 @@ def main():
         return
     release = get_release()
     print(f"=== RELEASING {args.namespace}/{args.project }, {release} ===")
+    if args.release_only:
+        return
     print(check_output("git status".split()).decode())
     check_call_s("git fetch --all --prune")
 

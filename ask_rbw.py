@@ -37,6 +37,7 @@ def main(prompt, host, pinentry):
 
 
 def wrap(pinentry, prompt, cmd):
+    # TODO: check with run(..., input=data)
     p = Popen(which(pinentry), stdin=PIPE, stdout=PIPE, text=True)
     data = f"setdesc {quote(prompt)}\n{cmd}\nbye\n"
     print(f"{which(pinentry)=} {data=}", file=sys.stderr)

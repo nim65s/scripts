@@ -11,6 +11,7 @@ import os
 import pathlib
 import subprocess
 import sys
+from subprocess import check_output
 
 import httpx
 
@@ -107,7 +108,11 @@ if __name__ == "__main__":
         level = 30 - 10 * args.verbose
     logging.basicConfig(level=level)
     main(
-        args.token or os.environ["GITHUB_TOKEN"],
+        args.token
+        or os.environ.get(
+            "GITHUB_TOKEN",
+            check_output(["rbw", "get", "github-token"]).decode().strip(),
+        ),
         # args.gl_token or os.environ["GITLAB_TOKEN"],
         args.orgs,
         args.page,

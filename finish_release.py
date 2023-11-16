@@ -217,7 +217,7 @@ def main():
     print("Getting message…")
     message = get_message(release) or ""
     print("Getting github token")
-    github_token = check_output(["pass", "web/github/ghcli-token"]).decode().strip()
+    github_token = check_output(["rbw", "get", "github-token"]).decode().strip()
     print("Publishing release draft…")
 
     check_call_v(

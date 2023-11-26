@@ -111,7 +111,10 @@ if __name__ == "__main__":
         args.token
         or os.environ.get(
             "GITHUB_TOKEN",
-            check_output(["rbw", "get", "github-token"]).decode().strip(),
+            subprocess.check_output(
+                os.environ.get("GITHUB_TOKEN_CMD", "rbw get github-token").split(),
+                text=True,
+            ).strip(),
         ),
         # args.gl_token or os.environ["GITLAB_TOKEN"],
         args.orgs,

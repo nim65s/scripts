@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -14,7 +13,6 @@ cals = {
 }
 
 FR = ZoneInfo("Europe/Paris")
-THIS_YEAR = datetime(2023, 7, 1, tzinfo=timezone.utc)
 MY_KEYWORDS = ["Multithreading", "Conception des systemes orientee objet"]
 
 
@@ -25,9 +23,7 @@ def main():
         events = icalendar.Calendar.from_ical(r.content)
         for event in events.walk("VEVENT"):
             summary = event["SUMMARY"].to_ical().decode()
-            # if any(kw in summary for kw in MY_KEYWORDS) and event["DTSTART"].dt >=
-            # THIS_YEAR:
-            if "GS" in summary and event["DTSTART"].dt >= THIS_YEAR:
+            if "GS" in summary:
                 print(
                     event["DTSTART"].dt.astimezone(FR),
                     event["DTEND"].dt.astimezone(FR),

@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from os import environ
 from shutil import which
 from socket import gethostname
-from subprocess import PIPE, Popen, check_output
+from subprocess import PIPE, CalledProcessError, Popen, check_output
 from urllib.parse import quote
 
 HOST = environ.get("ASK_RBW_HOST", gethostname())
@@ -27,7 +27,16 @@ def main(prompt, host, pinentry):
             key = prompt.strip().split()[-1][:-1]
         run = ["rbw", "get", "--folder", f"ssh/{host}", key]
         print(f"{run=}", file=sys.stderr)
-        print(check_output(run, text=True))
+        try:
+            print(check_output(run, text=True))
+        except CalledProcessError:
+            # rbw-agent might be broken, let's restart it
+            restart = ["rbw", "stop-agent"]
+            print(f"{restart=}", file=sys.stderr)
+            check_output(restart, text=True)
+            # And then try again
+            print(f"{run=}", file=sys.stderr)
+            print(check_output(run, text=True))
     elif "are you sure" in prompt.lower():
         wrap(pinentry, prompt, "confirm")
     elif "password" in prompt.lower():

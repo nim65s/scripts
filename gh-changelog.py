@@ -38,13 +38,16 @@ def main(token, owner, repo, page):
             # fixed in python < 3.11 can't deal with Z
             published_at = release["published_at"].removesuffix("Z")
             date = datetime.fromisoformat(published_at).strftime("%Y-%m-%d")
-            body = release["body"].replace("\r", "")
-            body = body.replace("\n# ", "\n### ")
-            body = body.replace("\n## ", "\n### ")
-            if body.startswith("# "):
-                body = f"##{body}"
-            elif body.startswith("## "):
-                body = f"#{body}"
+            if "body" in release and release["body"]:
+                body = release["body"].replace("\r", "")
+                body = body.replace("\n# ", "\n### ")
+                body = body.replace("\n## ", "\n### ")
+                if body.startswith("# "):
+                    body = f"##{body}"
+                elif body.startswith("## "):
+                    body = f"#{body}"
+            else:
+                body = ""
             print(f"## [{tag}] - {date}")
             print()
             print(body)

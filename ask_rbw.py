@@ -10,7 +10,7 @@ from subprocess import PIPE, CalledProcessError, Popen, check_output
 from urllib.parse import quote
 
 HOST = environ.get("ASK_RBW_HOST", gethostname())
-PINENTRY = environ.get("ASK_RBW_PINENTRY", "pinentry-gnome3")
+PINENTRY = environ.get("ASK_RBW_PINENTRY", "pinentry-qt")
 
 parser = ArgumentParser(description=__doc__)
 parser.add_argument("-H", "--host", default=HOST)

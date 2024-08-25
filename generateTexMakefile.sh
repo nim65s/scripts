@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 ls | grep -q .tex || exit 1

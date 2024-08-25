@@ -1,4 +1,5 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash
+set -euxo pipefail
 
 ORG=${1}
 PRJ=${2}

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 in=${1:-wlp2s0}
 internet=${2:-enp0s20u1}

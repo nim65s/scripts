@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 which optipng || exit 1
 which jpegoptim || exit 2

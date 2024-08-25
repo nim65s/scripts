@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # NotMuch New n Notify
 # Based on https://github.com/natmey/dotfiles/blob/master/notmuch/notmuch-notification.sh
 

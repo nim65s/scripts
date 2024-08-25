@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $1 == "sub" ]] ; then
     DIR=$(cut -d: -f2 .git)/hooks

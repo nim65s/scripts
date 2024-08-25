@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 prefix=/dev/sd$1
 shift

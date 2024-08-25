@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 main=${1:-eDP1}
 direction=${2:-above}

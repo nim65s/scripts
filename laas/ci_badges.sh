@@ -1,4 +1,5 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash
+set -euxo pipefail
 
 URL=${1%/}
 ORG=${URL%/*}

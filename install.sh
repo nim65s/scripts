@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # vim: tw=0
 # curl https://raw.githubusercontent.com/nim65s/scripts/master/install.sh | bash
 

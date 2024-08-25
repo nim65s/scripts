@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for org in gepetto stack-of-tasks humanoid-path-planner
 do

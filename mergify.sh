@@ -2,9 +2,16 @@
 
 set -euo pipefail
 
-OWNER=$1
-REPO=$2
-PR=$3
+if [[ $1 == https* ]]
+then
+    OWNER="$(echo "$1" | cut -d/ -f4)"
+    REPO="$(echo "$1" | cut -d/ -f5)"
+    PR="$(echo "$1" | cut -d/ -f7)"
+else
+    OWNER=$1
+    REPO=$2
+    PR=$3
+fi
 GITHUB_TOKEN=$(rbw get github-token)
 REF=$(curl -L \
     -H "Accept: application/vnd.github+json" \

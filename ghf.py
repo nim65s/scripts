@@ -32,6 +32,7 @@ parser = ArgumentParser()
 parser.add_argument(
     "repo",
     default=".",
+    nargs="?",
     help=f"'.', or repo, or org/repo, or org/, or {GITHUB_URL}repo/org",
 )
 parser.add_argument("branch", nargs="?", help="the branch to work on")

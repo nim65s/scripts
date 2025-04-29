@@ -24,22 +24,18 @@ from subprocess import check_output, DEVNULL, run
 from github import Auth, Github
 from github.GithubException import UnknownObjectException
 
+GITHUB_URL = "https://github.com"
+
 logger = getLogger("ghf")
 
 parser = ArgumentParser()
 parser.add_argument(
-    "repo", default=".", help="the current directory (.), or repo, or org/repo, or org/"
+    "repo",
+    default=".",
+    help=f"'.', or repo, or org/repo, or org/, or {GITHUB_URL}repo/org",
 )
 parser.add_argument("branch", nargs="?", help="the branch to work on")
-parser.add_argument(
-    "--token-cmd",
-    default="rbw get github-token",
-    help="github token is required. "
-    "Pass it through GITHUB_TOKEN env var, or provide a command to get it",
-)
-parser.add_argument(
-    "--github-url", default="gh:", help="eg. 'git@github.com:' or 'https://github.com/'"
-)
+parser.add_argument("--github-url", default=environ.get("GITHUB_URL", GITHUB_URL))
 parser.add_argument(
     "-v",
     "--verbose",
@@ -131,7 +127,9 @@ def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
 
 
 def main(gh: Github, repo: str, branch: str, github_url: str, **kwargs):
-    repo = repo.removeprefix("https://github.com/")
+    if repo.startswith(GITHUB_URL):
+        repo = repo.removeprefix(GITHUB_URL).strip("/")
+
     me = gh.get_user().login
 
     if repo.endswith("/"):
@@ -147,14 +145,17 @@ def main(gh: Github, repo: str, branch: str, github_url: str, **kwargs):
 
 
 if __name__ == "__main__":
+    if "GITHUB_TOKEN" in environ:
+        token = environ["GITHUB_TOKEN"]
+    elif "GITHUB_TOKEN_CMD" in environ:
+        token = check_output(environ["GITHUB_TOKEN_CMD"].split(), text=True).strip()
+    else:
+        err = "missing GITHUB_TOKEN or GITHUB_TOKEN_CMD"
+        raise RuntimeError(err)
+
     args = parser.parse_args()
     basicConfig(level=50 - 10 * args.verbose)
-    logger.debug("%s", args)
-    auth = Auth.Token(
-        environ.get(
-            "GITHUB_TOKEN", check_output(args.token_cmd.split(), text=True).strip()
-        )
-    )
+    auth = Auth.Token(token)
 
     with Github(auth=auth) as gh:
         main(gh, **vars(args))

@@ -131,6 +131,7 @@ def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
 
 
 def main(gh: Github, repo: str, branch: str, github_url: str, **kwargs):
+    repo = repo.removeprefix("https://github.com/")
     me = gh.get_user().login
 
     if repo.endswith("/"):

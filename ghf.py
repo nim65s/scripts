@@ -7,7 +7,6 @@
 Configure clone of fork(s):
 - fork the upstream if it is not already forked
 - clone the fork if it is not already cloned
-- get inside the clone if not already inside
 - configure `upstream` and `origin` remotes
 - fetch
 - configure pull from upstream
@@ -21,21 +20,23 @@ from os import environ
 from subprocess import check_output, DEVNULL, run
 
 from github import Auth, Github
-from github.GithubException import UnknownObjectException
+from github.NamedUser import NamedUser
 
-GITHUB_URL = "https://github.com"
+GITHUB_URL = "https://github.com/"
 
 logger = getLogger("ghf")
 
-parser = ArgumentParser()
+parser = ArgumentParser(description=__doc__)
 parser.add_argument(
     "repo",
     default=".",
     nargs="?",
-    help=f"'.', or repo, or org/repo, or org/, or {GITHUB_URL}repo/org",
+    help=f"'.', or repo, or owner/repo, or owner/, or {GITHUB_URL}owner/repo[/]",
 )
 parser.add_argument("branch", nargs="?", help="the branch to work on")
-parser.add_argument("--github-url", default=environ.get("GITHUB_URL", GITHUB_URL))
+parser.add_argument(
+    "--github-url", default=environ.get("GITHUB_URL", "git@github.com:")
+)
 parser.add_argument(
     "-v",
     "--verbose",
@@ -50,95 +51,154 @@ def vrun(*cmd, **kwargs):
     run(*cmd, **kwargs)
 
 
-def get_repo(gh: Github, repo: str, origin: str) -> (str, str):
-    if "/" in repo:
-        upstream, name = repo.split("/")
-        try:
-            gh.get_repo(f"{origin}/{name}")
-        except UnknownObjectException:
-            logger.info("Forking '%s/%s into '%s/%s'...", upstream, name, origin, name)
-            gh.get_repo(f"{upstream}/{name}").create_fork()
-            logger.info("Forked '%s/%s into '%s/%s'.", upstream, name, origin, name)
-    else:
-        name = Path.cwd().name if repo == "." else repo
-        ghr = gh.get_repo(f"{origin}/{name}")
-        upstream = ghr.parent.owner.login if ghr.fork else origin
+class Fork:
+    def __init__(self, gh: Github, repo: str, origin: NamedUser | str | None = None):
+        if origin is None:
+            origin = gh.get_user()
+        origin_owner = origin.login if hasattr(origin, "login") else origin
+        logger.debug("origin_owner: %s", origin_owner)
 
-    logger.debug("working on %s's fork of %s/%s", origin, upstream, name)
-    return upstream, name
-
-
-def clone(upstream: str, origin: str, name: str, branch: str, github_url: str):
-    # clone the fork if it is not already cloned
-    # get inside the clone if not already inside
-
-    if Path.cwd().name == name and Path(".git").exists():
-        git = ["git"]
-        logger.debug("Using already cloned current directory")
-    else:
-        git = ["git", "-C", name]
-        if Path(name).exists() and (Path(name) / ".git").exists():
-            logger.debug("Using already cloned %s directory", name)
+        if "/" in repo:
+            upstream_owner, upstream_name = repo.split("/")
+            self.upstream = gh.get_repo(f"{upstream_owner}/{upstream_name}")
+            for fork in self.upstream.get_forks():
+                if fork.owner.login == origin_owner:
+                    origin_name = fork.name
+                    self.origin = gh.get_repo(f"{origin_owner}/{origin_name}")
+                    break
+            else:
+                origin_name = upstream_name
+                logger.info(
+                    "Forking '%s/%s into '%s/%s'...",
+                    upstream_owner,
+                    upstream_name,
+                    origin_owner,
+                    origin_name,
+                )
+                self.upstream.create_fork(
+                    organization=origin_owner,
+                    name=origin_name,
+                    default_branch_only=True,
+                )
+                logger.info(
+                    "Forked '%s/%s into '%s/%s'...",
+                    upstream_owner,
+                    upstream_name,
+                    origin_owner,
+                    origin_name,
+                )
         else:
-            clone = ["git", "clone"]
-            if branch:
-                clone = [*clone, "--branch", branch]
-            logger.info("Cloning '%s/%s'...", origin, name)
-            vrun([*clone, f"{github_url}{origin}/{name}"], check=True)
-            logger.info("Cloned '%s/%s'.", origin, name)
+            origin_name = Path.cwd().name if repo == "." else repo
+            self.origin = gh.get_repo(f"{origin_owner}/{origin_name}")
+            self.upstream = self.origin.parent if self.origin.fork else self.origin
 
-    # configure `upstream` and `origin` remotes
-    for remote, url in [
-        ("upstream", f"{github_url}{upstream}/{name}"),
-        ("origin", f"{github_url}{origin}/{name}"),
-    ]:
-        if url not in check_output([*git, "remote", "show", "-n", remote], text=True):
-            vrun([*git, "remote", "remove", remote], stderr=DEVNULL)
-            logger.debug("Creating remote %s", remote)
-            vrun([*git, "remote", "add", remote, url], check=True)
+        self.origin_owner = self.origin.owner.login
+        self.origin_name = self.origin.name
+        self.upstream_owner = self.upstream.owner.login
+        self.upstream_name = self.upstream.name
 
-    # fetch
-    logger.debug("Updating upstream/origin remotes")
-    vrun([*git, "fetch", "--all", "--prune"])
+        logger.debug(
+            "working on %s/%s fork of %s/%s",
+            self.origin_owner,
+            self.origin_name,
+            self.upstream_owner,
+            self.upstream.name,
+        )
 
-    # configure pull from upstream
-    if not branch:
-        logger.debug("Get current branch")
-        branch = check_output([*git, "branch", "--show-current"], text=True).strip()
-    logger.info("Configure %s to be pulled from upstream", branch)
-    vrun([*git, "branch", f"--set-upstream-to=upstream/{branch}", branch], check=True)
-    for b in check_output([*git, "branch", "-a"], text=True).split("\n"):
-        if "remotes/upstream/HEAD" not in b:
-            continue
-        main_branch = b.strip().split("/")[-1]
-        if main_branch == branch:
+    def clone(self, branch: str, github_url: str):
+        # clone the fork if it is not already cloned
+
+        if Path.cwd().name == self.upstream_name and Path(".git").exists():
+            git = ["git"]
+            logger.debug("Using already cloned current directory")
+        else:
+            git = ["git", "-C", self.upstream_name]
+            if (
+                Path(self.upstream_name).exists()
+                and (Path(self.upstream_name) / ".git").exists()
+            ):
+                logger.debug("Using already cloned %s directory", self.upstream_name)
+            else:
+                clone = ["git", "clone"]
+                if branch:
+                    clone = [*clone, "--branch", branch]
+                logger.info(
+                    "Cloning '%s/%s' into %s...",
+                    self.origin_owner,
+                    self.origin_name,
+                    self.upstream_name,
+                )
+                vrun(
+                    [
+                        *clone,
+                        f"{github_url}{self.origin_owner}/{self.origin_name}",
+                        self.upstream_name,
+                    ],
+                    check=True,
+                )
+                logger.info(
+                    "Cloned '%s/%s' into %s.",
+                    self.origin_owner,
+                    self.origin_name,
+                    self.upstream_name,
+                )
+
+        # configure `upstream` and `origin` remotes
+        for remote, url in [
+            ("upstream", f"{github_url}{self.upstream_owner}/{self.upstream_name}"),
+            ("origin", f"{github_url}{self.origin_owner}/{self.origin_name}"),
+        ]:
+            if url not in check_output(
+                [*git, "remote", "show", "-n", remote], text=True
+            ):
+                vrun([*git, "remote", "remove", remote], stderr=DEVNULL)
+                logger.debug("Creating remote %s", remote)
+                vrun([*git, "remote", "add", remote, url], check=True)
+
+        # fetch
+        logger.debug("Updating upstream/origin remotes")
+        vrun([*git, "fetch", "--all", "--prune"])
+
+        # configure pull from upstream
+        if not branch:
+            logger.debug("Get current branch")
+            branch = check_output([*git, "branch", "--show-current"], text=True).strip()
+        logger.info("Configure %s to be pulled from upstream", branch)
+        vrun(
+            [*git, "branch", f"--set-upstream-to=upstream/{branch}", branch], check=True
+        )
+        for b in check_output([*git, "branch", "-a"], text=True).split("\n"):
+            if "remotes/upstream/HEAD" not in b:
+                continue
+            main_branch = b.strip().split("/")[-1]
+            if main_branch == branch:
+                break
+            logger.info("Configure %s to be pulled from upstream", main_branch)
+            vrun([*git, "switch", "-C", main_branch, "-t", "upstream"], check=True)
+            vrun([*git, "switch", branch], check=True)
             break
-        logger.info("Configure %s to be pulled from upstream", main_branch)
-        vrun([*git, "switch", "-C", main_branch, "-t", "upstream"], check=True)
-        vrun([*git, "switch", branch], check=True)
-        break
 
-    # configure push to origin
-    logger.info("Configure pushes to fork")
-    vrun([*git, "config", "remote.pushDefault", "origin"], check=True)
+        # configure push to origin
+        logger.info("Configure pushes to fork")
+        vrun([*git, "config", "remote.pushDefault", "origin"], check=True)
 
 
 def main(gh: Github, repo: str, branch: str, github_url: str, **kwargs):
     if repo.startswith(GITHUB_URL):
         repo = repo.removeprefix(GITHUB_URL).strip("/")
 
-    origin = gh.get_user().login
-
     if repo.endswith("/"):
-        upstream = repo.removesuffix("/")
-        org = gh.get_organization(upstream)
-        for repo in org.get_repos():
-            if not repo.archived:
-                upstream, name = get_repo(gh, f"{upstream}/{repo.name}", origin)
-                clone(upstream, origin, name, branch, github_url)
+        # We want to fork/clone every non-archived repo of this owner
+        upstream_owner = repo.removesuffix("/")
+        owner = gh.get_user(upstream_owner)
+        for ghr in owner.get_repos():
+            if not ghr.archived:
+                repo = f"{ghr.owner.login}/{ghr.name}"
+                fork = Fork(gh, repo)
+                fork.clone(branch, github_url)
     else:
-        upstream, name = get_repo(gh, repo, origin)
-        clone(upstream, origin, name, branch, github_url)
+        fork = Fork(gh, repo)
+        fork.clone(branch, github_url)
 
 
 if __name__ == "__main__":

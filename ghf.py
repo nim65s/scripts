@@ -4,7 +4,7 @@
 # ///
 
 """
-Configure clone of fork(s):
+Given a repo (or an owner), fork + clone + configure it (all its repos):
 - fork the upstream if it is not already forked
 - clone the fork if it is not already cloned
 - configure `upstream` and `origin` remotes

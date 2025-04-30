@@ -8,8 +8,7 @@ Configure clone of fork(s):
 - fork the upstream if it is not already forked
 - clone the fork if it is not already cloned
 - get inside the clone if not already inside
-- remove `origin` remote
-- configure `upstream` and `me` remotes
+- configure `upstream` and `origin` remotes
 - fetch
 - configure pull from upstream
 - configure push to fork
@@ -51,25 +50,25 @@ def vrun(*cmd, **kwargs):
     run(*cmd, **kwargs)
 
 
-def get_repo(gh: Github, repo: str, me: str) -> (str, str):
+def get_repo(gh: Github, repo: str, origin: str) -> (str, str):
     if "/" in repo:
         upstream, name = repo.split("/")
         try:
-            gh.get_repo(f"{me}/{name}")
+            gh.get_repo(f"{origin}/{name}")
         except UnknownObjectException:
-            logger.info("Forking '%s/%s into '%s/%s'...", upstream, name, me, name)
+            logger.info("Forking '%s/%s into '%s/%s'...", upstream, name, origin, name)
             gh.get_repo(f"{upstream}/{name}").create_fork()
-            logger.info("Forked '%s/%s into '%s/%s'.", upstream, name, me, name)
+            logger.info("Forked '%s/%s into '%s/%s'.", upstream, name, origin, name)
     else:
         name = Path.cwd().name if repo == "." else repo
-        ghr = gh.get_repo(f"{me}/{name}")
-        upstream = ghr.parent.owner.login if ghr.fork else me
+        ghr = gh.get_repo(f"{origin}/{name}")
+        upstream = ghr.parent.owner.login if ghr.fork else origin
 
-    logger.debug("working on %s's fork of %s/%s", me, upstream, name)
+    logger.debug("working on %s's fork of %s/%s", origin, upstream, name)
     return upstream, name
 
 
-def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
+def clone(upstream: str, origin: str, name: str, branch: str, github_url: str):
     # clone the fork if it is not already cloned
     # get inside the clone if not already inside
 
@@ -84,17 +83,14 @@ def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
             clone = ["git", "clone"]
             if branch:
                 clone = [*clone, "--branch", branch]
-            logger.info("Cloning '%s/%s'...", me, name)
-            vrun([*clone, f"{github_url}{me}/{name}"], check=True)
-            logger.info("Cloned '%s/%s'.", me, name)
+            logger.info("Cloning '%s/%s'...", origin, name)
+            vrun([*clone, f"{github_url}{origin}/{name}"], check=True)
+            logger.info("Cloned '%s/%s'.", origin, name)
 
-    # remove `origin` remote
-    vrun([*git, "remote", "remove", "origin"], stderr=DEVNULL)
-
-    # configure `upstream` and `me` remotes
+    # configure `upstream` and `origin` remotes
     for remote, url in [
         ("upstream", f"{github_url}{upstream}/{name}"),
-        ("me", f"{github_url}{me}/{name}"),
+        ("origin", f"{github_url}{origin}/{name}"),
     ]:
         if url not in check_output([*git, "remote", "show", "-n", remote], text=True):
             vrun([*git, "remote", "remove", remote], stderr=DEVNULL)
@@ -102,7 +98,7 @@ def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
             vrun([*git, "remote", "add", remote, url], check=True)
 
     # fetch
-    logger.debug("Updating upstream/me remotes")
+    logger.debug("Updating upstream/origin remotes")
     vrun([*git, "fetch", "--all", "--prune"])
 
     # configure pull from upstream
@@ -122,27 +118,27 @@ def clone(upstream: str, me: str, name: str, branch: str, github_url: str):
         vrun([*git, "switch", branch], check=True)
         break
 
-    # configure push to me
+    # configure push to origin
     logger.info("Configure pushes to fork")
-    vrun([*git, "config", "remote.pushDefault", "me"], check=True)
+    vrun([*git, "config", "remote.pushDefault", "origin"], check=True)
 
 
 def main(gh: Github, repo: str, branch: str, github_url: str, **kwargs):
     if repo.startswith(GITHUB_URL):
         repo = repo.removeprefix(GITHUB_URL).strip("/")
 
-    me = gh.get_user().login
+    origin = gh.get_user().login
 
     if repo.endswith("/"):
         upstream = repo.removesuffix("/")
         org = gh.get_organization(upstream)
         for repo in org.get_repos():
             if not repo.archived:
-                upstream, name = get_repo(gh, f"{upstream}/{repo.name}", me)
-                clone(upstream, me, name, branch, github_url)
+                upstream, name = get_repo(gh, f"{upstream}/{repo.name}", origin)
+                clone(upstream, origin, name, branch, github_url)
     else:
-        upstream, name = get_repo(gh, repo, me)
-        clone(upstream, me, name, branch, github_url)
+        upstream, name = get_repo(gh, repo, origin)
+        clone(upstream, origin, name, branch, github_url)
 
 
 if __name__ == "__main__":

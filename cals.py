@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = ["httpx", "icalendar"]
+# ///
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -23,6 +26,7 @@ now = datetime.now().astimezone(FR)
 
 def main():
     for cal, url in cals.items():
+        total = 0
         print(cal, url)
         r = httpx.get(url, timeout=10)
         events = icalendar.Calendar.from_ical(r.content)
@@ -36,6 +40,8 @@ def main():
                 k.append((start, duration, summary))
         for s, d, t in sorted(k):
             print(s.strftime(DTFMT), f"{d:.2f}", t.strip())
+            total += d
+        print(f"{total=}")
         print()
 
 

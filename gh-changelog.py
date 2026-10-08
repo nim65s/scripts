@@ -3,21 +3,32 @@
 Get releases info for a repo
 """
 
-import subprocess
 import argparse
+import itertools
 import logging
 import os
+import subprocess
 from datetime import datetime
 
 import httpx
 
 API = "https://api.github.com"
 LOG = logging.getLogger("gh-changelog")
+HEADER = """# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [Unreleased]
+"""
 
 
 def main(token, owner, repo, page):
     LOG.debug(f"main {token=} {owner=} {repo=} {page=}")
     headers = {"Authorization": f"Bearer {token}"}
+    versions = []
+    print(HEADER)
     while page:
         resp = httpx.get(
             f"{API}/repos/{owner}/{repo}/releases",
@@ -35,10 +46,11 @@ def main(token, owner, repo, page):
             if release["draft"]:
                 continue
             tag = release["tag_name"].removeprefix("v")
+            versions.append(tag)
             # fixed in python < 3.11 can't deal with Z
             published_at = release["published_at"].removesuffix("Z")
             date = datetime.fromisoformat(published_at).strftime("%Y-%m-%d")
-            if "body" in release and release["body"]:
+            if release.get("body"):
                 body = release["body"].replace("\r", "")
                 body = body.replace("\n# ", "\n### ")
                 body = body.replace("\n## ", "\n### ")
@@ -53,6 +65,14 @@ def main(token, owner, repo, page):
             print(body)
             print()
         page += 1
+    print(
+        f"[Unreleased]: https://github.com/{owner}/{repo}/compare/v{versions[0]}...HEAD"
+    )
+    for new, old in itertools.pairwise(versions):
+        print(f"[{new}]: https://github.com/{owner}/{repo}/compare/v{old}...v{new}")
+    print(
+        f"[{versions[-1]}]: https://github.com/{owner}/{repo}/releases/tag/v{versions[-1]}"
+    )
 
 
 if __name__ == "__main__":

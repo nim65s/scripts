@@ -84,8 +84,8 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="count", default=0)
     parser.add_argument("-t", "--token")
     parser.add_argument("-p", "--page", type=int, default=1)
-    parser.add_argument("owner", default=pathlib.Path.cwd().parent.name)
-    parser.add_argument("repo", default=pathlib.Path.cwd().name)
+    parser.add_argument("owner", nargs="?", default=pathlib.Path.cwd().parent.name)
+    parser.add_argument("repo", nargs="?", default=pathlib.Path.cwd().name)
     args = parser.parse_args()
     if args.verbose == 0:
         level = os.environ.get("LOG_LEVEL", "WARNING")

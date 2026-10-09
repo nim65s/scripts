@@ -4,11 +4,12 @@ Get releases info for a repo
 """
 
 import argparse
+import datetime as dt
 import itertools
 import logging
 import os
+import pathlib
 import subprocess
-from datetime import datetime
 
 import httpx
 
@@ -49,7 +50,7 @@ def main(token, owner, repo, page):
             versions.append(tag)
             # fixed in python < 3.11 can't deal with Z
             published_at = release["published_at"].removesuffix("Z")
-            date = datetime.fromisoformat(published_at).strftime("%Y-%m-%d")
+            date = dt.datetime.fromisoformat(published_at).strftime("%Y-%m-%d")
             if release.get("body"):
                 body = release["body"].replace("\r", "")
                 body = body.replace("\n# ", "\n### ")
@@ -80,8 +81,8 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="count", default=0)
     parser.add_argument("-t", "--token")
     parser.add_argument("-p", "--page", type=int, default=1)
-    parser.add_argument("owner")
-    parser.add_argument("repo")
+    parser.add_argument("owner", default=pathlib.Path.cwd().parent.name)
+    parser.add_argument("repo", default=pathlib.Path.cwd().name)
     args = parser.parse_args()
     if args.verbose == 0:
         level = os.environ.get("LOG_LEVEL", "WARNING")
